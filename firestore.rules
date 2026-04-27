@@ -1,0 +1,247 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // --- Global Denial ---
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Identity & Global Helpers ---
+    function isSignedIn() { return request.auth != null; }
+    function isOwner(uid) { return isSignedIn() && request.auth.uid == uid; }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+
+    // --- Validation Blueprints ---
+
+    function isValidUser(data) {
+      return data.get('uid', '') == request.auth.uid 
+        && data.get('email', '') is string && data.get('email', '').matches('^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$')
+        && data.get('displayName', '') is string && data.get('displayName', '').size() <= 128
+        && (data.get('photoURL', null) == null || data.photoURL is string)
+        && data.get('credits', 0) is number
+        && (data.get('role', null) == null || data.role in ['student', 'tutor'])
+        && (data.get('teachSkills', null) == null || data.teachSkills is list)
+        && (data.get('learnSkills', null) == null || data.learnSkills is list)
+        && (data.get('rating', null) == null || data.rating is number)
+        && (data.get('reviewCount', null) == null || data.reviewCount is number)
+        && (data.get('location', null) == null || data.location is string)
+        && (data.get('onboardingCompleted', null) == null || data.onboardingCompleted is bool)
+        && (data.get('joinedGroups', null) == null || data.joinedGroups is list)
+        && (data.get('createdAt', null) == null || data.createdAt is string)
+        && (data.get('privacy', null) == null || data.privacy is map)
+        && (data.get('bio', null) == null || data.bio is string);
+    }
+
+    function isValidQuiz(data) {
+      return isValidId(data.groupId)
+        && data.questions is list
+        && data.availableFrom is string
+        && data.availableUntil is string
+        && (data.get('createdAt', null) == null || data.createdAt is timestamp || data.createdAt is string);
+    }
+
+    function isValidQuizScore(data) {
+      return isValidId(data.userId) && isValidId(data.quizId) && isValidId(data.groupId)
+        && data.score is number
+        && (data.get('totalQuestions', null) == null || data.totalQuestions is number)
+        && (data.get('completedAt', null) == null || data.completedAt is timestamp || data.completedAt is string);
+    }
+    function isValidCourse(data) {
+      return isValidId(data.teacherId)
+        && data.title is string && data.title.size() <= 200
+        && (data.get('link', null) == null || data.link is string)
+        && (data.get('rating', null) == null || data.rating is number)
+        && (data.get('reviewCount', null) == null || data.reviewCount is number)
+        && (data.get('teacherName', null) == null || data.teacherName is string)
+        && (data.get('teacherPhoto', null) == null || data.teacherPhoto is string)
+        && (data.get('tags', null) == null || data.tags is list)
+        && (data.get('thumbnail', null) == null || data.thumbnail is string)
+        && (data.get('daoGroupLink', null) == null || data.daoGroupLink is string)
+        && (data.get('createdAt', null) == null || data.createdAt is timestamp || data.createdAt is string);
+    }
+
+    function isValidLearningRequest(data) {
+      return (data.senderId == request.auth.uid || data.recipientId == request.auth.uid)
+        && data.senderName is string && data.recipientName is string
+        && data.learnSkill is string && data.learnSkill.size() <= 150
+        && (data.get('teachSkill', null) == null || data.teachSkill is string)
+        && data.credits is number && data.credits >= 0
+        && (data.get('type', null) == null || data.type in ['Exchange', 'Learning'])
+        && (data.get('status', null) == null || data.status in ['Pending', 'Accepted', 'Declined', 'Decline'])
+        && (data.get('duration', null) == null || data.duration is string)
+        && (data.get('contactMedia', null) == null || data.contactMedia is string)
+        && (data.get('contactInfo', null) == null || data.contactInfo is string)
+        && (data.get('message', null) == null || data.message is string)
+        && (data.get('createdAt', null) == null || data.createdAt is timestamp || data.createdAt is string);
+    }
+
+    function isValidNotification(data) {
+      return data.userId is string 
+        && data.message is string && data.message.size() <= 1000
+        && data.read is bool
+        && (data.get('type', null) == null || data.type is string)
+        && (data.get('relatedId', null) == null || data.relatedId is string)
+        && (data.get('createdAt', null) == null || data.createdAt is timestamp || data.createdAt is string);
+    }
+
+    function isValidUserInterest(data) {
+      return (data.get('tagScores', null) == null || data.tagScores is map)
+        && (data.get('lastUpdated', null) == null || data.lastUpdated is timestamp || data.lastUpdated is string);
+    }
+
+    // --- Collections ---
+
+    match /users/{userId} {
+      allow read: if true;
+      allow create: if isSignedIn() && isValidUser(incoming());
+      allow update: if isSignedIn() && (
+        (isOwner(userId) && isValidUser(incoming())) ||
+        // Allow peer updates for rating metrics (remains open for peer feedback logic)
+        (incoming().diff(existing()).affectedKeys().hasOnly(['rating', 'reviewCount']))
+      );
+
+      match /metadata/interests {
+        allow read: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidUserInterest(incoming());
+        allow delete: if isOwner(userId);
+      }
+    }
+
+    match /courses/{courseId} {
+      allow read: if true;
+      allow create: if isSignedIn() && incoming().teacherId == request.auth.uid && isValidCourse(incoming());
+      allow update: if isSignedIn() && (
+        (existing().teacherId == request.auth.uid && isValidCourse(incoming())) ||
+        (incoming().diff(existing()).affectedKeys().hasOnly(['rating', 'reviewCount']))
+      );
+      allow delete: if isSignedIn() && existing().teacherId == request.auth.uid;
+    }
+
+    match /daoGroups/{groupId} {
+      allow read: if true;
+      allow create: if isSignedIn() && isValidId(incoming().get('adminId', '')) && incoming().adminId == request.auth.uid;
+      allow update: if isSignedIn() && (
+        (existing().adminId == request.auth.uid) ||
+        (incoming().diff(existing()).affectedKeys().hasAny(['membersCount', 'rating', 'ratingCount']) &&
+         incoming().diff(existing()).affectedKeys().hasOnly(['membersCount', 'rating', 'ratingCount']))
+      );
+      allow delete: if isSignedIn() && existing().adminId == request.auth.uid;
+
+      match /members/{memberId} {
+        allow read: if true;
+        allow create: if isSignedIn() && (
+          (get(/databases/$(database)/documents/daoGroups/$(groupId)).data.get('isPrivate', false) == false && memberId == request.auth.uid) ||
+          (get(/databases/$(database)/documents/daoGroups/$(groupId)).data.adminId == request.auth.uid)
+        );
+        allow delete: if isSignedIn() && (memberId == request.auth.uid || get(/databases/$(database)/documents/daoGroups/$(groupId)).data.adminId == request.auth.uid);
+        allow update: if isSignedIn() && (memberId == request.auth.uid || get(/databases/$(database)/documents/daoGroups/$(groupId)).data.adminId == request.auth.uid);
+      }
+
+      match /records/{recordId} {
+        allow read: if isSignedIn();
+        allow create: if isSignedIn() && (incoming().userId == request.auth.uid || request.auth.uid in recordId);
+        allow update: if isSignedIn() && (incoming().userId == request.auth.uid || request.auth.uid in recordId);
+      }
+
+      match /ratings/{ratingId} {
+        allow read: if true;
+        allow create, update: if isSignedIn() && (incoming().userId == request.auth.uid || ratingId == request.auth.uid);
+      }
+
+      match /messages/{messageId} {
+        allow read: if true;
+        allow create: if isSignedIn() && incoming().senderId == request.auth.uid;
+        allow delete: if isSignedIn() && (existing().senderId == request.auth.uid || get(/databases/$(database)/documents/daoGroups/$(groupId)).data.adminId == request.auth.uid);
+      }
+    }
+
+    match /quizScores/{scoreId} {
+      allow read: if true;
+      allow create: if isSignedIn() && incoming().userId == request.auth.uid && isValidQuizScore(incoming());
+    }
+
+    match /quizzes/{quizId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidQuiz(incoming()) && (
+        exists(/databases/$(database)/documents/daoGroups/$(incoming().groupId)) &&
+        get(/databases/$(database)/documents/daoGroups/$(incoming().groupId)).data.adminId == request.auth.uid
+      );
+      allow update, delete: if isSignedIn() && (
+        exists(/databases/$(database)/documents/daoGroups/$(resource.data.groupId)) &&
+        get(/databases/$(database)/documents/daoGroups/$(resource.data.groupId)).data.adminId == request.auth.uid
+      );
+    }
+
+    match /sessions/{sessionId} {
+      allow read: if true; // Allow discovery of live/completed sessions
+      allow create: if isSignedIn() && (incoming().teacherId == request.auth.uid || incoming().learnerId == request.auth.uid);
+      allow update: if isSignedIn() && (
+        resource.data.teacherId == request.auth.uid || 
+        resource.data.learnerId == request.auth.uid
+      );
+      allow delete: if isSignedIn() && (resource.data.teacherId == request.auth.uid || resource.data.learnerId == request.auth.uid);
+    }
+
+    match /learningRequests/{requestId} {
+      function isParticipant() {
+        return isSignedIn() && (
+          (resource == null && (
+            request.resource.data.senderId == request.auth.uid ||
+            request.resource.data.recipientId == request.auth.uid ||
+            (request.resource.data.keys().hasAll(['conversationId']) && get(/databases/$(database)/documents/conversations/$(request.resource.data.conversationId)).data.participants.hasAny([request.auth.uid]))
+          )) ||
+          (resource != null && (
+            resource.data.senderId == request.auth.uid || 
+            resource.data.recipientId == request.auth.uid ||
+            (resource.data.keys().hasAll(['conversationId']) && get(/databases/$(database)/documents/conversations/$(resource.data.conversationId)).data.participants.hasAny([request.auth.uid]))
+          ))
+        );
+      }
+      allow read: if isParticipant();
+      allow create: if isSignedIn() && incoming().senderId == request.auth.uid && isValidLearningRequest(incoming());
+      allow update: if isParticipant() && (
+        existing().status == 'Pending' || 
+        (incoming().diff(existing()).affectedKeys().hasOnly(['status']) && incoming().status in ['Accepted', 'Declined', 'Decline'])
+      );
+      allow delete: if isParticipant();
+    }
+
+    match /notifications/{notifId} {
+      allow read, delete: if isSignedIn() && (resource == null || resource.data.userId == request.auth.uid);
+      allow create: if isSignedIn() && (incoming().userId == request.auth.uid || isValidNotification(incoming()));
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid && incoming().diff(existing()).affectedKeys().hasOnly(['read']);
+    }
+
+    match /conversations/{convId} {
+      function isConvParticipant() {
+        return isSignedIn() && (resource == null || request.auth.uid in resource.data.participants);
+      }
+      // Allow get if participant, and allow list if query filters correctly
+      allow get: if isConvParticipant();
+      allow list: if isSignedIn() && request.auth.uid in resource.data.participants;
+      allow create: if isSignedIn() && request.auth.uid in incoming().participants;
+      allow update: if isSignedIn() && request.auth.uid in existing().participants;
+
+      match /messages/{msgId} {
+        function canReadMessages() {
+          let convPath = /databases/$(database)/documents/conversations/$(convId);
+          return isSignedIn() && exists(convPath) && (request.auth.uid in get(convPath).data.participants);
+        }
+        allow read: if canReadMessages();
+        allow create: if canReadMessages() && incoming().senderId == request.auth.uid;
+      }
+    }
+
+    match /visitRecords/{docId} {
+      allow read: if isSignedIn() && (resource == null || resource.data.userId == request.auth.uid);
+      allow write: if isSignedIn() && incoming().userId == request.auth.uid;
+    }
+
+    match /test/{docId} {
+      allow read: if true;
+    }
+  }
+}

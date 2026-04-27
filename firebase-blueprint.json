@@ -1,0 +1,224 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Public user profile and account information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "credits": { "type": "number" },
+        "teachSkills": { "type": "array" },
+        "learnSkills": { "type": "array" },
+        "rating": { "type": "number" },
+        "reviewCount": { "type": "number" },
+        "joinedGroups": { "type": "array" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "onboardingCompleted": { "type": "boolean" },
+        "bio": { "type": "string" },
+        "location": { "type": "string" },
+        "privacy": { "type": "object" }
+      },
+      "required": ["uid", "displayName", "credits"]
+    },
+    "Course": {
+      "title": "Learning Course",
+      "description": "External resource shared by a guru",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "link": { "type": "string" },
+        "thumbnail": { "type": "string" },
+        "teacherId": { "type": "string" },
+        "teacherName": { "type": "string" },
+        "teacherPhoto": { "type": "string" },
+        "rating": { "type": "number" },
+        "reviewCount": { "type": "number" },
+        "tags": { "type": "array" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "link", "teacherId"]
+    },
+    "DAOGroup": {
+      "title": "DAO Group",
+      "description": "Collaborative group committing to a shared goal",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "adminId": { "type": "string" },
+        "memberLimit": { "type": "number" },
+        "joinDeadline": { "type": "string", "format": "date-time" },
+        "quizTopic": { "type": "string" },
+        "stakedPoints": { "type": "number" },
+        "goalPeriodDays": { "type": "number" },
+        "quizTime": { "type": "string" },
+        "status": { "type": "string", "enum": ["Active", "Completed"] },
+        "tags": { "type": "array" },
+        "image": { "type": "string" },
+        "isPrivate": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "membersCount": { "type": "number" }
+      },
+      "required": ["name", "adminId", "stakedPoints"]
+    },
+    "DAOMember": {
+      "title": "DAO Member",
+      "description": "Membership record in a DAO group",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "pointsStaked": { "type": "number" },
+        "quizzesPassed": { "type": "number" },
+        "joinedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "pointsStaked"]
+    },
+    "Quiz": {
+      "title": "DAO Quiz",
+      "description": "Scheduled quiz with availability and time limits",
+      "type": "object",
+      "properties": {
+        "groupId": { "type": "string" },
+        "availableFrom": { "type": "string", "format": "date-time" },
+        "availableUntil": { "type": "string", "format": "date-time" },
+        "durationMinutes": { "type": "number" },
+        "negativeMarking": { "type": "boolean" },
+        "questions": { "type": "array" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["groupId", "questions", "availableFrom", "availableUntil"]
+    },
+    "DAORecord": {
+      "title": "DAO Quiz Record",
+      "description": "Individual member's score for a daily quiz",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "score": { "type": "number" },
+        "total": { "type": "number" },
+        "submittedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "score"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "System or user-generated alert",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "type": { "type": "string" },
+        "message": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "read": { "type": "boolean" }
+      },
+      "required": ["userId", "type", "message"]
+    },
+    "LearningRequest": {
+      "title": "Learning Request",
+      "description": "Request to initiate a 1-on-1 skill exchange",
+      "type": "object",
+      "properties": {
+        "senderId": { "type": "string" },
+        "senderName": { "type": "string" },
+        "recipientId": { "type": "string" },
+        "recipientName": { "type": "string" },
+        "learnSkill": { "type": "string" },
+        "teachSkill": { "type": "string" },
+        "status": { "type": "string", "enum": ["Pending", "Accepted", "Decline"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["senderId", "recipientId", "status"]
+    },
+    "Session": {
+      "title": "Learning Session",
+      "description": "Scheduled 1-on-1 learning contract",
+      "type": "object",
+      "properties": {
+        "teacherId": { "type": "string" },
+        "teacherName": { "type": "string" },
+        "learnerId": { "type": "string" },
+        "learnerName": { "type": "string" },
+        "date": { "type": "string" },
+        "time": { "type": "string" },
+        "duration": { "type": "string" },
+        "days": { "type": "number" },
+        "subject": { "type": "string" },
+        "credits": { "type": "number" },
+        "status": { "type": "string", "enum": ["Ready", "Live", "Completed"] },
+        "link": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["teacherId", "learnerId", "status"]
+    },
+    "VisitRecord": {
+      "title": "Course Visit Record",
+      "description": "Tracks if a user has unlocked a course",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "courseId": { "type": "string" },
+        "visitedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "courseId"]
+    },
+    "UserInterest": {
+      "title": "User Interest Scores",
+      "description": "Metadata tracking user preferences for personalized feeds",
+      "type": "object",
+      "properties": {
+        "tagScores": { "type": "object" },
+        "lastUpdated": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Collection of user profiles"
+    },
+    "/users/{userId}/metadata/interests": {
+      "schema": "UserInterest",
+      "description": "Personalized interest scores for feed ranking"
+    },
+    "/courses/{courseId}": {
+      "schema": "Course",
+      "description": "Public catalog of learning resources"
+    },
+    "/daoGroups/{groupId}": {
+      "schema": "DAOGroup",
+      "description": "Commitment groups for shared goals"
+    },
+    "/daoGroups/{groupId}/members/{memberId}": {
+      "schema": "DAOMember",
+      "description": "Members of a specific DAO group"
+    },
+    "/quizzes/{quizId}": {
+      "schema": "Quiz",
+      "description": "Scheduled daily quizzes for the group"
+    },
+    "/daoGroups/{groupId}/records/{recordId}": {
+      "schema": "DAORecord",
+      "description": "Quiz completion records"
+    },
+    "/notifications/{notificationId}": {
+      "schema": "Notification",
+      "description": "User specific alerts"
+    },
+    "/learningRequests/{requestId}": {
+      "schema": "LearningRequest",
+      "description": "Proposals for 1-on-1 exchanges"
+    },
+    "/sessions/{sessionId}": {
+      "schema": "Session",
+      "description": "Active learning contracts"
+    },
+    "/visitRecords/{recordId}": {
+      "schema": "VisitRecord",
+      "description": "Course unlocking history"
+    }
+  }
+}
