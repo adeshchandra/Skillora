@@ -187,17 +187,18 @@ service cloud.firestore {
 
     match /learningRequests/{requestId} {
       function isParticipant() {
-        return isSignedIn() && (
-          (resource == null && (
-            request.resource.data.senderId == request.auth.uid ||
-            request.resource.data.recipientId == request.auth.uid ||
-            (request.resource.data.keys().hasAll(['conversationId']) && get(/databases/$(database)/documents/conversations/$(request.resource.data.conversationId)).data.participants.hasAny([request.auth.uid]))
-          )) ||
-          (resource != null && (
-            resource.data.senderId == request.auth.uid || 
-            resource.data.recipientId == request.auth.uid ||
-            (resource.data.keys().hasAll(['conversationId']) && get(/databases/$(database)/documents/conversations/$(resource.data.conversationId)).data.participants.hasAny([request.auth.uid]))
-          ))
+        let isAuth = isSignedIn();
+        let userId = request.auth.uid;
+        
+        // Creation or Update (incoming data)
+        let isCreate = request.method == 'create';
+        let data = isCreate ? incoming() : existing();
+        
+        return isAuth && (
+          data.get('senderId', '') == userId || 
+          data.get('recipientId', '') == userId ||
+          (data.get('conversationId', null) != null && 
+           get(/databases/$(database)/documents/conversations/$(data.conversationId)).data.participants.hasAny([userId]))
         );
       }
       allow read: if isParticipant();

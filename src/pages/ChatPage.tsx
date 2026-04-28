@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { collection, query, where, onSnapshot, orderBy, doc, addDoc, serverTimestamp, updateDoc, increment, getDoc, writeBatch } from 'firebase/firestore';
 import { db } from '../lib/firebase';
+import { handleFirestoreError, OperationType } from '../lib/firestoreErrorHandler';
 import { useAuth } from '../App';
 import { ChatMessage, ChatConversation } from '../types';
 import { ArrowLeft, Send, User as UserIcon, Plus, Smile, Image as ImageIcon, Handshake, Zap, Clock, MessageCircle, Shield, Edit, Sparkles } from 'lucide-react';
@@ -97,6 +98,7 @@ const SkillRequestBubble = ({ requestId, isMe, onOpenNegotiation }: { requestId:
 
     useEffect(() => {
         const fetchRequest = async () => {
+            const path = `learningRequests/${requestId}`;
             try {
                 const snap = await getDoc(doc(db, 'learningRequests', requestId));
                 if (snap.exists()) {
@@ -104,6 +106,7 @@ const SkillRequestBubble = ({ requestId, isMe, onOpenNegotiation }: { requestId:
                 }
             } catch (err) {
                 console.error("Error fetching request for bubble:", err);
+                handleFirestoreError(err, OperationType.GET, path);
             } finally {
                 setLoading(false);
             }
@@ -306,6 +309,8 @@ export default function ChatPage() {
             setTimeout(() => {
                 scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
             }, 100);
+        }, (err) => {
+            handleFirestoreError(err, OperationType.LIST, `conversations/${conversationId}/messages`);
         });
 
         return () => {

@@ -4,6 +4,7 @@ import { X, Handshake, BookOpen, Clock, Zap, MessageCircle, Send, Users } from '
 import { UserProfile } from '../types';
 import { collection, addDoc, serverTimestamp, doc, setDoc, getDoc, updateDoc, increment } from 'firebase/firestore';
 import { db } from '../lib/firebase';
+import { handleFirestoreError, OperationType } from '../lib/firestoreErrorHandler';
 import { useAuth } from '../App';
 
 interface SkillRequestModalProps {
@@ -135,6 +136,7 @@ export const SkillRequestModal: React.FC<SkillRequestModalProps> = ({
       onClose();
     } catch (err) {
       console.error("Error sending request:", err);
+      handleFirestoreError(err, OperationType.WRITE, `learningRequests/${requestId}`);
       alert('Failed to send request. Please try again.');
     } finally {
       setLoading(false);
