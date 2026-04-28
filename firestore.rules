@@ -49,6 +49,7 @@ service cloud.firestore {
         && (data.get('totalQuestions', null) == null || data.totalQuestions is number)
         && (data.get('completedAt', null) == null || data.completedAt is timestamp || data.completedAt is string);
     }
+    
     function isValidCourse(data) {
       return isValidId(data.teacherId)
         && data.title is string && data.title.size() <= 200
@@ -70,7 +71,7 @@ service cloud.firestore {
         && (data.get('teachSkill', null) == null || data.teachSkill is string)
         && data.credits is number && data.credits >= 0
         && (data.get('type', null) == null || data.type in ['Exchange', 'Learning'])
-        && (data.get('status', null) == null || data.status in ['Pending', 'Accepted', 'Declined', 'Decline'])
+        && (data.get('status', null) == null || data.status in ['Pending', 'Accepted', 'Declined', 'Decline', 'Cancelled'])
         && (data.get('duration', null) == null || data.duration is string)
         && (data.get('contactMedia', null) == null || data.contactMedia is string)
         && (data.get('contactInfo', null) == null || data.contactInfo is string)
@@ -98,11 +99,11 @@ service cloud.firestore {
       allow read: if true;
       allow create: if isSignedIn() && isValidUser(incoming());
       allow update: if isSignedIn() && (
-        (isOwner(userId) && isValidUser(incoming())) ||
+        // SECURITY FIX 1: Prevent user from manually tampering with their own credits balance
+        (isOwner(userId) && isValidUser(incoming()) && incoming().credits == existing().credits) ||
         // Allow peer updates for rating metrics (remains open for peer feedback logic)
         (incoming().diff(existing()).affectedKeys().hasOnly(['rating', 'reviewCount']))
       );
-
       match /metadata/interests {
         allow read: if isOwner(userId);
         allow create, update: if isOwner(userId) && isValidUserInterest(incoming());
@@ -176,7 +177,7 @@ service cloud.firestore {
     }
 
     match /sessions/{sessionId} {
-      allow read: if true; // Allow discovery of live/completed sessions
+      allow read: if true;
       allow create: if isSignedIn() && (incoming().teacherId == request.auth.uid || incoming().learnerId == request.auth.uid);
       allow update: if isSignedIn() && (
         resource.data.teacherId == request.auth.uid || 
@@ -202,9 +203,12 @@ service cloud.firestore {
       }
       allow read: if isParticipant();
       allow create: if isSignedIn() && incoming().senderId == request.auth.uid && isValidLearningRequest(incoming());
+      
+      // SECURITY FIX 2: Prevent malicious recipient from changing request data (like setting credits cost to 0).
+      // They are now strictly limited to changing the 'status' field to respond to the request.
       allow update: if isParticipant() && (
-        existing().status == 'Pending' || 
-        (incoming().diff(existing()).affectedKeys().hasOnly(['status']) && incoming().status in ['Accepted', 'Declined', 'Decline'])
+        incoming().diff(existing()).affectedKeys().hasOnly(['status']) && 
+        incoming().status in ['Accepted', 'Declined', 'Decline', 'Cancelled']
       );
       allow delete: if isParticipant();
     }
@@ -219,7 +223,6 @@ service cloud.firestore {
       function isConvParticipant() {
         return isSignedIn() && (resource == null || request.auth.uid in resource.data.participants);
       }
-      // Allow get if participant, and allow list if query filters correctly
       allow get: if isConvParticipant();
       allow list: if isSignedIn() && request.auth.uid in resource.data.participants;
       allow create: if isSignedIn() && request.auth.uid in incoming().participants;
