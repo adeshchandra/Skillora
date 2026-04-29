@@ -1287,7 +1287,7 @@ export default function ProfilePage() {
   const reputation = getReputation(avgRating);
 
   return (
-    <div className="min-h-screen bg-bg-main dark:bg-black relative">
+    <div className="min-h-screen relative">
       {/* Profile Header */}
       <div className="bg-white dark:bg-black p-4 space-y-4 border-b border-border-main dark:border-border-main sticky top-0 z-10">
         <div className="flex items-center gap-4">

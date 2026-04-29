@@ -179,7 +179,7 @@ const Navigation = () => {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-border-main pb-safe z-50">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-border-main/50 pb-[env(safe-area-inset-bottom)] z-50 transition-colors duration-200">
       <div className="flex justify-around items-center h-14 max-w-lg mx-auto px-2">
         {navItems.map((item) => {
           const isActive = location.pathname === item.path;
@@ -220,8 +220,13 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(pre-color-scheme: dark)').matches)) {
+    const isDark = savedTheme === 'dark' || (!savedTheme && window.matchMedia('(pre-color-scheme: dark)').matches);
+    if (isDark) {
       document.documentElement.classList.add('dark');
+      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#0f0f0f');
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#f0f2f5');
     }
   }, []);
 
@@ -252,38 +257,40 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   return (
     <div className="min-h-screen bg-bg-main pb-16">
-      <header className="sticky top-0 h-14 bg-white border-b border-border-main z-50 flex items-center justify-between px-4">
-        <div className="flex items-center gap-1 group cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-            <div className="text-xl font-black tracking-tighter text-text-main">Skillora</div>
-            <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1" />
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="bg-hover-bg text-text-main px-3 py-1.5 rounded-full font-bold text-[11px] flex items-center gap-1.5 border border-border-main/50">
-            <Shield size={14} className="text-primary" />
-            {credits}
+      <header className="sticky top-0 pt-[env(safe-area-inset-top)] bg-white border-b border-border-main/50 z-50 transition-colors duration-200">
+        <div className="h-14 flex items-center justify-between px-4">
+          <div className="flex items-center gap-1 group cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+              <div className="text-xl font-black tracking-tighter text-text-main">Skillora</div>
+              <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1" />
           </div>
-          
-          <div className="flex items-center gap-4 px-1">
-            <Link to="/notification" className="relative text-text-muted hover:text-text-main transition-colors">
-              <Bell size={20} strokeWidth={2} />
-              {unreadNotifications > 0 && (
-                <div className="absolute -top-1.5 -right-1.5 min-w-[14px] h-[14px] bg-primary text-white text-[8px] font-black rounded-full flex items-center justify-center border-2 border-white px-0.5">
-                  {unreadNotifications > 9 ? '9+' : unreadNotifications}
-                </div>
+          <div className="flex items-center gap-3">
+            <div className="bg-hover-bg text-text-main px-3 py-1.5 rounded-full font-bold text-[11px] flex items-center gap-1.5 border border-border-main/50 transition-colors">
+              <Shield size={14} className="text-primary" />
+              {credits}
+            </div>
+            
+            <div className="flex items-center gap-4 px-1">
+              <Link to="/notification" className="relative text-text-muted hover:text-text-main transition-colors">
+                <Bell size={20} strokeWidth={2} />
+                {unreadNotifications > 0 && (
+                  <div className="absolute -top-1.5 -right-1.5 min-w-[14px] h-[14px] bg-primary text-white text-[8px] font-black rounded-full flex items-center justify-center border-2 border-white px-0.5">
+                    {unreadNotifications > 9 ? '9+' : unreadNotifications}
+                  </div>
+                )}
+              </Link>
+            </div>
+
+            <Link to="/profile" className="w-8 h-8 rounded-full bg-hover-bg overflow-hidden border border-border-main/50 relative flex items-center justify-center shrink-0 transition-colors">
+              {(profile?.photoURL || user.photoURL) ? (
+                <img src={profile?.photoURL || user.photoURL} className="w-full h-full object-cover" referrerPolicy="no-referrer" alt={profile?.displayName || user.displayName || 'Profile'} />
+              ) : (
+                <UserIcon size={16} className="text-text-muted transition-colors" />
               )}
             </Link>
           </div>
-
-          <Link to="/profile" className="w-8 h-8 rounded-full bg-hover-bg overflow-hidden border border-border-main relative flex items-center justify-center shrink-0">
-            {(profile?.photoURL || user.photoURL) ? (
-              <img src={profile?.photoURL || user.photoURL} className="w-full h-full object-cover" referrerPolicy="no-referrer" alt={profile?.displayName || user.displayName || 'Profile'} />
-            ) : (
-              <UserIcon size={16} className="text-text-muted" />
-            )}
-          </Link>
         </div>
       </header>
-      <main className="max-w-lg mx-auto min-h-screen bg-white">
+      <main className="max-w-lg mx-auto min-h-screen bg-white transition-colors duration-200">
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}

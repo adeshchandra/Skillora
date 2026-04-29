@@ -96,9 +96,11 @@ export default function SettingsPage() {
     if (newMode) {
       document.documentElement.classList.add('dark');
       localStorage.setItem('theme', 'dark');
+      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#0f0f0f');
     } else {
       document.documentElement.classList.remove('dark');
       localStorage.setItem('theme', 'light');
+      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#f0f2f5');
     }
   };
 
@@ -165,7 +167,7 @@ export default function SettingsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-bg-main dark:bg-black flex flex-col pb-20">
+    <div className="min-h-screen flex flex-col pb-20">
       {/* Header */}
       <div className="bg-white dark:bg-black border-b border-border-main dark:border-border-main p-4 flex items-center gap-4 sticky top-0 z-50">
         <button 

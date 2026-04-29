@@ -456,7 +456,7 @@ export default function UserViewPage() {
                                                         <div className="flex items-center gap-1">
                                                             {[1,2,3,4,5].map(s => (
                                                                 <Star 
-                                                                    key={s} size={10} 
+                                                                    key={`star-${sess.id}-${s}`} size={10} 
                                                                     className={s <= (isTeacher ? (sess.learnerRating || 0) : (sess.teacherRating || 0)) ? "text-accent-gold fill-accent-gold" : "text-border-main"} 
                                                                 />
                                                             ))}

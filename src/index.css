@@ -48,6 +48,9 @@
 }
 
 @layer base {
+  html {
+    @apply bg-bg-main;
+  }
   body {
     @apply font-sans bg-bg-main text-text-main transition-colors duration-200;
   }

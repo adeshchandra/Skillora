@@ -280,15 +280,13 @@ const QuizComponent = ({ group, onComplete }: { group: DAOGroup, onComplete: () 
                         {timeLeft !== null && Math.floor(timeLeft / 60)}:{timeLeft !== null && (timeLeft % 60).toString().padStart(2, '0')}
                     </div>
                 </div>
-             )}
-
-             <div className="space-y-6 max-h-[60vh] overflow-y-auto px-1 pt-2 pb-4 scroll-smooth no-scrollbar">
+             )}              <div className="space-y-6 max-h-[60vh] overflow-y-auto px-1 pt-2 pb-4 scroll-smooth no-scrollbar">
                 {quiz.questions.map((q, qIdx) => {
                     const selectedIdx = selections[qIdx];
                     const isAnswered = selectedIdx !== undefined;
 
                     return (
-                        <div key={qIdx} className="p-5 bg-white dark:bg-black rounded-2xl border border-border-main dark:border-border-main space-y-4 shadow-sm">
+                        <div key={`quiz-q-${qIdx}`} className="p-5 bg-white dark:bg-black rounded-2xl border border-border-main dark:border-border-main space-y-4 shadow-sm">
                             <h3 className="text-sm font-bold text-text-main dark:text-white leading-tight">
                                 <span className="text-primary mr-2">Q{qIdx + 1}.</span>
                                 {q.question}
@@ -306,7 +304,7 @@ const QuizComponent = ({ group, onComplete }: { group: DAOGroup, onComplete: () 
 
                                     return (
                                         <button
-                                            key={oIdx}
+                                            key={`quiz-q-${qIdx}-opt-${oIdx}`}
                                             disabled={isAnswered || currentStep === 'result'}
                                             onClick={() => handleSelectOption(qIdx, oIdx)}
                                             className={`
@@ -539,12 +537,12 @@ const ManageQuizzes = ({ groupId, onBack }: { groupId: string, onBack: () => voi
                     </h3>
                     <div className="space-y-3">
                         {questions.map((q, i) => (
-                            <div key={i} className="p-3 bg-white dark:bg-black border border-border-main dark:border-border-main rounded-xl relative group">
+                            <div key={`manage-q-${i}`} className="p-3 bg-white dark:bg-black border border-border-main dark:border-border-main rounded-xl relative group">
                                 <button onClick={() => removeQuestion(i)} className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"><X size={12} /></button>
                                 <p className="text-xs font-bold text-text-main dark:text-white mb-2">{i+1}. {q.question}</p>
                                 <div className="grid grid-cols-2 gap-1.5">
                                     {q.options.map((o, oi) => (
-                                        <div key={oi} className={`text-[9px] font-bold px-2 py-1 rounded ${oi === q.correctAnswerIndex ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400' : 'bg-hover-bg dark:bg-hover-bg/20 text-text-muted'}`}>
+                                        <div key={`manage-q-${i}-opt-${oi}`} className={`text-[9px] font-bold px-2 py-1 rounded ${oi === q.correctAnswerIndex ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400' : 'bg-hover-bg dark:bg-hover-bg/20 text-text-muted'}`}>
                                             {o}
                                         </div>
                                     ))}
@@ -562,7 +560,7 @@ const ManageQuizzes = ({ groupId, onBack }: { groupId: string, onBack: () => voi
                         />
                         <div className="space-y-2">
                             {opts.map((o, i) => (
-                                <div key={i} className="flex gap-2">
+                                <div key={`manage-q-new-opt-${i}`} className="flex gap-2">
                                     <input 
                                         value={o}
                                         onChange={e => {
@@ -1308,7 +1306,7 @@ export default function GroupPage() {
 
   return (
     <div 
-      className="min-h-screen bg-bg-main dark:bg-black pb-20 relative"
+      className="min-h-screen pb-20 relative"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
@@ -1355,14 +1353,7 @@ export default function GroupPage() {
       </motion.div>
 
       <div className="p-4 flex flex-col">
-        {filteredGroups.length === 0 ? (
-          <div className="py-20 text-center px-6">
-             <div className="w-16 h-16 bg-white border-2 border-dashed border-border-main rounded-full flex items-center justify-center mx-auto mb-4">
-                <Users size={24} className="text-text-muted opacity-40" />
-             </div>
-             <p className="text-text-muted font-bold text-sm">No results found.</p>
-          </div>
-        ) : (
+        {filteredGroups.length > 0 && 
           filteredGroups.map((group, idx) => (
             <DAOGroupCard 
                 key={`main-group-${group.id}-${idx}`} 
@@ -1372,7 +1363,7 @@ export default function GroupPage() {
                 isJoining={joiningId === group.id}
             />
           ))
-        )}
+        }
       </div>
     </div>
   );
