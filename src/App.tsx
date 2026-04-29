@@ -28,8 +28,6 @@ interface AuthContextType {
   loading: boolean;
   signIn: () => Promise<void>;
   logout: () => Promise<void>;
-  isOtpVerified: boolean;
-  setOtpVerified: (val: boolean) => void;
   credits: number;
   unreadNotifications: number;
   unreadMessages: number;
@@ -47,7 +45,6 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isOtpVerified, setIsOtpVerified] = useState(localStorage.getItem('otp_verified') === 'true');
   const [credits, setCredits] = useState(0);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [unreadMessages, setUnreadMessages] = useState(0);
@@ -157,14 +154,8 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     await signOut(auth);
   };
 
-  const setOtpVerified = (val: boolean) => {
-    setIsOtpVerified(val);
-    if (val) localStorage.setItem('otp_verified', 'true');
-    else localStorage.removeItem('otp_verified');
-  };
-
   return (
-    <AuthContext.Provider value={{ user, profile, loading, signIn, logout, isOtpVerified, setOtpVerified, credits, unreadNotifications, unreadMessages }}>
+    <AuthContext.Provider value={{ user, profile, loading, signIn, logout, credits, unreadNotifications, unreadMessages }}>
       {children}
     </AuthContext.Provider>
   );
@@ -224,7 +215,7 @@ const Navigation = () => {
 };
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, profile, loading, credits, unreadNotifications, unreadMessages, isOtpVerified } = useAuth();
+  const { user, profile, loading, credits, unreadNotifications, unreadMessages } = useAuth();
   const location = useLocation();
 
   useEffect(() => {
@@ -250,7 +241,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     );
   }
 
-  if (!user || !isOtpVerified) {
+  if (!user) {
     return <AuthPage />;
   }
 

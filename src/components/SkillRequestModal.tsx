@@ -42,10 +42,11 @@ export const SkillRequestModal: React.FC<SkillRequestModalProps> = ({
       return;
     }
 
+    let requestId = '';
     setLoading(true);
     try {
       const timestamp = Date.now();
-      const requestId = `${user.uid}_${targetUser.uid}_${timestamp}`;
+      requestId = `${user.uid}_${targetUser.uid}_${timestamp}`;
       
       // Define activeConvId early
       let activeConvId = conversationId;

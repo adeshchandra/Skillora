@@ -45,7 +45,7 @@ const FloatingInput = ({ label, value, onChange, type = 'text', showPasswordTogg
 };
 
 export default function AuthPage() {
-  const { signIn: signInWithGoogle, isOtpVerified, setOtpVerified } = useAuth();
+  const { signIn: signInWithGoogle } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -56,10 +56,6 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [showResetForm, setShowResetForm] = useState(false);
-  const [otpStep, setOtpStep] = useState(false);
-  const [otpValue, setOtpValue] = useState('');
-  const [correctOtp, setCorrectOtp] = useState('');
-  const [pendingAction, setPendingAction] = useState<any>(null);
 
   const handlePasswordReset = async (e: React.FormEvent) => {
       e.preventDefault();
@@ -95,7 +91,6 @@ export default function AuthPage() {
     try {
       if (isLogin) {
         await signInWithEmailAndPassword(auth, email, password);
-        setOtpVerified(true);
       } else {
         if (!validateEmail(email)) throw new Error('Please provide a valid email address.');
         if (password.length < 6) throw new Error('Password must be at least 6 characters');
@@ -108,13 +103,30 @@ export default function AuthPage() {
              throw new Error('This email address is already taken. Please use an original email.');
         }
 
-        // Generate and "send" OTP
-        const otp = Math.floor(100000 + Math.random() * 900000).toString();
-        setCorrectOtp(otp);
-        setPendingAction({ type: 'signup', email, password, displayName });
-        setOtpStep(true);
-        console.log(`[SIMULATION] OTP for ${email}: ${otp}`);
-        setSuccessMsg(`An OTP has been sent to ${email} (Simulation: check console)`);
+        // Directly create user profile instead of OTP
+        const targetUser = (await createUserWithEmailAndPassword(auth, email, password)).user;
+        await updateProfile(targetUser, { displayName });
+        
+        // Send verification email
+        sendEmailVerification(targetUser).catch(console.error);
+
+        const userRef = doc(db, 'users', targetUser.uid);
+        const userData = {
+            uid: targetUser.uid,
+            email: email.toLowerCase(),
+            displayName: displayName || 'Learner',
+            photoURL: `https://api.dicebear.com/7.x/initials/svg?seed=${displayName || 'U'}`,
+            role: 'student',
+            credits: 150,
+            teachSkills: [],
+            learnSkills: [],
+            joinedGroups: [],
+            rating: 5.0,
+            reviewCount: 0,
+            createdAt: new Date().toISOString(),
+            onboardingCompleted: false
+        };
+        await setDoc(userRef, userData);
       }
     } catch (err: any) {
       console.error(err);
@@ -124,93 +136,12 @@ export default function AuthPage() {
     }
   };
 
-  const handleVerifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    
-    if (otpValue.length !== 6) {
-        setError('Please enter the full 6-digit code.');
-        return;
-    }
-
-    if (otpValue !== correctOtp) {
-        setError('Invalid code. Please check and try again.');
-        return;
-    }
-
-    setLoading(true);
-    try {
-        if (pendingAction.type === 'signup') {
-            const { email, password, displayName } = pendingAction;
-            const targetUser = (await createUserWithEmailAndPassword(auth, email, password)).user;
-            await updateProfile(targetUser, { displayName });
-            
-            // Send verification email as requested
-            sendEmailVerification(targetUser).then(() => {
-                console.log("Verification email sent!");
-            });
-
-            const userRef = doc(db, 'users', targetUser.uid);
-            const userData = {
-                uid: targetUser.uid,
-                email: email.toLowerCase(),
-                displayName: displayName || 'Learner',
-                photoURL: `https://api.dicebear.com/7.x/initials/svg?seed=${displayName || 'U'}`,
-                role: 'student',
-                credits: 150,
-                teachSkills: [],
-                learnSkills: [],
-                joinedGroups: [],
-                rating: 5.0,
-                reviewCount: 0,
-                createdAt: new Date().toISOString(),
-                onboardingCompleted: false
-            };
-            await setDoc(userRef, userData);
-            setOtpVerified(true);
-        } else if (pendingAction.type === 'google') {
-            // Identity verified for Google account
-            setOtpVerified(true);
-            setSuccessMsg('Identity verified. Account confirmed.');
-            // Profile is created by signIn function if it's new
-            // Since we intercepted the redirect or state, we just let the auth state handle it.
-            // But we actually need to finish the sign-in process if we want to be strict.
-            // In App.tsx, we have logic to create the profile.
-        }
-    } catch (err: any) {
-        setError(err.message);
-    } finally {
-        setLoading(false);
-    }
-  };
-
-  const handleGoogleSignInWithOtp = async () => {
+  const handleGoogleSignIn = async () => {
     setError('');
     setLoading(true);
     try {
         const provider = new GoogleAuthProvider();
-        const result = await signInWithPopup(auth, provider);
-        const u = result.user;
-
-        // Check if user already exists
-        const userDocRef = doc(db, 'users', u.uid);
-        const snap = await getDoc(userDocRef);
-        
-        if (snap.exists()) {
-            // Existing user, normally we might skip OTP
-            setOtpVerified(true);
-            setLoading(false);
-            return;
-        }
-
-        // New Google user -> Send OTP
-        const otp = Math.floor(100000 + Math.random() * 900000).toString();
-        setCorrectOtp(otp);
-        setPendingAction({ type: 'google', email: u.email, user: u });
-        setOtpVerified(false);
-        setOtpStep(true);
-        console.log(`[SIMULATION] OTP for Google User ${u.email}: ${otp}`);
-        setSuccessMsg(`A verification code has been sent to ${u.email}`);
+        await signInWithPopup(auth, provider);
     } catch (err: any) {
         setError(err.message);
     } finally {
@@ -233,60 +164,6 @@ export default function AuthPage() {
         </div>
 
         <div className="w-full">
-            {otpStep ? (
-                <form onSubmit={handleVerifyOtp} className="w-full space-y-6">
-                    <div className="p-4 bg-hover-bg rounded-2xl text-center space-y-2 border border-border-main/30 shadow-sm">
-                        <Mail className="w-5 h-5 text-primary mx-auto" />
-                        <h4 className="text-[14px] font-black tracking-tight text-text-main">Verify identity</h4>
-                        <p className="text-[10px] text-text-muted font-bold leading-relaxed px-2">
-                            Enter the 6-digit code sent to <span className="text-text-main font-black">{pendingAction?.email}</span>
-                        </p>
-                    </div>
-
-                    <div className="flex justify-center gap-2">
-                        <input
-                            type="text"
-                            maxLength={6}
-                            value={otpValue}
-                            onChange={(e) => setOtpValue(e.target.value.replace(/\D/g, ''))}
-                            className="w-full max-w-[200px] text-center text-3xl font-black tracking-[0.5em] py-5 bg-hover-bg/30 border-2 border-border-main/50 rounded-2xl outline-none focus:ring-8 focus:ring-primary/5 focus:border-primary transition-all text-text-main shadow-inner"
-                            placeholder="000000"
-                            autoFocus
-                        />
-                    </div>
-
-                    {error && (
-                        <div className="p-3 bg-red-50 text-red-600 text-[10px] font-bold rounded-xl flex items-center gap-2 border border-red-100">
-                            <X size={14} strokeWidth={3} />
-                            {error}
-                        </div>
-                    )}
-
-                    {successMsg && !error && (
-                        <div className="p-3 bg-green-50 text-green-600 text-[10px] font-bold rounded-xl flex items-center gap-2 border border-green-100">
-                            <Check size={14} strokeWidth={3} />
-                            {successMsg}
-                        </div>
-                    )}
-                    
-                    <div className="space-y-3">
-                        <button
-                            type="submit"
-                            disabled={loading || otpValue.length !== 6}
-                            className="w-full py-4.5 bg-text-main text-white font-black text-sm rounded-2xl hover:bg-black transition-all active:scale-[0.98] disabled:opacity-50 shadow-xl shadow-text-main/10"
-                        >
-                            {loading ? 'Verifying...' : 'Complete Sign Up'}
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => { setOtpStep(false); setError(''); setSuccessMsg(''); setOtpValue(''); }}
-                            className="w-full py-2 text-[10px] font-black text-text-muted hover:text-text-main transition-colors uppercase tracking-[0.2em]"
-                        >
-                            Go Back
-                        </button>
-                    </div>
-                </form>
-            ) : (
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={showResetForm ? 'reset' : (isLogin ? 'login' : 'signup')}
@@ -413,7 +290,7 @@ export default function AuthPage() {
                     </div>
 
                     <button
-                        onClick={handleGoogleSignInWithOtp}
+                        onClick={handleGoogleSignIn}
                         disabled={loading}
                         className="w-full flex items-center justify-center gap-4 px-6 py-4 bg-white border border-border-main text-text-main rounded-2xl font-bold text-sm hover:bg-hover-bg transition-all active:scale-[0.98] disabled:opacity-50"
                     >
@@ -425,7 +302,6 @@ export default function AuthPage() {
                         )}
                     </motion.div>
                 </AnimatePresence>
-            )}
         </div>
       </div>
       
