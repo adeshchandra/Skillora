@@ -106,18 +106,18 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
   const displayRating = typeof course.rating === 'number' && !isNaN(course.rating) ? course.rating : 0;
 
   return (
-    <div className="flex flex-col bg-white mb-8 border-b border-border-main/30 last:border-0 pb-2">
+    <div className="flex flex-col bg-white dark:bg-black mb-8 border-b border-border-main/30 dark:border-border-main/20 last:border-0 pb-2 transition-colors">
       <div 
-        className="relative aspect-video w-full cursor-pointer group overflow-hidden" 
+        className="relative aspect-video w-full cursor-pointer group overflow-hidden rounded-2xl md:rounded-3xl border border-border-main/10 dark:border-border-main/20" 
         onClick={() => handleVisit()}
       >
         <img 
           src={course.thumbnail || `https://picsum.photos/seed/course-${course.id}/800/450`} 
           alt={course.title}
-          className="w-full h-full object-cover bg-hover-bg transition-transform group-hover:scale-105"
+          className="w-full h-full object-cover bg-hover-bg dark:bg-card-bg transition-transform group-hover:scale-105"
           referrerPolicy="no-referrer"
         />
-        <div className="absolute bottom-3 right-3 bg-text-main/80 text-white text-[10px] px-2 py-1 rounded-lg font-bold backdrop-blur-sm border border-white/10">
+        <div className="absolute bottom-3 right-3 bg-text-main/80 dark:bg-black/80 text-white text-[10px] px-2 py-1 rounded-lg font-bold backdrop-blur-sm border border-white/10 shadow-lg">
           {hasVisited ? 'Respin' : 'Unlock'}
         </div>
       </div>
@@ -128,7 +128,7 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
             className="flex-shrink-0 pt-0.5 cursor-pointer" 
             onClick={() => navigate(`/user/${course.teacherId}`)}
             >
-            <div className="w-10 h-10 rounded-full overflow-hidden bg-hover-bg border border-border-main/20">
+            <div className="w-10 h-10 rounded-full overflow-hidden bg-hover-bg dark:bg-black border border-border-main/20 dark:border-border-main/30 shadow-sm transition-colors">
                 {course.teacherPhoto ? (
                 <img src={course.teacherPhoto} alt={course.teacherName} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                 ) : (
@@ -143,7 +143,7 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
         <div className="flex-grow min-w-0 pr-2">
           <div className="flex items-start justify-between gap-2 mb-1">
             <h3 
-              className="text-[14px] font-bold text-text-main leading-snug line-clamp-2 cursor-pointer hover:text-primary transition-colors"
+              className="text-[14px] font-bold text-text-main dark:text-white leading-snug line-clamp-2 cursor-pointer hover:text-primary transition-colors"
               onClick={() => handleVisit()}
             >
               {course.title}
@@ -172,7 +172,7 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
             <span className="text-[10px] opacity-40">•</span>
             <span className="flex items-center gap-0.5">
               <Star size={11} fill="currentColor" className={displayRating > 0 ? 'text-accent-gold' : 'text-text-muted'} />
-              {displayRating.toFixed(1)}
+              <span className="dark:text-text-muted">{displayRating.toFixed(1)}</span>
             </span>
           </div>
 
@@ -188,11 +188,11 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
                     }
                   }}
                   disabled={!course.daoGroupLink && hasSentRequest}
-                  className={`px-5 py-2 rounded-xl text-[10.5px] font-bold tracking-wide transition-all active:scale-95 flex items-center gap-2 ${
+                  className={`px-5 py-2 rounded-xl text-[10.5px] font-bold tracking-wide transition-all active:scale-95 flex items-center gap-2 shadow-sm ${
                     course.daoGroupLink 
-                      ? 'bg-text-main text-white hover:bg-text-main/90' 
+                      ? 'bg-text-main dark:bg-white text-white dark:text-black hover:bg-black dark:hover:bg-white/90' 
                       : (hasSentRequest 
-                          ? 'bg-green-50 text-green-600 border border-green-200' 
+                          ? 'bg-green-50 dark:bg-green-500/10 text-green-600 dark:text-green-500 border border-green-200 dark:border-green-500/30' 
                           : 'bg-primary text-white hover:bg-primary-dark')
                   }`}
                 >
@@ -212,14 +212,14 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
                 {course.daoGroupLink ? (
                   <button 
                     onClick={() => window.open(course.daoGroupLink, '_blank')}
-                    className="px-5 py-2 bg-text-main text-white rounded-xl text-[10.5px] font-bold tracking-wide hover:bg-text-main/90 transition-all active:scale-95"
+                    className="px-5 py-2 bg-text-main dark:bg-white text-white dark:text-black rounded-xl text-[10.5px] font-bold tracking-wide hover:bg-black dark:hover:bg-white/90 transition-all active:scale-95 shadow-sm"
                   >
                     Join DAO
                   </button>
                 ) : (
                   <button 
                     onClick={() => handleVisit()}
-                    className="px-5 py-2 bg-hover-bg hover:bg-border-main text-text-main rounded-xl text-[10.5px] font-bold tracking-wide transition-colors"
+                    className="px-5 py-2 bg-hover-bg dark:bg-hover-bg/20 hover:bg-border-main dark:hover:bg-hover-bg/30 text-text-main dark:text-white rounded-xl text-[10.5px] font-bold tracking-wide transition-colors shadow-sm"
                   >
                     Watch again
                   </button>
@@ -227,13 +227,13 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
                 {!isRating && !hasRated && user?.uid !== course.teacherId && (
                   <button 
                     onClick={() => setIsRating(true)}
-                    className="px-5 py-2 text-primary bg-primary/5 hover:bg-primary/10 rounded-xl text-[10.5px] font-bold tracking-wide transition-colors"
+                    className="px-5 py-2 text-primary bg-primary/5 dark:bg-primary/10 hover:bg-primary/10 dark:hover:bg-primary/20 rounded-xl text-[10.5px] font-bold tracking-wide transition-colors border border-primary/20"
                   >
                     Rate now
                   </button>
                 )}
                 {hasRated && (
-                  <span className="text-[10.5px] font-bold text-text-muted bg-hover-bg px-4 py-2 rounded-xl tracking-wide">
+                  <span className="text-[10.5px] font-bold text-text-muted bg-hover-bg dark:bg-hover-bg/10 px-4 py-2 rounded-xl tracking-wide border border-border-main/30 dark:border-border-main/10 shadow-sm transition-colors">
                     Already rated
                   </span>
                 )}
@@ -245,7 +245,7 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
 
       <AnimatePresence>
         {isRating && (
-            <div className="fixed inset-0 bg-text-main/20 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+            <div className="fixed inset-0 bg-text-main/20 dark:bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
             <motion.div 
                 initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -253,7 +253,7 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
                 className="bg-white dark:bg-card-bg w-full max-w-sm rounded-[32px] p-6 border border-border-main dark:border-border-main space-y-6 shadow-2xl"
             >
                 <div className="text-center space-y-1">
-                <h4 className="text-lg font-bold text-text-main tracking-tighter">Rate this resource</h4>
+                <h4 className="text-lg font-bold text-text-main dark:text-white tracking-tighter">Rate this resource</h4>
                 <p className="text-xs text-text-muted leading-relaxed font-medium">How helpful was this link for your learning?</p>
                 </div>
                 <div className="flex justify-center gap-2">
@@ -261,7 +261,7 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
                     <button
                     key={s}
                     onClick={() => handleRate(s)}
-                    className="w-10 h-10 rounded-xl flex items-center justify-center bg-hover-bg hover:bg-primary hover:text-white transition-all font-black text-sm border border-border-main/50"
+                    className="w-10 h-10 rounded-xl flex items-center justify-center bg-hover-bg dark:bg-hover-bg/20 hover:bg-primary hover:text-white dark:text-white transition-all font-black text-sm border border-border-main/50 dark:border-border-main/30"
                     >
                     {s}
                     </button>
@@ -269,7 +269,7 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
                 </div>
                 <button 
                 onClick={() => setIsRating(false)}
-                className="w-full py-2 text-[11px] font-bold text-text-muted hover:text-text-main transition-colors tracking-wide"
+                className="w-full py-2 text-[11px] font-bold text-text-muted hover:text-text-main dark:hover:text-white transition-colors tracking-wide"
                 >
                 Wait, I'll rate later
                 </button>

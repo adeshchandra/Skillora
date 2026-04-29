@@ -71,14 +71,14 @@ export default function MessagesPage() {
     }
 
     return (
-        <div className="flex flex-col h-full bg-white">
-            <div className="p-4 border-b border-border-main bg-white dark:bg-black sticky top-0 z-10 space-y-4">
+        <div className="flex flex-col h-full bg-white dark:bg-black transition-colors">
+            <div className="p-4 border-b border-border-main dark:border-border-main/50 bg-white dark:bg-black sticky top-0 z-10 space-y-4 transition-colors">
                 <div className="flex items-center justify-between">
-                    <h1 className="text-xl font-bold text-text-main dark:text-white">Inbox</h1>
-                    <div className="flex bg-hover-bg dark:bg-hover-bg/20 p-1 rounded-xl">
+                    <h1 className="text-xl font-bold text-text-main dark:text-white transition-colors">Inbox</h1>
+                    <div className="flex bg-hover-bg dark:bg-hover-bg/10 p-1 rounded-xl transition-colors">
                         <button 
                             onClick={() => setActiveTab('chats')}
-                            className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'chats' ? 'bg-white dark:bg-black text-text-main dark:text-white shadow-sm' : 'text-text-muted hover:text-text-main'}`}
+                            className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'chats' ? 'bg-white dark:bg-black text-text-main dark:text-white shadow-sm' : 'text-text-muted hover:text-text-main dark:hover:text-white'}`}
                         >
                             Chats
                             {conversations.some(c => (c.unreadCount?.[user?.uid || ''] || 0) > 0) && (
@@ -87,7 +87,7 @@ export default function MessagesPage() {
                         </button>
                         <button 
                             onClick={() => setActiveTab('requests')}
-                            className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all relative ${activeTab === 'requests' ? 'bg-white dark:bg-black text-text-main dark:text-white shadow-sm' : 'text-text-muted hover:text-text-main'}`}
+                            className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all relative ${activeTab === 'requests' ? 'bg-white dark:bg-black text-text-main dark:text-white shadow-sm' : 'text-text-muted hover:text-text-main dark:hover:text-white'}`}
                         >
                             Requests
                             {requests.length > 0 && (
@@ -105,12 +105,12 @@ export default function MessagesPage() {
                         placeholder={activeTab === 'chats' ? "Search conversations..." : "Search requests..."}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 bg-hover-bg dark:bg-black border-none dark:border dark:border-border-main rounded-xl text-sm font-medium focus:ring-1 focus:ring-primary focus:bg-white dark:focus:bg-black dark:text-white transition-all outline-none"
+                        className="w-full pl-10 pr-4 py-2.5 bg-hover-bg dark:bg-black border-none dark:border-2 dark:border-border-main/50 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:bg-white dark:focus:bg-hover-bg/10 dark:text-white transition-all outline-none"
                     />
                 </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto pb-20">
+            <div className="flex-1 overflow-y-auto pb-20 dark:bg-black transition-colors">
                 <AnimatePresence mode="wait">
                     {activeTab === 'chats' ? (
                         <motion.div 
@@ -118,14 +118,14 @@ export default function MessagesPage() {
                             initial={{ opacity: 0, x: -10 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: -10 }}
-                            className="divide-y divide-border-main/30"
+                            className="divide-y divide-border-main/30 dark:divide-border-main/10"
                         >
                             {filteredConversations.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center py-20 px-8 text-center">
-                                    <div className="w-16 h-16 bg-hover-bg rounded-full flex items-center justify-center text-text-muted mb-4 border border-border-main/50">
+                                    <div className="w-16 h-16 bg-hover-bg dark:bg-hover-bg/10 rounded-full flex items-center justify-center text-text-muted mb-4 border border-border-main/50 dark:border-border-main/30 shadow-sm transition-colors">
                                         <MessageSquare size={32} strokeWidth={1.5} />
                                     </div>
-                                    <h3 className="text-sm font-bold text-text-main">No messages yet</h3>
+                                    <h3 className="text-sm font-bold text-text-main dark:text-white transition-colors">No messages yet</h3>
                                     <p className="text-xs text-text-muted font-medium mt-1">Start a conversation from a member's profile!</p>
                                 </div>
                             ) : (
@@ -139,10 +139,10 @@ export default function MessagesPage() {
                                         <button
                                             key={conv.id}
                                             onClick={() => navigate(`/chat/${conv.id}`)}
-                                            className="w-full flex items-center gap-4 p-4 hover:bg-hover-bg/50 transition-colors text-left group"
+                                            className="w-full flex items-center gap-4 p-4 hover:bg-hover-bg/50 dark:hover:bg-hover-bg/5 transition-colors text-left group"
                                         >
                                             <div className="relative shrink-0">
-                                                <div className="w-12 h-12 rounded-2xl overflow-hidden bg-hover-bg border border-border-main/50">
+                                                <div className="w-12 h-12 rounded-2xl overflow-hidden bg-hover-bg dark:bg-black border border-border-main/50 dark:border-border-main/30 shadow-sm transition-colors">
                                                     {otherInfo.photoURL ? (
                                                         <img src={otherInfo.photoURL} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                                                     ) : (
@@ -152,7 +152,7 @@ export default function MessagesPage() {
                                                     )}
                                                 </div>
                                                 {unread > 0 && (
-                                                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white">
+                                                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white dark:border-black">
                                                         {unread > 9 ? '9+' : unread}
                                                     </div>
                                                 )}
@@ -160,7 +160,7 @@ export default function MessagesPage() {
 
                                             <div className="flex-1 min-w-0 space-y-0.5">
                                                 <div className="flex items-center justify-between">
-                                                    <h4 className={`text-sm font-bold tracking-tight truncate ${unread > 0 ? 'text-text-main' : 'text-text-main/80'}`}>
+                                                    <h4 className={`text-sm font-bold tracking-tight truncate transition-colors ${unread > 0 ? 'text-text-main dark:text-white' : 'text-text-main/80 dark:text-white/80'}`}>
                                                         {otherInfo.displayName}
                                                     </h4>
                                                     {conv.updatedAt && (
@@ -170,7 +170,7 @@ export default function MessagesPage() {
                                                     )}
                                                 </div>
                                                 <div className="flex items-center justify-between">
-                                                    <p className={`text-xs truncate font-medium ${unread > 0 ? 'text-text-main font-bold' : 'text-text-muted'}`}>
+                                                    <p className={`text-xs truncate font-medium transition-colors ${unread > 0 ? 'text-text-main dark:text-white/90 font-bold' : 'text-text-muted'}`}>
                                                         {lastMsg ? (
                                                             <>
                                                                 {lastMsg.senderId === user?.uid && <span className="text-[10px] uppercase tracking-wider text-primary mr-1">You:</span>}
@@ -194,14 +194,14 @@ export default function MessagesPage() {
                             initial={{ opacity: 0, x: 10 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: 10 }}
-                            className="divide-y divide-border-main/30"
+                            className="divide-y divide-border-main/30 dark:divide-border-main/10"
                         >
                             {filteredRequests.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center py-20 px-8 text-center text-text-muted">
-                                    <div className="w-16 h-16 bg-hover-bg rounded-full flex items-center justify-center mb-4">
+                                    <div className="w-16 h-16 bg-hover-bg dark:bg-hover-bg/10 rounded-full flex items-center justify-center mb-4 border border-border-main/50 dark:border-border-main/30 shadow-sm transition-colors">
                                         <Clock size={32} strokeWidth={1.5} />
                                     </div>
-                                    <h3 className="text-sm font-bold text-text-main">No pending requests</h3>
+                                    <h3 className="text-sm font-bold text-text-main dark:text-white transition-colors">No pending requests</h3>
                                     <p className="text-xs font-medium mt-1">Skill requests you receive will appear here.</p>
                                 </div>
                             ) : (
@@ -213,19 +213,19 @@ export default function MessagesPage() {
                                             const conversationId = participants.join('_');
                                             navigate(`/chat/${conversationId}?openRequest=${req.id}`);
                                         }}
-                                        className="w-full flex items-start gap-4 p-4 hover:bg-hover-bg/50 transition-colors text-left group"
+                                        className="w-full flex items-start gap-4 p-4 hover:bg-hover-bg/50 dark:hover:bg-hover-bg/5 transition-colors text-left group"
                                     >
-                                        <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center shrink-0 border border-primary/20 text-primary">
+                                        <div className="w-12 h-12 bg-primary/10 dark:bg-primary/20 rounded-2xl flex items-center justify-center shrink-0 border border-primary/20 dark:border-primary/40 text-primary transition-colors">
                                             <Handshake size={24} />
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center justify-between mb-1">
-                                                <h4 className="text-sm font-bold text-text-main truncate">{req.senderName}</h4>
+                                                <h4 className="text-sm font-bold text-text-main dark:text-white truncate transition-colors">{req.senderName}</h4>
                                                 <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-tight ${req.type === 'Exchange' ? 'bg-accent-gold/20 text-accent-gold' : 'bg-primary/20 text-primary'}`}>
                                                     {req.type}
                                                 </span>
                                             </div>
-                                            <p className="text-xs font-bold text-text-main leading-tight mb-1">Wants to learn {req.learnSkill}</p>
+                                            <p className="text-xs font-bold text-text-main dark:text-white/90 leading-tight mb-1 transition-colors">Wants to learn {req.learnSkill}</p>
                                             <p className="text-[10px] text-text-muted font-medium italic line-clamp-1">"{req.message}"</p>
                                         </div>
                                         <ChevronRight size={14} className="text-text-muted mt-1 opacity-0 group-hover:opacity-100 transition-opacity" />

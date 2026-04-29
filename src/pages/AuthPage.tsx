@@ -27,7 +27,7 @@ const FloatingInput = ({ label, value, onChange, type = 'text', showPasswordTogg
           type={showPasswordToggle ? (isPasswordVisible ? 'text' : 'password') : type}
           value={value}
           onChange={onChange}
-          className={`w-full ${Icon ? 'pl-11' : 'px-4'} pr-4 py-4 bg-hover-bg/40 dark:bg-black border border-border-main/50 dark:border-border-main rounded-2xl outline-none focus:bg-white dark:focus:bg-black focus:ring-4 focus:ring-primary/5 dark:focus:ring-primary/20 focus:border-primary transition-all text-[13px] font-bold text-text-main dark:text-white placeholder:text-text-muted/20 shadow-sm`}
+          className={`w-full ${Icon ? 'pl-11' : 'px-4'} pr-4 py-4 bg-hover-bg/40 dark:bg-hover-bg/10 border-2 border-transparent dark:border dark:border-border-main/50 rounded-2xl outline-none focus:bg-white dark:focus:bg-hover-bg/20 focus:ring-4 focus:ring-primary/5 dark:focus:ring-primary/10 focus:border-primary dark:focus:border-primary transition-all text-[13px] font-bold text-text-main dark:text-white placeholder:text-text-muted/20 shadow-sm`}
           placeholder={`Enter your ${label.toLowerCase()}...`}
         />
         {showPasswordToggle && (

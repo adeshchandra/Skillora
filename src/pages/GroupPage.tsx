@@ -31,10 +31,10 @@ const FilterSystem = ({ selectedTags, setSelectedTags, searchQuery, setSearchQue
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Find a DAO goal..."
-                className="w-full bg-hover-bg dark:bg-black border-none dark:border dark:border-border-main dark:text-white rounded-xl py-2 pl-10 pr-4 text-xs font-semibold focus:ring-1 focus:ring-primary outline-none"
+                className="w-full bg-hover-bg dark:bg-hover-bg/10 border-none dark:border-2 dark:border-border-main/50 dark:text-white rounded-xl py-2.5 pl-10 pr-4 text-xs font-semibold focus:ring-2 focus:ring-primary/20 dark:focus:bg-hover-bg/20 outline-none transition-all"
             />
             {searchQuery && (
-                <button onClick={() => setSearchQuery('')} className="absolute right-3 p-1 text-text-muted">
+                <button onClick={() => setSearchQuery('')} className="absolute right-3 p-1 text-text-muted hover:text-text-main dark:hover:text-white transition-colors">
                     <X size={14} />
                 </button>
             )}
@@ -490,7 +490,7 @@ const ManageQuizzes = ({ groupId, onBack }: { groupId: string, onBack: () => voi
                                 type="datetime-local" 
                                 value={availableFrom} 
                                 onChange={e => setAvailableFrom(e.target.value)}
-                                className="w-full bg-white dark:bg-black dark:text-white border border-border-main dark:border-border-main rounded-xl p-2.5 text-xs font-bold outline-none focus:ring-1 focus:ring-primary dark:[color-scheme:dark]"
+                                className="w-full bg-white dark:bg-hover-bg/10 dark:text-white border border-border-main dark:border-border-main/50 rounded-xl p-2.5 text-xs font-bold outline-none focus:ring-2 focus:ring-primary/20 dark:focus:bg-hover-bg/20 dark:[color-scheme:dark] transition-all"
                             />
                         </div>
                         <div className="space-y-1">
@@ -499,7 +499,7 @@ const ManageQuizzes = ({ groupId, onBack }: { groupId: string, onBack: () => voi
                                 type="datetime-local" 
                                 value={availableUntil} 
                                 onChange={e => setAvailableUntil(e.target.value)}
-                                className="w-full bg-white dark:bg-black dark:text-white border border-border-main dark:border-border-main rounded-xl p-2.5 text-xs font-bold outline-none focus:ring-1 focus:ring-primary dark:[color-scheme:dark]"
+                                className="w-full bg-white dark:bg-hover-bg/10 dark:text-white border border-border-main dark:border-border-main/50 rounded-xl p-2.5 text-xs font-bold outline-none focus:ring-2 focus:ring-primary/20 dark:focus:bg-hover-bg/20 dark:[color-scheme:dark] transition-all"
                             />
                         </div>
                     </div>
@@ -513,7 +513,7 @@ const ManageQuizzes = ({ groupId, onBack }: { groupId: string, onBack: () => voi
                             min="1" 
                             value={duration || ''} 
                             onChange={e => setDuration(parseInt(e.target.value) || 0)}
-                            className="w-16 bg-white dark:bg-black dark:text-white border border-border-main dark:border-border-main rounded-lg p-2 text-xs font-bold text-center outline-none"
+                            className="w-16 bg-white dark:bg-hover-bg/10 dark:text-white border border-border-main dark:border-border-main/50 rounded-lg p-2 text-xs font-bold text-center outline-none focus:ring-2 focus:ring-primary/20 dark:focus:bg-hover-bg/20 transition-all"
                         />
                     </div>
                     <div className="flex items-center justify-between p-3 bg-white dark:bg-black rounded-xl border border-border-main/50 dark:border-border-main">
@@ -556,7 +556,7 @@ const ManageQuizzes = ({ groupId, onBack }: { groupId: string, onBack: () => voi
                             value={qText} 
                             onChange={e => setQText(e.target.value)} 
                             placeholder="Type question here..."
-                            className="w-full bg-white dark:bg-black dark:text-white border border-border-main dark:border-border-main rounded-xl p-3 text-xs font-medium outline-none focus:ring-1 focus:ring-primary min-h-[80px]"
+                            className="w-full bg-white dark:bg-hover-bg/10 dark:text-white border border-border-main dark:border-border-main/50 rounded-xl p-3 text-xs font-medium outline-none focus:ring-2 focus:ring-primary/20 dark:focus:bg-hover-bg/20 min-h-[80px] transition-all"
                         />
                         <div className="space-y-2">
                             {opts.map((o, i) => (
@@ -569,7 +569,7 @@ const ManageQuizzes = ({ groupId, onBack }: { groupId: string, onBack: () => voi
                                             setOpts(newOpts);
                                         }}
                                         placeholder={`Option ${i+1}`}
-                                        className="flex-grow bg-white dark:bg-black dark:text-white border border-border-main dark:border-border-main rounded-lg px-3 py-1.5 text-xs outline-none"
+                                        className="flex-grow bg-white dark:bg-hover-bg/10 dark:text-white border border-border-main dark:border-border-main/50 rounded-lg px-3 py-1.5 text-xs outline-none focus:ring-2 focus:ring-primary/20 dark:focus:bg-hover-bg/20 transition-all font-sans"
                                     />
                                     <button 
                                         onClick={() => setCorrectIdx(i)}
@@ -961,7 +961,7 @@ const DAODetail = ({ groupId, onBack }: { groupId: string, onBack: () => void })
                           value={userSearch}
                           onChange={(e) => setUserSearch(e.target.value)}
                           placeholder="Search user by name..."
-                          className="w-full pl-9 pr-4 py-2 bg-white dark:bg-black border border-border-main dark:border-border-main dark:text-white rounded-lg text-xs font-bold outline-none focus:ring-1 focus:ring-primary"
+                          className="w-full pl-9 pr-4 py-2.5 bg-white dark:bg-hover-bg/10 border border-border-main dark:border-border-main/50 dark:text-white rounded-lg text-xs font-bold outline-none focus:ring-2 focus:ring-primary/20 dark:focus:bg-hover-bg/20 transition-all font-sans"
                         />
                       </div>
                       
@@ -1055,11 +1055,11 @@ const DAODetail = ({ groupId, onBack }: { groupId: string, onBack: () => void })
                       value={meetingLink}
                       onChange={(e) => setMeetingLink(e.target.value)}
                       placeholder="Enter meeting link or ID..."
-                      className="w-full bg-white dark:bg-black dark:text-white border border-border-main dark:border-border-main rounded-xl p-3 text-xs font-medium focus:ring-1 focus:ring-primary outline-none"
+                      className="w-full bg-white dark:bg-hover-bg/10 dark:text-white border border-border-main dark:border-border-main/50 rounded-xl p-3 text-xs font-medium focus:ring-2 focus:ring-primary/20 dark:focus:bg-hover-bg/20 outline-none transition-all"
                     />
                     <button 
                       onClick={updateMeetingLink}
-                      className="w-full py-2.5 bg-primary text-white rounded-xl font-bold text-xs"
+                      className="w-full py-2.5 bg-primary text-white rounded-xl font-bold text-xs active:scale-95 transition-all shadow-lg shadow-primary/10"
                     >
                       Save Meeting Info
                     </button>

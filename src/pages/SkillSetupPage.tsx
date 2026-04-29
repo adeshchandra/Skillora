@@ -88,8 +88,8 @@ export default function SkillSetupPage() {
                 <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1" />
             </div>
             <div className="flex items-center gap-1.5 justify-center">
-                <div className={`h-1 rounded-full transition-all duration-500 ${step >= 1 ? 'w-8 bg-text-main dark:bg-white' : 'w-4 bg-text-muted/20'}`} />
-                <div className={`h-1 rounded-full transition-all duration-500 ${step >= 2 ? 'w-8 bg-text-main dark:bg-white' : 'w-4 bg-text-muted/20'}`} />
+                <div className={`h-1 rounded-full transition-all duration-500 ${step >= 1 ? 'w-8 bg-text-main dark:bg-primary' : 'w-4 bg-text-muted/20'}`} />
+                <div className={`h-1 rounded-full transition-all duration-500 ${step >= 2 ? 'w-8 bg-text-main dark:bg-primary' : 'w-4 bg-text-muted/20'}`} />
             </div>
         </div>
 
@@ -103,7 +103,7 @@ export default function SkillSetupPage() {
               className="w-full space-y-8"
             >
               <div className="text-center space-y-2">
-                <h1 className="text-2xl font-black text-text-main tracking-tight">Choose your path</h1>
+                <h1 className="text-2xl font-black text-text-main dark:text-white tracking-tight transition-colors">Choose your path</h1>
                 <p className="text-[12px] font-bold text-text-muted">How would you like to use Skillora?</p>
               </div>
 
@@ -114,25 +114,33 @@ export default function SkillSetupPage() {
                     <button
                       key={r.id}
                       onClick={() => setRole(r.id)}
-                      className={`relative w-full p-6 text-left rounded-3xl border-2 transition-all ${
+                      className={`relative w-full p-6 text-left rounded-[32px] border-2 transition-all active:scale-[0.98] ${
                         role === r.id 
-                          ? `border-text-main bg-text-main text-white shadow-xl shadow-text-main/10` 
-                          : 'border-border-main hover:border-text-main/20 bg-hover-bg/30'
+                          ? `border-primary bg-primary/5 dark:bg-primary/20 text-text-main dark:text-white shadow-xl shadow-primary/10` 
+                          : 'border-border-main dark:border-border-main/50 hover:border-primary/50 dark:hover:border-primary/50 bg-hover-bg/30 dark:bg-black'
                       }`}
                     >
                       <div className="flex gap-5">
-                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${role === r.id ? 'bg-white/10' : 'bg-white shadow-sm'}`}>
+                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-colors ${role === r.id ? 'bg-primary text-white' : 'bg-white dark:bg-hover-bg/10 shadow-sm'}`}>
                           <Icon size={24} className={role === r.id ? 'text-white' : r.textColor} />
                         </div>
                         <div className="space-y-1">
                           <div className="flex items-center gap-2">
-                            <span className="text-[11px] font-black tracking-[0.2em]">{r.title}</span>
+                            <span className={`text-[11px] font-black tracking-[0.2em] transition-colors ${role === r.id ? 'text-primary' : 'text-text-muted'}`}>{r.title}</span>
                           </div>
-                          <h3 className="text-sm font-black">{r.subtitle}</h3>
-                          <p className={`text-[10px] font-bold leading-relaxed ${role === r.id ? 'text-white/60' : 'text-text-muted'}`}>
+                          <h3 className="text-sm font-black dark:text-white transition-colors">{r.subtitle}</h3>
+                          <p className={`text-[10px] font-bold leading-relaxed transition-colors ${role === r.id ? 'text-text-main/80 dark:text-white/70' : 'text-text-muted'}`}>
                             {r.description}
                           </p>
                         </div>
+                        {role === r.id && (
+                           <motion.div 
+                             initial={{ scale: 0 }} animate={{ scale: 1 }}
+                             className="absolute top-4 right-4 w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center shadow-lg"
+                           >
+                             <Check size={14} strokeWidth={3} />
+                           </motion.div>
+                        )}
                       </div>
                     </button>
                   );
@@ -142,7 +150,7 @@ export default function SkillSetupPage() {
               <button
                 disabled={!role}
                 onClick={() => setStep(2)}
-                className="w-full py-4.5 bg-text-main text-white font-black text-sm rounded-2xl hover:bg-black transition-all active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2 group"
+                className="w-full py-4.5 bg-text-main dark:bg-white text-white dark:text-black font-black text-sm rounded-[24px] hover:bg-black dark:hover:bg-white/90 transition-all active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2 group shadow-xl"
               >
                 Continue
                 <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
@@ -158,11 +166,11 @@ export default function SkillSetupPage() {
             >
               <div className="text-center space-y-2">
                 <div className="flex items-center justify-center gap-2 mb-2">
-                    <div className="w-8 h-8 rounded-full bg-text-main flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-full bg-text-main dark:bg-primary flex items-center justify-center shadow-lg">
                         <Sparkles size={16} className="text-white" />
                     </div>
                 </div>
-                <h1 className="text-2xl font-black text-text-main tracking-tight">
+                <h1 className="text-2xl font-black text-text-main dark:text-white tracking-tight transition-colors">
                     {role === 'tutor' ? 'What do you master?' : 'What do you seek?'}
                 </h1>
                 <p className="text-[12px] font-bold text-text-muted">
@@ -171,15 +179,15 @@ export default function SkillSetupPage() {
               </div>
 
               <div className="space-y-6">
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 justify-center">
                   {PRESET_SKILLS.map((skill) => (
                     <button
                       key={skill}
                       onClick={() => toggleSkill(skill)}
-                      className={`px-4 py-2 rounded-full text-[11px] font-bold border-2 transition-all ${
+                      className={`px-5 py-2 rounded-full text-[11px] font-bold border-2 transition-all active:scale-95 ${
                         selectedSkills.includes(skill)
-                          ? 'bg-text-main text-white border-text-main'
-                          : 'bg-white text-text-muted border-border-main hover:border-text-main/20'
+                          ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20'
+                          : 'bg-white dark:bg-black text-text-muted border-border-main dark:border-border-main/50 hover:border-primary/50 dark:hover:border-primary/50'
                       }`}
                     >
                       {skill}
@@ -194,11 +202,11 @@ export default function SkillSetupPage() {
                       value={customSkill}
                       onChange={(e) => setCustomSkill(e.target.value)}
                       placeholder="Add another skill..."
-                      className="w-full px-4 py-4 bg-hover-bg/30 dark:bg-black border-2 border-dashed border-border-main rounded-2xl text-[12px] font-bold text-text-main dark:text-white outline-none focus:border-text-main dark:focus:border-white focus:bg-white dark:focus:bg-black transition-all pr-12"
+                      className="w-full px-4 py-4 bg-hover-bg/30 dark:bg-hover-bg/10 border-2 border-dashed border-border-main dark:border-border-main/50 rounded-2xl text-[12px] font-bold text-text-main dark:text-white outline-none focus:border-primary dark:focus:border-primary focus:ring-4 focus:ring-primary/5 dark:focus:ring-primary/10 transition-all pr-12"
                     />
                     <button 
                         type="submit"
-                        className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-text-main dark:bg-white text-white dark:text-black rounded-xl hover:bg-black dark:hover:bg-white/90 transition-all"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-text-main dark:bg-primary text-white rounded-xl hover:bg-black dark:hover:bg-primary-dark transition-all active:scale-95"
                     >
                         <Plus size={16} />
                     </button>
@@ -206,14 +214,17 @@ export default function SkillSetupPage() {
                 </div>
 
                 {selectedSkills.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 p-4 bg-hover-bg/20 rounded-2xl border border-dashed border-border-main">
+                    <div className="flex flex-wrap gap-1.5 p-4 bg-hover-bg/20 dark:bg-hover-bg/5 rounded-2xl border border-dashed border-border-main dark:border-border-main/30">
                         {selectedSkills.map(s => (
-                            <div key={s} className="px-2 py-1 bg-white border border-border-main rounded-lg flex items-center gap-1.5">
-                                <span className="text-[10px] font-black text-text-main">{s}</span>
-                                <button onClick={() => toggleSkill(s)} className="text-text-muted hover:text-red-500">
+                            <motion.div 
+                                initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+                                key={s} className="px-2.5 py-1.5 bg-white dark:bg-card-bg border border-border-main dark:border-border-main rounded-xl flex items-center gap-1.5 shadow-sm"
+                            >
+                                <span className="text-[10px] font-black text-text-main dark:text-white transition-colors">{s}</span>
+                                <button onClick={() => toggleSkill(s)} className="text-text-muted hover:text-red-500 transition-colors">
                                     <X size={12} strokeWidth={3} />
                                 </button>
-                            </div>
+                            </motion.div>
                         ))}
                     </div>
                 )}
@@ -222,14 +233,14 @@ export default function SkillSetupPage() {
               <div className="flex gap-3">
                 <button
                     onClick={() => setStep(1)}
-                    className="flex-[0.4] py-4.5 border-2 border-border-main text-text-muted font-black text-sm rounded-2xl hover:border-text-main/20 transition-all active:scale-[0.98]"
+                    className="flex-[0.4] py-4.5 border-2 border-border-main dark:border-border-main/50 text-text-muted font-black text-sm rounded-[24px] hover:border-primary/50 dark:hover:border-primary/50 transition-all active:scale-[0.98]"
                 >
                     Back
                 </button>
                 <button
                     disabled={selectedSkills.length === 0 || loading}
                     onClick={handleComplete}
-                    className={`flex-1 py-4.5 text-white font-black text-sm rounded-2xl transition-all active:scale-[0.98] disabled:opacity-30 ${role === 'tutor' ? 'bg-accent-gold' : 'bg-primary'}`}
+                    className={`flex-1 py-4.5 text-white font-black text-sm rounded-[24px] transition-all active:scale-[0.98] disabled:opacity-30 shadow-xl ${role === 'tutor' ? 'bg-accent-gold shadow-accent-gold/20' : 'bg-primary shadow-primary/20'}`}
                 >
                     {loading ? 'Finalizing...' : 'Finish Setup'}
                 </button>

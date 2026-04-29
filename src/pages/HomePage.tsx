@@ -38,10 +38,10 @@ const FilterSystem = ({ selectedTags, setSelectedTags, searchQuery, setSearchQue
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search skills, teachers, topics..."
-                className="w-full bg-hover-bg dark:bg-black border-none dark:border dark:border-border-main rounded-xl py-2 pl-10 pr-4 text-xs font-semibold focus:ring-1 focus:ring-primary dark:focus:bg-black dark:text-white outline-none"
+                className="w-full bg-hover-bg dark:bg-hover-bg/10 border-none dark:border-2 dark:border-border-main/50 rounded-xl py-2.5 pl-10 pr-4 text-xs font-semibold focus:ring-2 focus:ring-primary/20 dark:focus:bg-hover-bg/20 dark:text-white outline-none transition-all"
             />
             {searchQuery && (
-                <button onClick={() => setSearchQuery('')} className="absolute right-3 p-1 text-text-muted">
+                <button onClick={() => setSearchQuery('')} className="absolute right-3 p-1 text-text-muted hover:text-text-main dark:hover:text-white transition-colors">
                     <X size={14} />
                 </button>
             )}

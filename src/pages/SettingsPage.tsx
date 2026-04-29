@@ -14,7 +14,8 @@ import {
   ShieldCheck, 
   Eye, 
   UserCircle,
-  RefreshCw
+  RefreshCw,
+  Moon
 } from 'lucide-react';
 import { doc, updateDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
@@ -181,7 +182,7 @@ export default function SettingsPage() {
             />
             <motion.div 
               initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white w-full max-w-xs rounded-[32px] p-6 border-2 border-black relative z-10 space-y-6 text-center"
+              className="bg-white dark:bg-card-bg w-full max-w-xs rounded-[32px] p-6 border-2 border-black dark:border-border-main relative z-10 space-y-6 text-center shadow-2xl"
             >
               <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto text-red-500 mb-2">
                 <LogOut size={32} />
@@ -220,7 +221,7 @@ export default function SettingsPage() {
             />
             <motion.div 
               initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white w-full max-w-xs rounded-[32px] p-8 border-2 border-black relative z-10 space-y-6 text-center"
+              className="bg-white dark:bg-card-bg w-full max-w-xs rounded-[32px] p-8 border-2 border-black dark:border-border-main relative z-10 space-y-6 text-center shadow-2xl"
             >
               {resetSent ? (
                 <>
@@ -284,7 +285,7 @@ export default function SettingsPage() {
             />
             <motion.div 
               initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white w-full max-w-sm rounded-[32px] p-6 border-2 border-black relative z-10 space-y-6"
+              className="bg-white dark:bg-card-bg w-full max-w-sm rounded-[32px] p-6 border-2 border-black dark:border-border-main relative z-10 space-y-6 shadow-2xl"
             >
               <div className="text-center space-y-1">
                 <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto text-primary mb-2">
@@ -305,7 +306,7 @@ export default function SettingsPage() {
                     <button 
                       key={item.key}
                       onClick={() => handlePrivacyToggle(item.key)}
-                      className="w-full flex items-center justify-between p-4 bg-hover-bg rounded-2xl border border-border-main/50 hover:border-primary/30 transition-all"
+                      className="w-full flex items-center justify-between p-4 bg-hover-bg dark:bg-hover-bg/10 rounded-2xl border border-border-main/50 dark:border-border-main/30 hover:border-primary/30 transition-all"
                     >
                       <div className="flex items-center gap-3">
                         <item.icon size={18} className="text-text-muted" />
