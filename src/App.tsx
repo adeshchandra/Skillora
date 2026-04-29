@@ -219,15 +219,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    const isDark = savedTheme === 'dark' || (!savedTheme && window.matchMedia('(pre-color-scheme: dark)').matches);
-    if (isDark) {
-      document.documentElement.classList.add('dark');
-      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#0f0f0f');
-    } else {
-      document.documentElement.classList.remove('dark');
-      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#f0f2f5');
-    }
+    document.documentElement.classList.add('dark');
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#0f0f0f');
   }, []);
 
   if (loading) {

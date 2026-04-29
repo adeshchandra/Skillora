@@ -58,11 +58,11 @@ const compressImage = (file: File): Promise<string> => {
 };
 
 const PersistenceAgreement = ({ onAgree }: { onAgree: () => void }) => (
-    <div className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-sm flex items-center justify-center p-6">
+    <div className="fixed inset-0 z-[200] bg-text-main/20 backdrop-blur-sm flex items-center justify-center p-6">
         <motion.div 
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="bg-white rounded-[32px] p-8 max-w-sm w-full text-center space-y-6 border-2 border-black"
+            className="bg-white dark:bg-card-bg rounded-[32px] p-8 max-w-sm w-full text-center space-y-6 border border-border-main dark:border-border-main shadow-2xl"
         >
             <div className="w-16 h-16 bg-primary/10 rounded-2xl mx-auto flex items-center justify-center text-primary">
                 <Shield size={32} />
@@ -76,7 +76,7 @@ const PersistenceAgreement = ({ onAgree }: { onAgree: () => void }) => (
             <div className="flex flex-col gap-3 pt-2">
                 <button 
                     onClick={onAgree}
-                    className="w-full py-4 bg-text-main text-white rounded-2xl font-bold text-xs shadow-lg shadow-black/10 active:scale-95 transition-all"
+                    className="w-full py-4 bg-primary text-white rounded-2xl font-bold text-xs shadow-lg shadow-primary/20 active:scale-95 transition-all"
                 >
                     I agree, Sync to my device
                 </button>
@@ -171,7 +171,7 @@ const SkillRequestBubble = ({ requestId, isMe, onOpenNegotiation }: { requestId:
                 {!isMe && request.status === 'Pending' && (
                     <button 
                         onClick={() => onOpenNegotiation(request)}
-                        className="w-full py-2 bg-text-main text-white rounded-xl text-[10px] font-bold hover:bg-black transition-all"
+                        className="w-full py-2 bg-primary text-white rounded-xl text-[10px] font-bold hover:bg-primary-dark transition-all shadow-md shadow-primary/10"
                     >
                         Negotiate Contract
                     </button>

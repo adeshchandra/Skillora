@@ -148,12 +148,12 @@ export const SkillRequestModal: React.FC<SkillRequestModalProps> = ({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/80 p-4">
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-text-main/20 backdrop-blur-sm p-4">
           <motion.div 
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
-            className="bg-white w-full max-w-lg rounded-[32px] overflow-hidden border-2 border-black flex flex-col max-h-[90vh]"
+            className="bg-white dark:bg-card-bg w-full max-w-lg rounded-[32px] overflow-hidden border border-border-main dark:border-border-main flex flex-col max-h-[90vh] shadow-2xl shadow-text-main/10"
           >
             {/* Header */}
             <div className="p-6 border-b border-border-main flex items-center justify-between shrink-0">

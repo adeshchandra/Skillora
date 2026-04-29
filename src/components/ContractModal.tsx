@@ -80,12 +80,12 @@ export const ContractModal: React.FC<ContractModalProps> = ({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center bg-black/80 p-0 md:p-4">
+        <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center bg-text-main/20 backdrop-blur-sm p-0 md:p-4">
             <motion.div 
                 initial={{ y: "100%" }} 
                 animate={{ y: 0 }} 
                 exit={{ y: "100%" }}
-                className="w-full max-w-lg bg-white rounded-t-3xl md:rounded-3xl p-6 space-y-6 border-2 border-black relative overflow-hidden"
+                className="w-full max-w-lg bg-white dark:bg-card-bg rounded-t-3xl md:rounded-3xl p-6 space-y-6 border border-border-main dark:border-border-main relative overflow-hidden shadow-2xl"
             >
                 <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-primary via-accent-gold to-primary opacity-20" />
                 
@@ -165,7 +165,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                 <button 
                     disabled={loading}
                     onClick={createContract}
-                    className="w-full py-4 bg-text-main text-white rounded-2xl font-bold text-xs tracking-wide transition-all active:scale-[0.98] disabled:opacity-50"
+                    className="w-full py-4 bg-primary text-white rounded-2xl font-bold text-xs tracking-wide transition-all active:scale-[0.98] disabled:opacity-50 shadow-lg shadow-primary/20"
                 >
                     {loading ? 'Finalizing...' : 'Sign & finalize agreement'}
                 </button>

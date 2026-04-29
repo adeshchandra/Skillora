@@ -117,7 +117,7 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
           className="w-full h-full object-cover bg-hover-bg transition-transform group-hover:scale-105"
           referrerPolicy="no-referrer"
         />
-        <div className="absolute bottom-3 right-3 bg-black/80 text-white text-[10px] px-2 py-1 rounded-lg font-bold backdrop-blur-sm border border-white/10">
+        <div className="absolute bottom-3 right-3 bg-text-main/80 text-white text-[10px] px-2 py-1 rounded-lg font-bold backdrop-blur-sm border border-white/10">
           {hasVisited ? 'Respin' : 'Unlock'}
         </div>
       </div>
@@ -190,7 +190,7 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
                   disabled={!course.daoGroupLink && hasSentRequest}
                   className={`px-5 py-2 rounded-xl text-[10.5px] font-bold tracking-wide transition-all active:scale-95 flex items-center gap-2 ${
                     course.daoGroupLink 
-                      ? 'bg-text-main text-white hover:bg-black' 
+                      ? 'bg-text-main text-white hover:bg-text-main/90' 
                       : (hasSentRequest 
                           ? 'bg-green-50 text-green-600 border border-green-200' 
                           : 'bg-primary text-white hover:bg-primary-dark')
@@ -212,7 +212,7 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
                 {course.daoGroupLink ? (
                   <button 
                     onClick={() => window.open(course.daoGroupLink, '_blank')}
-                    className="px-5 py-2 bg-text-main text-white rounded-xl text-[10.5px] font-bold tracking-wide hover:bg-black transition-all active:scale-95"
+                    className="px-5 py-2 bg-text-main text-white rounded-xl text-[10.5px] font-bold tracking-wide hover:bg-text-main/90 transition-all active:scale-95"
                   >
                     Join DAO
                   </button>
@@ -245,12 +245,12 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
 
       <AnimatePresence>
         {isRating && (
-            <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4">
+            <div className="fixed inset-0 bg-text-main/20 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
             <motion.div 
                 initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.95, opacity: 0 }}
-                className="bg-white w-full max-w-sm rounded-[32px] p-6 border-2 border-black space-y-6"
+                className="bg-white dark:bg-card-bg w-full max-w-sm rounded-[32px] p-6 border border-border-main dark:border-border-main space-y-6 shadow-2xl"
             >
                 <div className="text-center space-y-1">
                 <h4 className="text-lg font-bold text-text-main tracking-tighter">Rate this resource</h4>

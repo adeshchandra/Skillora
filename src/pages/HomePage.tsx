@@ -52,7 +52,7 @@ const FilterSystem = ({ selectedTags, setSelectedTags, searchQuery, setSearchQue
             <button 
                 onClick={() => setSelectedTags([])}
                 className={`flex-shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold transition-all ${
-                    selectedTags.length === 0 ? 'bg-text-main text-white' : 'bg-hover-bg text-text-main group hover:bg-border-main'
+                    selectedTags.length === 0 ? 'bg-primary text-white shadow-sm shadow-primary/20' : 'bg-hover-bg text-text-main group hover:bg-border-main'
                 }`}
             >
                 All

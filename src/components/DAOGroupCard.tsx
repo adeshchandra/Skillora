@@ -144,11 +144,11 @@ const DAOGroupCard = ({ group, onJoin, onView, isJoining }: DAOGroupCardProps) =
             )}
             
             <div className="absolute top-2 left-2 flex items-center gap-1.5">
-                <div className="bg-black/80 backdrop-blur-none px-2.5 py-1 rounded-md font-bold border border-white/10">
+                <div className="bg-text-main/80 backdrop-blur-none px-2.5 py-1 rounded-md font-bold border border-white/10">
                     <span className="text-[9px] font-bold text-white tracking-wide">{group.stakedPoints} pts stake</span>
                 </div>
                 {group.isPrivate && (
-                    <div className="bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-md font-bold border border-white/10 flex items-center gap-1.5">
+                    <div className="bg-text-main/60 backdrop-blur-sm px-2.5 py-1 rounded-md font-bold border border-white/10 flex items-center gap-1.5">
                         <Lock size={10} className="text-white" />
                         <span className="text-[9px] font-bold text-white tracking-wide uppercase">Private</span>
                     </div>
@@ -220,7 +220,7 @@ const DAOGroupCard = ({ group, onJoin, onView, isJoining }: DAOGroupCardProps) =
                 (isMember || user?.uid === group.adminId) 
                     ? 'bg-hover-bg text-text-main hover:bg-border-main border border-border-main' 
                     : (group.isPrivate && group.adminId !== user?.uid)
-                        ? 'bg-text-main text-white hover:bg-black shadow-md shadow-black/10'
+                        ? 'bg-text-main text-white hover:bg-text-main/90 shadow-md shadow-text-main/10'
                         : 'bg-primary text-white hover:bg-primary-dark shadow-md disabled:opacity-50'
             }`}
         >
@@ -243,12 +243,12 @@ const DAOGroupCard = ({ group, onJoin, onView, isJoining }: DAOGroupCardProps) =
 
       <AnimatePresence>
         {isRating && (
-            <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4">
+            <div className="fixed inset-0 bg-text-main/20 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
                 <motion.div 
                     initial={{ scale: 0.95, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0.95, opacity: 0 }}
-                    className="bg-white w-full max-w-sm rounded-[32px] p-6 border-2 border-black space-y-6"
+                    className="bg-white dark:bg-card-bg w-full max-w-sm rounded-[32px] p-6 border border-border-main dark:border-border-main space-y-6 shadow-2xl"
                 >
                     <div className="text-center space-y-1">
                         <h4 className="text-lg font-bold text-text-main tracking-tighter">Rate this DAO</h4>

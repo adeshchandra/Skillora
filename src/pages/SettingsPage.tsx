@@ -9,8 +9,6 @@ import {
   Lock, 
   FileText, 
   LogOut, 
-  Moon, 
-  Sun, 
   Info, 
   ChevronRight, 
   ShieldCheck, 
@@ -49,7 +47,6 @@ const Section = ({ title, children }: any) => (
 export default function SettingsPage() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [darkMode, setDarkMode] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
@@ -85,24 +82,8 @@ export default function SettingsPage() {
 
   // Sync theme with local storage or profile if implemented
   useEffect(() => {
-    const isDark = document.documentElement.classList.contains('dark');
-    setDarkMode(isDark);
+    // No longer needed to sync darkMode state as it's always dark
   }, []);
-
-  const toggleDarkMode = () => {
-    const newMode = !darkMode;
-    setDarkMode(newMode);
-
-    if (newMode) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#0f0f0f');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#f0f2f5');
-    }
-  };
 
   const menuItems = [
     {
@@ -122,22 +103,6 @@ export default function SettingsPage() {
           label: "Privacy Controls", 
           description: "Manage who can see your learning goals",
           onClick: () => setShowPrivacyModal(true) 
-        }
-      ]
-    },
-    {
-      section: "Preferences",
-      items: [
-        { 
-          icon: darkMode ? Sun : Moon, 
-          label: "Dark Mode", 
-          description: `Switch to ${darkMode ? 'light' : 'dark'} theme`,
-          onClick: toggleDarkMode,
-          rightElement: (
-            <div className={`w-12 h-6 rounded-full relative transition-colors ${darkMode ? 'bg-primary' : 'bg-border-main'}`}>
-                <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${darkMode ? 'left-7' : 'left-1'}`} />
-            </div>
-          )
         }
       ]
     },

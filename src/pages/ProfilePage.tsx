@@ -20,12 +20,12 @@ const RatingModal = ({ isOpen, onClose, onRate, name }: { isOpen: boolean, onClo
     return (
         <AnimatePresence>
             {isOpen && (
-                <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/80 p-4 font-sans">
+                <div className="fixed inset-0 z-[120] flex items-center justify-center bg-text-main/20 backdrop-blur-sm p-4 font-sans">
                     <motion.div 
                         initial={{ scale: 0.95, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0.95, opacity: 0 }}
-                        className="bg-white dark:bg-black w-full max-w-sm rounded-[32px] p-6 border-2 border-black dark:border-border-main space-y-6"
+                        className="bg-white dark:bg-card-bg w-full max-w-sm rounded-[32px] p-6 border border-border-main dark:border-border-main space-y-6 shadow-2xl"
                     >
                         <div className="text-center space-y-1">
                             <h4 className="text-lg font-bold text-text-main dark:text-white tracking-tighter">Rate {name}</h4>
@@ -52,7 +52,7 @@ const RatingModal = ({ isOpen, onClose, onRate, name }: { isOpen: boolean, onClo
                             <button onClick={onClose} className="flex-1 py-3 text-xs font-bold text-text-muted hover:text-text-main">Cancel</button>
                             <button 
                                 onClick={() => onRate(score, review)}
-                                className="flex-1 py-3 bg-text-main text-white rounded-xl text-xs font-bold shadow-lg shadow-black/10 active:scale-95 transition-all"
+                                className="flex-1 py-3 bg-primary text-white rounded-xl text-xs font-bold shadow-lg shadow-primary/20 active:scale-95 transition-all"
                             >
                                 Submit Rating
                             </button>
@@ -351,10 +351,10 @@ const DAOEditModal = ({ group, onClose }: { group: DAOGroup; onClose: () => void
     };
 
     return (
-        <div className="fixed inset-0 z-[110] flex items-end md:items-center justify-center bg-black/80 p-0 md:p-4">
+        <div className="fixed inset-0 z-[110] flex items-end md:items-center justify-center bg-text-main/20 backdrop-blur-sm p-0 md:p-4">
             <motion.div 
                 initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
-                className="w-full max-w-lg bg-white dark:bg-black rounded-t-3xl md:rounded-3xl flex flex-col border-2 border-black dark:border-border-main overflow-hidden shadow-2xl"
+                className="w-full max-w-lg bg-white dark:bg-card-bg rounded-t-3xl md:rounded-3xl flex flex-col border border-border-main dark:border-border-main overflow-hidden shadow-2xl"
             >
                 <div className="p-6 border-b border-border-main dark:border-border-main flex items-center justify-between bg-white dark:bg-black shrink-0">
                     <div className="flex items-center gap-3">
@@ -1354,7 +1354,7 @@ export default function ProfilePage() {
                                     referrerPolicy="no-referrer" 
                                 />
                             </div>
-                            <label className="absolute inset-0 flex items-center justify-center cursor-pointer bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl">
+                            <label className="absolute inset-0 flex items-center justify-center cursor-pointer bg-text-main/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl">
                                 <Camera size={18} className="text-white" />
                                 <input type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
                             </label>
@@ -1581,7 +1581,7 @@ export default function ProfilePage() {
                                             initial={{ opacity: 0, scale: 0.95, y: -10 }}
                                             animate={{ opacity: 1, scale: 1, y: 0 }}
                                             exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                                            className="absolute right-0 top-14 w-44 bg-white border-2 border-black rounded-2xl shadow-2xl z-20 overflow-hidden"
+                                            className="absolute right-0 top-14 w-44 bg-white dark:bg-card-bg border border-border-main dark:border-border-main rounded-2xl shadow-2xl z-20 overflow-hidden"
                                         >
                                             <button 
                                                 onClick={() => { setSelectedDAOGroup(group); setShowDAOEdit(true); setActiveDAOMenu(null); }}
@@ -1763,7 +1763,7 @@ export default function ProfilePage() {
                             </div>
                              <button 
                                  onClick={() => sendRequest(u)}
-                                 className="w-full py-2 bg-text-main text-white rounded-xl text-xs font-bold transition-all hover:bg-black active:scale-[0.98]"
+                                 className="w-full py-2 bg-primary text-white rounded-xl text-xs font-bold transition-all hover:bg-primary-dark active:scale-[0.98] shadow-lg shadow-primary/10"
                              >
                                  Initiate Match
                              </button>
@@ -1890,12 +1890,12 @@ export default function ProfilePage() {
       {/* Course Edit Modal */}
       <AnimatePresence>
         {showCourseEdit && selectedCourse && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4">
+            <div className="fixed inset-0 z-[100] flex items-center justify-center bg-text-main/20 backdrop-blur-sm p-4">
                 <motion.div 
                     initial={{ scale: 0.9, opacity: 0 }} 
                     animate={{ scale: 1, opacity: 1 }} 
                     exit={{ scale: 0.9, opacity: 0 }}
-                    className="w-full max-w-sm bg-white dark:bg-black rounded-[2.5rem] p-8 space-y-6 border-2 border-black dark:border-border-main relative overflow-hidden"
+                    className="w-full max-w-sm bg-white dark:bg-card-bg rounded-[2.5rem] p-8 space-y-6 border border-border-main dark:border-border-main relative overflow-hidden shadow-2xl"
                 >
                     <div className="flex items-center justify-between">
                         <h2 className="text-lg font-bold text-text-main dark:text-white tracking-tight">Edit course</h2>
