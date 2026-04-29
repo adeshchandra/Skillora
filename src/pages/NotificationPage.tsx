@@ -41,42 +41,13 @@ const NotificationItem = ({ notification }: NotificationItemProps) => {
                 navigate(`/chat/${notification.relatedId}`);
                 return;
             }
-            // Fetch the learning request to find participants
-            const reqSnap = await getDoc(doc(db, 'learningRequests', notification.relatedId!));
-            if (reqSnap.exists()) {
-                const reqData = reqSnap.data();
-                const participants = [reqData.senderId, reqData.recipientId].sort();
-                const conversationId = participants.join('_');
-                
-                // Ensure conversation document exists (standard check)
-                const convRef = doc(db, 'conversations', conversationId);
-                const convSnap = await getDoc(convRef);
-                if (!convSnap.exists()) {
-                    await setDoc(convRef, {
-                        participants,
-                        participantInfo: {
-                            [reqData.senderId]: {
-                                displayName: reqData.senderName,
-                                photoURL: '' // Info will be filled later or by Chat
-                            },
-                            [reqData.recipientId]: {
-                                displayName: reqData.recipientName,
-                                photoURL: ''
-                            }
-                        },
-                        unreadCount: { [reqData.senderId]: 0, [reqData.recipientId]: 0 },
-                        updatedAt: serverTimestamp(),
-                        createdAt: serverTimestamp()
-                    });
-                }
-                navigate(`/chat/${conversationId}?openRequest=${notification.relatedId}`);
-            }
+            // Navigate to Profile Upcoming sub-menu to see the request form
+            navigate(`/profile#request-${notification.relatedId}`);
         } else if (notification.type === 'dao') {
             // Related ID for DAO is the groupId
             navigate(`/group?id=${notification.relatedId}`);
         } else if (notification.type === 'contract') {
             // Sessions/Contracts are on the profile page
-            // Highlight specific session if we implement similar highlighting for sessions
             navigate(`/profile#session-${notification.relatedId}`);
         } else if (notification.type === 'rating') {
             // Take them to the profile to rate the session

@@ -32,7 +32,8 @@ export const SkillRequestModal: React.FC<SkillRequestModalProps> = ({
   const [credits, setCredits] = useState(50);
   const [contactMedia, setContactMedia] = useState('WhatsApp');
   const [contactInfo, setContactInfo] = useState('');
-  const [message, setMessage] = useState('');
+  const INITIAL_LETTER_TEMPLATE = `To [Recipient Name / Authority] [Organization / Institution Name] [Address] Subject: Application for [Purpose] Dear Sir/Madam, I would like to respectfully apply for [clearly state your purpose—e.g., admission, job position, course enrollment, leave, etc.]. I am [your name], and I have completed [your qualification / current status]. I am highly interested in [mention reason or motivation briefly]. I believe my skills and dedication will make me a suitable candidate for this opportunity. I would be grateful if you kindly consider my application. I am ready to provide any additional information if required. Thank you for your time and consideration. Yours sincerely, [Your Full Name] [Your Contact Information] [Date]`;
+  const [message, setMessage] = useState(INITIAL_LETTER_TEMPLATE);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
@@ -193,12 +194,12 @@ export const SkillRequestModal: React.FC<SkillRequestModalProps> = ({
               {/* Skills Fields */}
               <div className="space-y-4">
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-text-muted pl-1 uppercase tracking-widest text-primary">I want to learn</label>
+                  <label className="text-[10px] font-bold text-text-muted pl-1 text-primary">I want to learn</label>
                   <input 
                     value={learnSkill}
                     onChange={e => setLearnSkill(e.target.value)}
                     placeholder="e.g. Advanced Figma"
-                    className="w-full bg-hover-bg border-none rounded-2xl px-4 py-4 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20"
+                    className="w-full bg-hover-bg dark:bg-black dark:text-white border-none rounded-2xl px-4 py-4 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20 transition-colors"
                   />
                   {initialTeacherSkills.length > 0 && (
                     <div className="flex flex-wrap gap-2 mt-2">
@@ -211,12 +212,12 @@ export const SkillRequestModal: React.FC<SkillRequestModalProps> = ({
 
                 {requestType === 'Exchange' && (
                   <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-text-muted pl-1 uppercase tracking-widest text-accent-gold">I can teach in return</label>
+                    <label className="text-[10px] font-bold text-text-muted pl-1 text-accent-gold">I can teach in return</label>
                     <input 
                       value={teachSkill}
                       onChange={e => setTeachSkill(e.target.value)}
                       placeholder="e.g. Next.js Basics"
-                      className="w-full bg-hover-bg border-none rounded-2xl px-4 py-4 text-sm font-semibold outline-none focus:ring-2 focus:ring-accent-gold/20"
+                      className="w-full bg-hover-bg dark:bg-black dark:text-white border-none rounded-2xl px-4 py-4 text-sm font-semibold outline-none focus:ring-2 focus:ring-accent-gold/20 transition-colors"
                     />
                     {initialLearnerSkills.length > 0 && (
                       <div className="flex flex-wrap gap-2 mt-2">
@@ -232,13 +233,13 @@ export const SkillRequestModal: React.FC<SkillRequestModalProps> = ({
               {/* Contract Details */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-text-muted pl-1 uppercase tracking-widest">Duration</label>
+                  <label className="text-[10px] font-bold text-text-muted pl-1">Duration</label>
                   <div className="relative">
                     <Clock size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" />
                     <select 
                       value={duration}
                       onChange={e => setDuration(e.target.value)}
-                      className="w-full bg-hover-bg border-none rounded-2xl pl-10 pr-4 py-4 text-sm font-semibold outline-none appearance-none"
+                      className="w-full bg-hover-bg dark:bg-black dark:text-white border-none rounded-2xl pl-10 pr-4 py-4 text-sm font-semibold outline-none appearance-none focus:ring-2 focus:ring-primary/20 transition-colors"
                     >
                       <option>3 days</option>
                       <option>1 week</option>
@@ -248,14 +249,14 @@ export const SkillRequestModal: React.FC<SkillRequestModalProps> = ({
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-text-muted pl-1 uppercase tracking-widest">Credit Stake</label>
+                  <label className="text-[10px] font-bold text-text-muted pl-1">Credit Stake</label>
                   <div className="relative">
                     <Zap size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-accent-gold" />
                     <input 
                       type="number"
                       value={credits}
                       onChange={e => setCredits(parseInt(e.target.value))}
-                      className="w-full bg-hover-bg border-none rounded-2xl pl-10 pr-4 py-4 text-sm font-semibold outline-none"
+                      className="w-full bg-hover-bg dark:bg-black dark:text-white border-none rounded-2xl pl-10 pr-4 py-4 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20 transition-colors"
                     />
                   </div>
                 </div>
@@ -264,7 +265,7 @@ export const SkillRequestModal: React.FC<SkillRequestModalProps> = ({
               {/* Contact Info */}
               <div className="space-y-4">
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-text-muted pl-1 uppercase tracking-widest">Preferred Contact Media</label>
+                  <label className="text-[10px] font-bold text-text-muted pl-1">Preferred Contact Media</label>
                   <div className="flex gap-2">
                     {['WhatsApp', 'Telegram', 'Email', 'Discord'].map(media => (
                       <button 
@@ -278,14 +279,14 @@ export const SkillRequestModal: React.FC<SkillRequestModalProps> = ({
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-text-muted pl-1 uppercase tracking-widest">Contact Information</label>
+                  <label className="text-[10px] font-bold text-text-muted pl-1">Contact Information</label>
                   <div className="relative">
                     <MessageCircle size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" />
                     <input 
                       value={contactInfo}
                       onChange={e => setContactInfo(e.target.value)}
                       placeholder={contactMedia === 'Email' ? 'your@email.com' : 'Your ID / Number'}
-                      className="w-full bg-hover-bg border-none rounded-2xl pl-10 pr-4 py-4 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20"
+                      className="w-full bg-hover-bg dark:bg-black dark:text-white border-none rounded-2xl pl-10 pr-4 py-4 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20 transition-colors"
                     />
                   </div>
                 </div>
@@ -293,30 +294,29 @@ export const SkillRequestModal: React.FC<SkillRequestModalProps> = ({
 
               {/* Message / Motivation */}
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-text-muted pl-1 uppercase tracking-widest">Why do you want to learn this skill?</label>
+                <label className="text-[10px] font-bold text-text-muted pl-1">Application Proposal / Motivation</label>
                 <textarea 
                   value={message}
                   onChange={e => setMessage(e.target.value)}
-                  placeholder="Tell the guru about your goals or why you're interested..."
-                  rows={3}
-                  className="w-full bg-hover-bg border-none rounded-2xl px-4 py-4 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20 resize-none"
+                  placeholder="Fill in the template or tell the guru about your goals..."
+                  rows={10}
+                  className="w-full bg-hover-bg dark:bg-black dark:text-white border-none rounded-2xl px-4 py-4 text-[11px] font-semibold outline-none focus:ring-2 focus:ring-primary/20 resize-none transition-colors leading-relaxed"
                 />
               </div>
             </div>
 
-            {/* Footer */}
-            <div className="p-6 border-t border-border-main bg-gray-50 shrink-0">
+            <div className="p-6 border-t border-border-main shrink-0">
               <button 
                 onClick={handleSubmit}
                 disabled={loading}
-                className="w-full py-4 bg-primary text-white rounded-2xl font-bold text-xs tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-primary/20 active:scale-[0.98] transition-all disabled:opacity-50"
+                className="w-full py-4 bg-primary text-white rounded-2xl font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-primary/20 active:scale-[0.98] transition-all disabled:opacity-50"
               >
                 {loading ? (
                   <Clock className="animate-spin" size={16} />
                 ) : (
                   <>
                     <Send size={16} />
-                    SEND SKILL REQUEST
+                    Send Skill Request
                   </>
                 )}
               </button>

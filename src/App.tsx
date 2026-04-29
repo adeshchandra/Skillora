@@ -275,8 +275,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           </div>
 
           <Link to="/profile" className="w-8 h-8 rounded-full bg-hover-bg overflow-hidden border border-border-main relative flex items-center justify-center shrink-0">
-            {user.photoURL ? (
-              <img src={user.photoURL} className="w-full h-full object-cover" referrerPolicy="no-referrer" alt={user.displayName || 'Profile'} />
+            {(profile?.photoURL || user.photoURL) ? (
+              <img src={profile?.photoURL || user.photoURL} className="w-full h-full object-cover" referrerPolicy="no-referrer" alt={profile?.displayName || user.displayName || 'Profile'} />
             ) : (
               <UserIcon size={16} className="text-text-muted" />
             )}

@@ -13,7 +13,7 @@ const SuggestionBox = ({ title, icon: Icon, description, steps, onDismiss, type 
         <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="p-4 bg-primary/5 rounded-2xl border border-primary/10 space-y-3 relative overflow-hidden"
+            className="p-4 bg-primary/5 dark:bg-black rounded-2xl border border-primary/10 dark:border-border-main space-y-3 relative overflow-hidden"
         >
             <div className="absolute -top-4 -right-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl" />
             <div className="flex items-center gap-2">
@@ -202,14 +202,14 @@ export default function CreatePage() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-white">
-      <div className="p-4 border-b border-border-main flex items-center gap-4">
-         <h1 className="text-xl font-bold text-text-main">Create</h1>
+    <div className="flex flex-col h-full bg-white dark:bg-black">
+      <div className="p-4 border-b border-border-main dark:border-border-main flex items-center gap-4">
+         <h1 className="text-xl font-bold text-text-main dark:text-white">Create</h1>
          <div className="flex items-center gap-1.5 ml-auto">
             <button 
                 onClick={() => setActiveTab('course')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                    activeTab === 'course' ? 'bg-text-main text-white' : 'bg-hover-bg text-text-main group hover:bg-border-main'
+                    activeTab === 'course' ? 'bg-text-main dark:bg-white text-white dark:text-black' : 'bg-hover-bg dark:bg-hover-bg/10 text-text-main dark:text-text-muted group hover:bg-border-main dark:hover:bg-hover-bg/20'
                 }`}
             >
                 Course
@@ -217,7 +217,7 @@ export default function CreatePage() {
             <button 
                 onClick={() => setActiveTab('dao')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                    activeTab === 'dao' ? 'bg-text-main text-white' : 'bg-hover-bg text-text-main group hover:bg-border-main'
+                    activeTab === 'dao' ? 'bg-text-main dark:bg-white text-white dark:text-black' : 'bg-hover-bg dark:bg-hover-bg/10 text-text-main dark:text-text-muted group hover:bg-border-main dark:hover:bg-hover-bg/20'
                 }`}
             >
                 DAO Group
@@ -297,38 +297,38 @@ export default function CreatePage() {
                     </div>
 
                     <div className="space-y-1">
-                        <label className="text-xs font-bold text-text-main pl-1 uppercase tracking-wider">Course Title</label>
+                        <label className="text-xs font-bold text-text-main dark:text-white pl-1 uppercase tracking-wider">Course Title</label>
                         <input
                           required type="text" value={courseTitle}
                           onChange={(e) => setCourseTitle(e.target.value)}
                           placeholder="e.g. Master React in 10 mins"
-                          className="w-full px-4 py-3 bg-hover-bg border-none rounded-xl focus:bg-white focus:ring-1 focus:ring-primary outline-none transition-all text-sm font-semibold"
+                          className="w-full px-4 py-3 bg-hover-bg dark:bg-black dark:text-white border-none dark:border dark:border-border-main rounded-xl focus:bg-white dark:focus:bg-black focus:ring-1 focus:ring-primary outline-none transition-all text-sm font-semibold"
                         />
                     </div>
                     <div className="space-y-1">
-                        <label className="text-xs font-bold text-text-main pl-1 uppercase tracking-wider">Link URL</label>
+                        <label className="text-xs font-bold text-text-main dark:text-white pl-1 uppercase tracking-wider">Link URL</label>
                         <div className="relative">
                             <input
                               required type="url" value={courseLink}
                               onChange={(e) => setCourseLink(e.target.value)}
                               placeholder="YouTube, Facebook, etc."
-                              className="w-full px-4 py-3 bg-hover-bg border-none rounded-xl focus:bg-white focus:ring-1 focus:ring-primary outline-none transition-all text-sm font-semibold pr-10"
+                              className="w-full px-4 py-3 bg-hover-bg dark:bg-black dark:text-white border-none dark:border dark:border-border-main rounded-xl focus:bg-white dark:focus:bg-black focus:ring-1 focus:ring-primary outline-none transition-all text-sm font-semibold pr-10"
                             />
                             {courseLink && (
-                                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-[10px] bg-white px-2 py-0.5 rounded border border-border-main/20">
+                                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-[10px] bg-white dark:bg-black px-2 py-0.5 rounded border border-border-main/20">
                                     <LinkIcon size={10} className="text-primary" />
-                                    <span className="font-bold text-text-muted">{reduceURL(courseLink)}</span>
+                                    <span className="font-bold text-text-muted dark:text-text-muted">{reduceURL(courseLink)}</span>
                                 </div>
                             )}
                         </div>
                     </div>
                     <div className="space-y-1">
-                        <label className="text-xs font-bold text-text-main pl-1 tracking-wide">DAO Group Link (Optional)</label>
+                        <label className="text-xs font-bold text-text-main dark:text-white pl-1 tracking-wide">DAO Group Link (Optional)</label>
                         <input
                           type="url" value={daoGroupLink}
                           onChange={(e) => setDaoGroupLink(e.target.value)}
                           placeholder="Link to your DAO group"
-                          className="w-full px-4 py-3 bg-hover-bg border-none rounded-xl focus:bg-white focus:ring-1 focus:ring-primary outline-none transition-all text-sm font-semibold"
+                          className="w-full px-4 py-3 bg-hover-bg dark:bg-black dark:text-white border-none dark:border dark:border-border-main rounded-xl focus:bg-white dark:focus:bg-black focus:ring-1 focus:ring-primary outline-none transition-all text-sm font-semibold"
                         />
                     </div>
                 </div>
@@ -342,7 +342,7 @@ export default function CreatePage() {
                             onChange={(e) => setCustomTag(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addCustomTag())}
                             placeholder="Add custom skill..."
-                            className="flex-grow px-4 py-2 bg-hover-bg border-none rounded-xl focus:bg-white focus:ring-1 focus:ring-primary outline-none text-xs font-bold"
+                            className="flex-grow px-4 py-2 bg-hover-bg dark:bg-black dark:text-white border-none rounded-xl focus:bg-white dark:focus:bg-black focus:ring-1 focus:ring-primary outline-none text-xs font-bold"
                         />
                         <button 
                             type="button" 
@@ -387,7 +387,7 @@ export default function CreatePage() {
                     </div>
                 </div>
 
-                <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10 flex items-center gap-3">
+                <div className="p-4 bg-primary/5 dark:bg-black rounded-2xl border border-primary/10 dark:border-border-main flex items-center gap-3">
                     <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-xs">+10</div>
                     <p className="text-[13px] font-bold text-text-main tracking-tight">Post & earn 10 skill credits.</p>
                 </div>
@@ -439,38 +439,38 @@ export default function CreatePage() {
                     </div>
 
                     <div className="space-y-1">
-                        <label className="text-xs font-bold text-text-main pl-1 uppercase tracking-wider">DAO Group Name</label>
+                        <label className="text-xs font-bold text-text-main dark:text-white pl-1 uppercase tracking-wider">DAO Group Name</label>
                         <input
                           required type="text" value={daoName}
                           onChange={(e) => setDaoName(e.target.value)}
                           placeholder="e.g. Python Warriors"
-                          className="w-full px-4 py-3 bg-hover-bg border-none rounded-xl focus:bg-white focus:ring-1 focus:ring-primary outline-none transition-all text-sm font-semibold"
+                          className="w-full px-4 py-3 bg-hover-bg dark:bg-black dark:text-white border-none dark:border dark:border-border-main rounded-xl focus:bg-white dark:focus:bg-black focus:ring-1 focus:ring-primary outline-none transition-all text-sm font-semibold"
                         />
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                         <div className="space-y-1">
-                            <label className="text-xs font-bold text-text-main pl-1 uppercase tracking-wider">Member Limit</label>
+                            <label className="text-xs font-bold text-text-main dark:text-white pl-1 uppercase tracking-wider">Member Limit</label>
                             <input
                               required type="number" min="3" value={daoLimit || ''}
                               onChange={(e) => setDaoLimit(parseInt(e.target.value) || 0)}
-                              className="w-full px-4 py-3 bg-hover-bg border-none rounded-xl focus:bg-white focus:ring-1 focus:ring-primary outline-none transition-all text-sm font-semibold"
+                              className="w-full px-4 py-3 bg-hover-bg dark:bg-black dark:text-white border-none dark:border dark:border-border-main rounded-xl focus:bg-white dark:focus:bg-black focus:ring-1 focus:ring-primary outline-none transition-all text-sm font-semibold"
                             />
                         </div>
                         <div className="space-y-1">
-                            <label className="text-xs font-bold text-text-main pl-1 uppercase tracking-wider">Stake (Pts)</label>
+                            <label className="text-xs font-bold text-text-main dark:text-white pl-1 uppercase tracking-wider">Stake (Pts)</label>
                             <input
                               required type="number" min="1" value={daoStake || ''}
                               onChange={(e) => setDaoStake(parseInt(e.target.value) || 0)}
-                              className="w-full px-4 py-3 bg-hover-bg border-none rounded-xl focus:bg-white focus:ring-1 focus:ring-primary outline-none transition-all text-sm font-semibold"
+                              className="w-full px-4 py-3 bg-hover-bg dark:bg-black dark:text-white border-none dark:border dark:border-border-main rounded-xl focus:bg-white dark:focus:bg-black focus:ring-1 focus:ring-primary outline-none transition-all text-sm font-semibold"
                             />
                         </div>
                     </div>
                     <div className="space-y-1">
-                        <label className="text-xs font-bold text-text-main pl-1 uppercase tracking-wider">Join Deadline</label>
+                        <label className="text-xs font-bold text-text-main dark:text-white pl-1 uppercase tracking-wider">Join Deadline</label>
                         <input
                           required type="datetime-local" value={daoDeadline}
                           onChange={(e) => setDaoDeadline(e.target.value)}
-                          className="w-full px-4 py-3 bg-hover-bg border-none rounded-xl focus:bg-white focus:ring-1 focus:ring-primary outline-none transition-all text-sm font-semibold"
+                          className="w-full px-4 py-3 bg-hover-bg dark:bg-black dark:text-white border-none dark:border dark:border-border-main rounded-xl focus:bg-white dark:focus:bg-black focus:ring-1 focus:ring-primary outline-none transition-all text-sm font-semibold"
                         />
                     </div>
                     
@@ -497,12 +497,12 @@ export default function CreatePage() {
                     </div>
 
                     <div className="space-y-1">
-                        <label className="text-xs font-bold text-text-main pl-1 uppercase tracking-wider">Learning Topic</label>
+                        <label className="text-xs font-bold text-text-main dark:text-white pl-1 uppercase tracking-wider">Learning Topic</label>
                         <input
                           required type="text" value={daoTopic}
                           onChange={(e) => setDaoTopic(e.target.value)}
                           placeholder="e.g. Design Systems"
-                          className="w-full px-4 py-3 bg-hover-bg border-none rounded-xl focus:bg-white focus:ring-1 focus:ring-primary outline-none transition-all text-sm font-semibold"
+                          className="w-full px-4 py-3 bg-hover-bg dark:bg-black dark:text-white border-none dark:border dark:border-border-main rounded-xl focus:bg-white dark:focus:bg-black focus:ring-1 focus:ring-primary outline-none transition-all text-sm font-semibold"
                         />
                     </div>
                 </div>
@@ -516,7 +516,7 @@ export default function CreatePage() {
                             onChange={(e) => setCustomTag(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addCustomTag())}
                             placeholder="Add custom skill..."
-                            className="flex-grow px-4 py-2 bg-hover-bg border-none rounded-xl focus:bg-white focus:ring-1 focus:ring-primary outline-none text-xs font-bold"
+                            className="flex-grow px-4 py-2 bg-hover-bg dark:bg-black dark:text-white border-none rounded-xl focus:bg-white dark:focus:bg-black focus:ring-1 focus:ring-primary outline-none text-xs font-bold"
                         />
                         <button 
                             type="button" 

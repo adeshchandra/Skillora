@@ -22,7 +22,7 @@ const FilterSystem = ({ selectedTags, setSelectedTags, searchQuery, setSearchQue
   };
 
   return (
-    <div className="bg-white border-b border-border-main">
+    <div className="bg-white dark:bg-black border-b border-border-main dark:border-border-main">
       <div className="px-4 py-3 space-y-3">
         <div className="relative flex items-center">
             <SearchIcon size={16} className="absolute left-3 text-text-muted" />
@@ -31,7 +31,7 @@ const FilterSystem = ({ selectedTags, setSelectedTags, searchQuery, setSearchQue
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Find a DAO goal..."
-                className="w-full bg-hover-bg border-none rounded-xl py-2 pl-10 pr-4 text-xs font-semibold focus:ring-1 focus:ring-primary outline-none"
+                className="w-full bg-hover-bg dark:bg-black border-none dark:border dark:border-border-main dark:text-white rounded-xl py-2 pl-10 pr-4 text-xs font-semibold focus:ring-1 focus:ring-primary outline-none"
             />
             {searchQuery && (
                 <button onClick={() => setSearchQuery('')} className="absolute right-3 p-1 text-text-muted">
@@ -207,7 +207,7 @@ const QuizComponent = ({ group, onComplete }: { group: DAOGroup, onComplete: () 
   if (loadingRecord) return <div className="p-10 flex justify-center"><RefreshCw className="animate-spin text-primary" /></div>;
 
   if (!quiz) return (
-    <div className="p-6 text-center bg-hover-bg rounded-xl border border-border-main">
+    <div className="p-6 text-center bg-hover-bg dark:bg-hover-bg/10 rounded-xl border border-border-main dark:border-border-main">
       <Timer size={24} className="mx-auto text-text-muted mb-2 opacity-40" />
       <p className="text-xs font-bold text-text-muted italic">No active goal quiz right now.</p>
       <p className="text-[10px] text-text-muted mt-1 tracking-wide font-bold">Admins release quizzes periodically</p>
@@ -288,8 +288,8 @@ const QuizComponent = ({ group, onComplete }: { group: DAOGroup, onComplete: () 
                     const isAnswered = selectedIdx !== undefined;
 
                     return (
-                        <div key={qIdx} className="p-5 bg-white rounded-2xl border border-border-main space-y-4 shadow-sm">
-                            <h3 className="text-sm font-bold text-text-main leading-tight">
+                        <div key={qIdx} className="p-5 bg-white dark:bg-black rounded-2xl border border-border-main dark:border-border-main space-y-4 shadow-sm">
+                            <h3 className="text-sm font-bold text-text-main dark:text-white leading-tight">
                                 <span className="text-primary mr-2">Q{qIdx + 1}.</span>
                                 {q.question}
                             </h3>
@@ -311,10 +311,10 @@ const QuizComponent = ({ group, onComplete }: { group: DAOGroup, onComplete: () 
                                             onClick={() => handleSelectOption(qIdx, oIdx)}
                                             className={`
                                                 w-full text-left p-3.5 rounded-xl border transition-all font-medium text-xs flex justify-between items-center group
-                                                ${variant === 'correct' ? 'bg-green-50 border-green-500 text-green-700 shadow-sm' : ''}
-                                                ${variant === 'wrong' ? 'bg-red-50 border-red-500 text-red-700' : ''}
+                                                ${variant === 'correct' ? 'bg-green-50 dark:bg-green-500/10 border-green-500 text-green-700 dark:text-green-400 shadow-sm' : ''}
+                                                ${variant === 'wrong' ? 'bg-red-50 dark:bg-red-500/10 border-red-500 text-red-700 dark:text-red-400' : ''}
                                                 ${variant === 'selected' ? 'bg-primary/5 border-primary text-primary' : ''}
-                                                ${variant === 'default' ? 'bg-white border-border-main hover:bg-hover-bg hover:border-primary/30 text-text-main' : ''}
+                                                ${variant === 'default' ? 'bg-white dark:bg-black border-border-main dark:border-border-main hover:bg-hover-bg dark:hover:bg-hover-bg/10 hover:border-primary/30 text-text-main dark:text-white' : ''}
                                                 ${isAnswered && variant === 'default' ? 'opacity-50' : ''}
                                             `}
                                         >
@@ -323,7 +323,7 @@ const QuizComponent = ({ group, onComplete }: { group: DAOGroup, onComplete: () 
                                                     ${variant === 'correct' ? 'bg-green-500 text-white' : ''}
                                                     ${variant === 'wrong' ? 'bg-red-500 text-white' : ''}
                                                     ${variant === 'selected' ? 'bg-primary text-white' : ''}
-                                                    ${variant === 'default' ? 'bg-hover-bg text-text-muted' : ''}
+                                                    ${variant === 'default' ? 'bg-hover-bg dark:bg-hover-bg/20 text-text-muted' : ''}
                                                 `}>
                                                     {String.fromCharCode(65 + oIdx)}
                                                 </div>
@@ -469,10 +469,10 @@ const ManageQuizzes = ({ groupId, onBack }: { groupId: string, onBack: () => voi
   };
 
   return (
-    <div className="flex flex-col h-full bg-white animate-in slide-in-from-bottom duration-300">
-      <div className="p-4 border-b border-border-main flex items-center justify-between sticky top-0 bg-white z-10">
+    <div className="flex flex-col h-full bg-white dark:bg-black animate-in slide-in-from-bottom duration-300">
+      <div className="p-4 border-b border-border-main dark:border-border-main flex items-center justify-between sticky top-0 bg-white dark:bg-black z-10">
         <button onClick={onBack} className="p-2 -ml-2 text-text-muted hover:text-text-main"><ArrowRight size={22} className="rotate-180" /></button>
-        <h2 className="font-bold text-sm">Quiz Management</h2>
+        <h2 className="font-bold text-sm dark:text-white">Quiz Management</h2>
         {!isAdding ? (
             <button onClick={() => setIsAdding(true)} className="p-2 bg-primary text-white rounded-lg"><Plus size={18} /></button>
         ) : (
@@ -483,7 +483,7 @@ const ManageQuizzes = ({ groupId, onBack }: { groupId: string, onBack: () => voi
       <div className="flex-grow overflow-y-auto p-4 space-y-6">
         {isAdding ? (
             <div className="space-y-6 pb-20">
-                <div className="p-4 bg-hover-bg rounded-2xl border border-border-main space-y-4">
+                <div className="p-4 bg-hover-bg dark:bg-hover-bg/10 rounded-2xl border border-border-main dark:border-border-main space-y-4">
                     <h3 className="text-xs font-bold tracking-wide text-text-muted">Settings</h3>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1">
@@ -492,7 +492,7 @@ const ManageQuizzes = ({ groupId, onBack }: { groupId: string, onBack: () => voi
                                 type="datetime-local" 
                                 value={availableFrom} 
                                 onChange={e => setAvailableFrom(e.target.value)}
-                                className="w-full bg-white border border-border-main rounded-xl p-2.5 text-xs font-bold outline-none focus:ring-1 focus:ring-primary"
+                                className="w-full bg-white dark:bg-black dark:text-white border border-border-main dark:border-border-main rounded-xl p-2.5 text-xs font-bold outline-none focus:ring-1 focus:ring-primary dark:[color-scheme:dark]"
                             />
                         </div>
                         <div className="space-y-1">
@@ -501,13 +501,13 @@ const ManageQuizzes = ({ groupId, onBack }: { groupId: string, onBack: () => voi
                                 type="datetime-local" 
                                 value={availableUntil} 
                                 onChange={e => setAvailableUntil(e.target.value)}
-                                className="w-full bg-white border border-border-main rounded-xl p-2.5 text-xs font-bold outline-none focus:ring-1 focus:ring-primary"
+                                className="w-full bg-white dark:bg-black dark:text-white border border-border-main dark:border-border-main rounded-xl p-2.5 text-xs font-bold outline-none focus:ring-1 focus:ring-primary dark:[color-scheme:dark]"
                             />
                         </div>
                     </div>
                     <div className="flex items-center justify-between">
                         <div className="space-y-0.5">
-                            <p className="text-xs font-bold text-text-main">Time limit (mins)</p>
+                            <p className="text-xs font-bold text-text-main dark:text-white">Time limit (mins)</p>
                             <p className="text-[10px] text-text-muted">Once member starts quiz</p>
                         </div>
                         <input 
@@ -515,13 +515,13 @@ const ManageQuizzes = ({ groupId, onBack }: { groupId: string, onBack: () => voi
                             min="1" 
                             value={duration || ''} 
                             onChange={e => setDuration(parseInt(e.target.value) || 0)}
-                            className="w-16 bg-white border border-border-main rounded-lg p-2 text-xs font-bold text-center outline-none"
+                            className="w-16 bg-white dark:bg-black dark:text-white border border-border-main dark:border-border-main rounded-lg p-2 text-xs font-bold text-center outline-none"
                         />
                     </div>
-                    <div className="flex items-center justify-between p-3 bg-white rounded-xl border border-border-main/50">
+                    <div className="flex items-center justify-between p-3 bg-white dark:bg-black rounded-xl border border-border-main/50 dark:border-border-main">
                         <div className="flex items-center gap-2">
                             <AlertTriangle size={14} className={negativeMarking ? "text-red-500" : "text-text-muted"} />
-                            <span className="text-xs font-bold text-text-main">Negative Marking (-0.25)</span>
+                            <span className="text-xs font-bold text-text-main dark:text-white">Negative Marking (-0.25)</span>
                         </div>
                         <button 
                             type="button" 
@@ -539,12 +539,12 @@ const ManageQuizzes = ({ groupId, onBack }: { groupId: string, onBack: () => voi
                     </h3>
                     <div className="space-y-3">
                         {questions.map((q, i) => (
-                            <div key={i} className="p-3 bg-white border border-border-main rounded-xl relative group">
+                            <div key={i} className="p-3 bg-white dark:bg-black border border-border-main dark:border-border-main rounded-xl relative group">
                                 <button onClick={() => removeQuestion(i)} className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"><X size={12} /></button>
-                                <p className="text-xs font-bold text-text-main mb-2">{i+1}. {q.question}</p>
+                                <p className="text-xs font-bold text-text-main dark:text-white mb-2">{i+1}. {q.question}</p>
                                 <div className="grid grid-cols-2 gap-1.5">
                                     {q.options.map((o, oi) => (
-                                        <div key={oi} className={`text-[9px] font-bold px-2 py-1 rounded ${oi === q.correctAnswerIndex ? 'bg-green-100 text-green-700' : 'bg-hover-bg text-text-muted'}`}>
+                                        <div key={oi} className={`text-[9px] font-bold px-2 py-1 rounded ${oi === q.correctAnswerIndex ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400' : 'bg-hover-bg dark:bg-hover-bg/20 text-text-muted'}`}>
                                             {o}
                                         </div>
                                     ))}
@@ -556,9 +556,9 @@ const ManageQuizzes = ({ groupId, onBack }: { groupId: string, onBack: () => voi
                     <div className="p-4 bg-primary/5 rounded-2xl border border-primary/20 space-y-4">
                         <textarea 
                             value={qText} 
-                            onChange={e => setQText(e.target.value)}
+                            onChange={e => setQText(e.target.value)} 
                             placeholder="Type question here..."
-                            className="w-full bg-white border border-border-main rounded-xl p-3 text-xs font-medium outline-none focus:ring-1 focus:ring-primary min-h-[80px]"
+                            className="w-full bg-white dark:bg-black dark:text-white border border-border-main dark:border-border-main rounded-xl p-3 text-xs font-medium outline-none focus:ring-1 focus:ring-primary min-h-[80px]"
                         />
                         <div className="space-y-2">
                             {opts.map((o, i) => (
@@ -571,18 +571,18 @@ const ManageQuizzes = ({ groupId, onBack }: { groupId: string, onBack: () => voi
                                             setOpts(newOpts);
                                         }}
                                         placeholder={`Option ${i+1}`}
-                                        className="flex-grow bg-white border border-border-main rounded-lg px-3 py-1.5 text-xs outline-none"
+                                        className="flex-grow bg-white dark:bg-black dark:text-white border border-border-main dark:border-border-main rounded-lg px-3 py-1.5 text-xs outline-none"
                                     />
                                     <button 
                                         onClick={() => setCorrectIdx(i)}
-                                        className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 border transition-colors ${correctIdx === i ? 'bg-green-500 border-green-500 text-white' : 'bg-white border-border-main text-transparent'}`}
+                                        className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 border transition-colors ${correctIdx === i ? 'bg-green-500 border-green-500 text-white' : 'bg-white dark:bg-black border-border-main dark:border-border-main text-transparent'}`}
                                     >
                                         <CheckCircle size={14} />
                                     </button>
                                 </div>
                             ))}
                         </div>
-                        <button onClick={addQuestion} className="w-full py-2 bg-text-main text-white rounded-xl text-xs font-bold tracking-wide">+ Add question</button>
+                        <button onClick={addQuestion} className="w-full py-2 bg-text-main dark:bg-white dark:text-black rounded-xl text-xs font-bold tracking-wide">+ Add question</button>
                     </div>
                 </div>
 
@@ -873,13 +873,13 @@ const DAODetail = ({ groupId, onBack }: { groupId: string, onBack: () => void })
   const isAdmin = user?.uid === group.adminId;
 
   return (
-    <div className="flex flex-col h-full bg-white animate-in slide-in-from-right duration-200">
-      <div className="sticky top-0 bg-white z-40 px-4 h-14 flex items-center gap-4 border-b border-border-main">
+    <div className="flex flex-col h-full bg-white dark:bg-black animate-in slide-in-from-right duration-200">
+      <div className="sticky top-0 bg-white dark:bg-black z-40 px-4 h-14 flex items-center gap-4 border-b border-border-main dark:border-border-main">
         <button onClick={onBack} className="p-1 -ml-1 text-text-muted hover:text-text-main">
            <ArrowRight className="rotate-180" size={24} />
         </button>
-        <h2 className="font-bold text-[16px] truncate flex-grow text-text-main">{group.name}</h2>
-        <div className="bg-hover-bg text-text-main font-bold text-[10px] px-2.5 py-1 rounded tracking-wide border border-border-main">
+        <h2 className="font-bold text-[16px] truncate flex-grow text-text-main dark:text-white">{group.name}</h2>
+        <div className="bg-hover-bg dark:bg-hover-bg/20 text-text-main dark:text-white font-bold text-[10px] px-2.5 py-1 rounded tracking-wide border border-border-main dark:border-border-main">
             {group.status}
         </div>
       </div>
@@ -954,7 +954,7 @@ const DAODetail = ({ groupId, onBack }: { groupId: string, onBack: () => void })
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      className="overflow-hidden space-y-3 p-3 bg-hover-bg rounded-xl border border-border-main/50"
+                      className="overflow-hidden space-y-3 p-3 bg-hover-bg dark:bg-hover-bg/10 rounded-xl border border-border-main/50 dark:border-border-main"
                     >
                       <div className="relative">
                         <SearchIcon size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
@@ -963,7 +963,7 @@ const DAODetail = ({ groupId, onBack }: { groupId: string, onBack: () => void })
                           value={userSearch}
                           onChange={(e) => setUserSearch(e.target.value)}
                           placeholder="Search user by name..."
-                          className="w-full pl-9 pr-4 py-2 bg-white border border-border-main rounded-lg text-xs font-bold outline-none focus:ring-1 focus:ring-primary"
+                          className="w-full pl-9 pr-4 py-2 bg-white dark:bg-black border border-border-main dark:border-border-main dark:text-white rounded-lg text-xs font-bold outline-none focus:ring-1 focus:ring-primary"
                         />
                       </div>
                       
@@ -972,10 +972,10 @@ const DAODetail = ({ groupId, onBack }: { groupId: string, onBack: () => void })
                           <p className="text-[10px] font-bold text-text-muted text-center py-2">Searching...</p>
                         ) : searchResults.length > 0 ? (
                           searchResults.map((u, idx) => (
-                            <div key={`${u.uid}-${idx}`} className="flex items-center justify-between p-2 bg-white rounded-lg border border-border-main/30 shadow-sm">
+                            <div key={`${u.uid}-${idx}`} className="flex items-center justify-between p-2 bg-white dark:bg-black rounded-lg border border-border-main/30 dark:border-border-main shadow-sm">
                               <div className="flex items-center gap-2">
                                 <img src={u.photoURL} className="w-6 h-6 rounded-full" referrerPolicy="no-referrer" />
-                                <span className="text-[11px] font-bold text-text-main">{u.displayName}</span>
+                                <span className="text-[11px] font-bold text-text-main dark:text-white">{u.displayName}</span>
                               </div>
                               <button 
                                 onClick={() => addMember(u)}
@@ -1026,14 +1026,14 @@ const DAODetail = ({ groupId, onBack }: { groupId: string, onBack: () => void })
                 </div>
 
                 {group.meetingLink ? (
-                  <div className="flex items-center justify-between p-3 bg-white rounded-xl border border-border-main/50 shadow-sm">
+                  <div className="flex items-center justify-between p-3 bg-white dark:bg-black rounded-xl border border-border-main/50 dark:border-border-main shadow-sm">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-8 h-8 bg-hover-bg rounded-lg flex items-center justify-center text-primary shrink-0">
+                      <div className="w-8 h-8 bg-hover-bg dark:bg-hover-bg/20 rounded-lg flex items-center justify-center text-primary shrink-0">
                         <Users size={16} />
                       </div>
                       <div className="min-w-0">
                         <p className="text-[10px] font-bold text-text-muted">Link to join meeting</p>
-                        <p className="text-xs font-bold text-text-main truncate max-w-[150px]">{group.meetingLink}</p>
+                        <p className="text-xs font-bold text-text-main dark:text-white truncate max-w-[150px]">{group.meetingLink}</p>
                       </div>
                     </div>
                     <button 
@@ -1057,7 +1057,7 @@ const DAODetail = ({ groupId, onBack }: { groupId: string, onBack: () => void })
                       value={meetingLink}
                       onChange={(e) => setMeetingLink(e.target.value)}
                       placeholder="Enter meeting link or ID..."
-                      className="w-full bg-white border border-border-main rounded-xl p-3 text-xs font-medium focus:ring-1 focus:ring-primary outline-none"
+                      className="w-full bg-white dark:bg-black dark:text-white border border-border-main dark:border-border-main rounded-xl p-3 text-xs font-medium focus:ring-1 focus:ring-primary outline-none"
                     />
                     <button 
                       onClick={updateMeetingLink}
@@ -1114,21 +1114,21 @@ const DAODetail = ({ groupId, onBack }: { groupId: string, onBack: () => void })
                     {members.sort((a,b) => (b.quizzesPassed || 0) - (a.quizzesPassed || 0)).map((m, idx) => (
                       <div 
                         key={m.id || m.userId || `member-${idx}`} 
-                        className="flex items-center gap-3 p-3 bg-white border border-border-main rounded-xl hover:bg-hover-bg transition-colors"
+                        className="flex items-center gap-3 p-3 bg-white dark:bg-black border border-border-main dark:border-border-main rounded-xl hover:bg-hover-bg dark:hover:bg-hover-bg/10 transition-colors"
                       >
                          <span className="w-4 text-center font-bold text-xs text-text-muted shrink-0">{idx + 1}</span>
                          <div 
                            className="flex-grow flex items-center gap-3 min-w-0 cursor-pointer"
                            onClick={() => navigate(`/user/${m.userId || m.id}`)}
                          >
-                            <img src={m.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${m.displayName}`} className="w-8 h-8 rounded-full bg-hover-bg shrink-0" referrerPolicy="no-referrer" />
+                            <img src={m.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${m.displayName}`} className="w-8 h-8 rounded-full bg-hover-bg dark:bg-hover-bg/20 shrink-0" referrerPolicy="no-referrer" />
                             <div className="flex-grow min-w-0">
-                                <p className="text-sm font-bold text-text-main truncate">{m.displayName}</p>
+                                <p className="text-sm font-bold text-text-main dark:text-white truncate">{m.displayName}</p>
                                 <p className="text-[10px] text-text-muted font-medium">Last Score: {m.latestQuizScore ?? 'N/A'}</p>
                             </div>
                          </div>
                          <div className="flex items-center gap-3 shrink-0">
-                            <div className="text-[11px] font-bold text-text-main">
+                            <div className="text-[11px] font-bold text-text-main dark:text-white">
                                 {m.quizzesPassed || 0} ✓
                             </div>
                             {isAdmin && (m.id !== user?.uid && m.userId !== user?.uid) && (
@@ -1161,6 +1161,9 @@ export default function GroupPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [groups, setGroups] = useState<DAOGroup[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
+  const [pullDistance, setPullDistance] = useState(0);
+  const [startY, setStartY] = useState(0);
   const [userInterests, setUserInterests] = useState<UserInterest | null>(null);
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(searchParams.get('id'));
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -1190,14 +1193,55 @@ export default function GroupPage() {
     };
   }, []);
 
-  useEffect(() => {
+  const fetchGroups = (isRefreshing = false) => {
+    if (isRefreshing) setRefreshing(true);
+    
     const q = query(collection(db, 'daoGroups'), orderBy('createdAt', 'desc'), limit(50));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as DAOGroup));
+      let data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as DAOGroup));
+      
+      if (isRefreshing) {
+        // High quality: Keep top 5 latest, shuffle the rest (11-50)
+        const recent = data.slice(0, 5);
+        const older = data.slice(5);
+        const shuffled = [...older].sort(() => Math.random() - 0.5);
+        data = [...recent, ...shuffled];
+      }
+
       setGroups(data);
+      setRefreshing(false);
     });
     return unsubscribe;
+  };
+
+  useEffect(() => {
+    const unsubscribe = fetchGroups();
+    return unsubscribe;
   }, []);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (window.scrollY === 0) {
+      setStartY(e.touches[0].clientY);
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (startY) {
+      const distance = e.touches[0].clientY - startY;
+      if (distance > 0 && window.scrollY === 0) {
+        const resistedDistance = Math.min(distance * 0.4, 150);
+        setPullDistance(resistedDistance);
+      }
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (pullDistance > 60) {
+      fetchGroups(true);
+    }
+    setPullDistance(0);
+    setStartY(0);
+  };
 
   const [joiningId, setJoiningId] = useState<string | null>(null);
 
@@ -1263,9 +1307,30 @@ export default function GroupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-bg-main pb-20">
-      <div className="p-5 bg-white border-b border-border-main">
-        <h1 className="text-xl font-bold text-text-main tracking-tight mb-0.5">DeadlineDAO</h1>
+    <div 
+      className="min-h-screen bg-bg-main dark:bg-black pb-20 relative"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* Pull to refresh indicator */}
+      {(pullDistance > 0 || refreshing) && (
+        <div 
+          className="absolute left-0 right-0 flex justify-center z-[60] pointer-events-none"
+          style={{ top: refreshing ? '80px' : `${Math.min(pullDistance, 100)}px` }}
+        >
+          <motion.div 
+            animate={refreshing ? { rotate: 360 } : { rotate: pullDistance * 2 }}
+            transition={refreshing ? { repeat: Infinity, duration: 1, ease: "linear" } : { duration: 0 }}
+            className={`w-8 h-8 rounded-full bg-white dark:bg-black shadow-lg border border-border-main flex items-center justify-center ${refreshing ? 'text-primary' : 'text-text-muted'}`}
+          >
+            <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
+          </motion.div>
+        </div>
+      )}
+
+      <div className="p-5 bg-white dark:bg-black border-b border-border-main dark:border-border-main">
+        <h1 className="text-xl font-bold text-text-main dark:text-white tracking-tight mb-0.5">DeadlineDAO</h1>
         <p className="text-text-muted text-[10px] font-bold tracking-wide">Commit together. Earn together.</p>
       </div>
 

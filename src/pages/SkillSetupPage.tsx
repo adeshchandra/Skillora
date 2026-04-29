@@ -78,18 +78,18 @@ export default function SkillSetupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col font-sans">
+    <div className="min-h-screen bg-white dark:bg-black flex flex-col font-sans">
       <div className="flex-1 flex flex-col items-center justify-center px-6 max-w-[400px] mx-auto w-full py-20">
         
         {/* Progress Header */}
         <div className="w-full mb-12 space-y-6">
             <div className="flex items-center justify-center gap-1.5 opacity-40">
-                <div className="text-xl font-black tracking-tighter text-text-main">Skillora</div>
+                <div className="text-xl font-black tracking-tighter text-text-main dark:text-white">Skillora</div>
                 <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1" />
             </div>
             <div className="flex items-center gap-1.5 justify-center">
-                <div className={`h-1 rounded-full transition-all duration-500 ${step >= 1 ? 'w-8 bg-text-main' : 'w-4 bg-text-muted/20'}`} />
-                <div className={`h-1 rounded-full transition-all duration-500 ${step >= 2 ? 'w-8 bg-text-main' : 'w-4 bg-text-muted/20'}`} />
+                <div className={`h-1 rounded-full transition-all duration-500 ${step >= 1 ? 'w-8 bg-text-main dark:bg-white' : 'w-4 bg-text-muted/20'}`} />
+                <div className={`h-1 rounded-full transition-all duration-500 ${step >= 2 ? 'w-8 bg-text-main dark:bg-white' : 'w-4 bg-text-muted/20'}`} />
             </div>
         </div>
 
@@ -194,11 +194,11 @@ export default function SkillSetupPage() {
                       value={customSkill}
                       onChange={(e) => setCustomSkill(e.target.value)}
                       placeholder="Add another skill..."
-                      className="w-full px-4 py-4 bg-hover-bg/30 border-2 border-dashed border-border-main rounded-2xl text-[12px] font-bold text-text-main outline-none focus:border-text-main focus:bg-white transition-all pr-12"
+                      className="w-full px-4 py-4 bg-hover-bg/30 dark:bg-black border-2 border-dashed border-border-main rounded-2xl text-[12px] font-bold text-text-main dark:text-white outline-none focus:border-text-main dark:focus:border-white focus:bg-white dark:focus:bg-black transition-all pr-12"
                     />
                     <button 
                         type="submit"
-                        className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-text-main text-white rounded-xl hover:bg-black transition-all"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-text-main dark:bg-white text-white dark:text-black rounded-xl hover:bg-black dark:hover:bg-white/90 transition-all"
                     >
                         <Plus size={16} />
                     </button>

@@ -85,7 +85,7 @@ export interface Session {
   subject: string;
   credits: number;
   link?: string;
-  status: 'Ready' | 'Live' | 'Completed' | 'Cancelled';
+  status: 'Ready' | 'Live' | 'Started' | 'Completed' | 'Cancelled';
   createdAt: any;
 
   // Mutual Rating System

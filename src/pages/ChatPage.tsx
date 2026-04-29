@@ -76,13 +76,13 @@ const PersistenceAgreement = ({ onAgree }: { onAgree: () => void }) => (
             <div className="flex flex-col gap-3 pt-2">
                 <button 
                     onClick={onAgree}
-                    className="w-full py-4 bg-text-main text-white rounded-2xl font-bold text-xs tracking-wide shadow-lg shadow-black/10 active:scale-95 transition-all"
+                    className="w-full py-4 bg-text-main text-white rounded-2xl font-bold text-xs shadow-lg shadow-black/10 active:scale-95 transition-all"
                 >
                     I agree, Sync to my device
                 </button>
                 <button 
                     onClick={() => onAgree()} 
-                    className="w-full py-4 bg-hover-bg text-text-muted rounded-2xl font-bold text-xs tracking-wide"
+                    className="w-full py-4 bg-hover-bg text-text-muted rounded-2xl font-bold text-xs"
                 >
                     Maybe later
                 </button>
@@ -90,6 +90,8 @@ const PersistenceAgreement = ({ onAgree }: { onAgree: () => void }) => (
         </motion.div>
     </div>
 );
+
+import Markdown from 'react-markdown';
 
 const SkillRequestBubble = ({ requestId, isMe, onOpenNegotiation }: { requestId: string, isMe: boolean, onOpenNegotiation: (req: LearningRequest) => void }) => {
     const { user } = useAuth();
@@ -126,9 +128,9 @@ const SkillRequestBubble = ({ requestId, isMe, onOpenNegotiation }: { requestId:
                     <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
                         <Handshake size={16} />
                     </div>
-                    <span className="text-[10px] font-black uppercase tracking-wider text-primary">Skill Request</span>
+                    <span className="text-[10px] font-black text-primary">Skill Request</span>
                 </div>
-                <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider ${
+                <span className={`px-2 py-0.5 rounded text-[8px] font-black ${
                     request.status === 'Accepted' ? 'bg-green-500 text-white' : 
                     request.status === 'Declined' ? 'bg-red-500 text-white' : 'bg-accent-gold text-white'
                 }`}>
@@ -138,13 +140,13 @@ const SkillRequestBubble = ({ requestId, isMe, onOpenNegotiation }: { requestId:
             
             <div className="p-4 space-y-3">
                 <div className="space-y-1">
-                    <p className="text-[9px] font-bold text-text-muted uppercase tracking-widest">Learn</p>
+                    <p className="text-[9px] font-bold text-text-muted">Learn</p>
                     <p className="text-xs font-bold text-text-main leading-tight">{request.learnSkill}</p>
                 </div>
 
                 {request.teachSkill && (
                     <div className="space-y-1">
-                        <p className="text-[9px] font-bold text-text-muted uppercase tracking-widest">Teach</p>
+                        <p className="text-[9px] font-bold text-text-muted">Teach</p>
                         <p className="text-xs font-bold text-text-main leading-tight">{request.teachSkill}</p>
                     </div>
                 )}
@@ -161,8 +163,8 @@ const SkillRequestBubble = ({ requestId, isMe, onOpenNegotiation }: { requestId:
                 </div>
 
                 {request.message && (
-                    <div className="p-3 bg-hover-bg/30 rounded-xl">
-                        <p className="text-[10px] text-text-main font-medium italic leading-relaxed">"{request.message}"</p>
+                    <div className="p-3 bg-hover-bg/30 rounded-xl prose-xs dark:prose-invert">
+                        <Markdown>{request.message}</Markdown>
                     </div>
                 )}
 
@@ -397,7 +399,7 @@ export default function ChatPage() {
                         <h2 className="text-sm font-bold text-text-main truncate tracking-tight">{otherInfo?.displayName}</h2>
                         <div className="flex items-center gap-1">
                             <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                            <span className="text-[9px] font-bold text-text-muted uppercase tracking-widest">Active Now</span>
+                            <span className="text-[9px] font-bold text-text-muted">Active Now</span>
                         </div>
                     </div>
                 </div>
@@ -410,7 +412,7 @@ export default function ChatPage() {
                         <UserIcon className="text-text-muted" size={20} />
                     </div>
                     <h3 className="text-xs font-bold text-text-main leading-none">Conversation with {otherInfo?.displayName}</h3>
-                    <p className="text-[9px] text-text-muted font-medium mt-1 uppercase tracking-widest">Secure Skill Sync Channel</p>
+                    <p className="text-[9px] text-text-muted font-medium mt-1">Secure Skill Sync Channel</p>
                 </div>
 
                 {messages.map((msg, i) => {
@@ -422,7 +424,7 @@ export default function ChatPage() {
                             <div key={`${msg.id}-${i}`} className="space-y-1">
                                 {showTime && msg.createdAt && (
                                     <div className="text-center py-2">
-                                        <span className="text-[8px] font-black text-text-muted uppercase tracking-[0.2em] px-2 py-0.5 bg-hover-bg rounded">
+                                        <span className="text-[8px] font-black text-text-muted px-2 py-0.5 bg-hover-bg rounded">
                                             {format(msg.createdAt.toDate(), 'h:mm a')}
                                         </span>
                                     </div>
@@ -447,7 +449,7 @@ export default function ChatPage() {
                                                         {msg.text}
                                                     </p>
                                                     <div className="h-[1px] w-8 bg-primary/20 mx-auto" />
-                                                    <p className="text-[8px] font-black text-primary uppercase tracking-[0.2em]">Verified Skillora Suggestion</p>
+                                                    <p className="text-[8px] font-black text-primary">Verified Skillora Suggestion</p>
                                                 </div>
                                             </motion.div>
                                         ) : msg.skillRequestId ? (

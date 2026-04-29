@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { doc, getDoc, onSnapshot, updateDoc, collection, query, where, getDocs, setDoc, addDoc, serverTimestamp, orderBy, deleteDoc, writeBatch, increment } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { db, auth } from '../lib/firebase';
 import { useAuth } from '../App';
+import { handleFirestoreError, OperationType } from '../lib/firestore-utils';
 import { UserProfile, Session, LearningRequest, Course, DAOGroup, Quiz } from '../types';
 import { useNavigate } from 'react-router-dom';
 import { Settings, CreditCard, BookOpen, GraduationCap, MapPin, Layers, Check, X, RefreshCw, LogOut, ExternalLink, Calendar, Shield, Star, Plus, Users, User as UserIcon, Zap, MessageCircle, Clock, Video, Handshake, ChevronRight, AlertCircle, Sparkles, Save, Trash2, BookOpenCheck, Camera, Image as ImageIcon, Crop, MoreVertical, Share2, Edit, Menu, Copy } from 'lucide-react';
@@ -10,6 +11,7 @@ import Cropper from 'react-easy-crop';
 import { Area } from 'react-easy-crop';
 
 import { ContractModal } from '../components/ContractModal';
+import Markdown from 'react-markdown';
 
 const RatingModal = ({ isOpen, onClose, onRate, name }: { isOpen: boolean, onClose: () => void, onRate: (score: number, review: string) => void, name: string }) => {
     const [score, setScore] = useState(5);
@@ -23,10 +25,10 @@ const RatingModal = ({ isOpen, onClose, onRate, name }: { isOpen: boolean, onClo
                         initial={{ scale: 0.95, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0.95, opacity: 0 }}
-                        className="bg-white w-full max-w-sm rounded-[32px] p-6 border-2 border-black space-y-6"
+                        className="bg-white dark:bg-black w-full max-w-sm rounded-[32px] p-6 border-2 border-black dark:border-border-main space-y-6"
                     >
                         <div className="text-center space-y-1">
-                            <h4 className="text-lg font-bold text-text-main tracking-tighter">Rate {name}</h4>
+                            <h4 className="text-lg font-bold text-text-main dark:text-white tracking-tighter">Rate {name}</h4>
                             <p className="text-xs text-text-muted leading-relaxed font-medium">Please provide your feedback on the contract/learning session.</p>
                         </div>
                         <div className="flex justify-center gap-2">
@@ -34,7 +36,7 @@ const RatingModal = ({ isOpen, onClose, onRate, name }: { isOpen: boolean, onClo
                                 <button
                                     key={s}
                                     onClick={() => setScore(s)}
-                                    className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all font-black text-sm border ${score === s ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20' : 'bg-hover-bg text-text-muted border-border-main/50 hover:bg-border-main'}`}
+                                    className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all font-black text-sm border ${score === s ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20' : 'bg-hover-bg dark:bg-hover-bg/10 text-text-muted border-border-main/50 hover:bg-border-main dark:hover:bg-hover-bg/20'}`}
                                 >
                                     {s}
                                 </button>
@@ -44,7 +46,7 @@ const RatingModal = ({ isOpen, onClose, onRate, name }: { isOpen: boolean, onClo
                             value={review}
                             onChange={e => setReview(e.target.value)}
                             placeholder="Write your review here..."
-                            className="w-full bg-hover-bg border-none rounded-2xl px-4 py-4 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20 resize-none min-h-[100px]"
+                            className="w-full bg-hover-bg dark:bg-black border-none dark:border dark:border-border-main rounded-2xl px-4 py-4 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20 dark:text-white resize-none min-h-[100px]"
                         />
                         <div className="flex gap-3">
                             <button onClick={onClose} className="flex-1 py-3 text-xs font-bold text-text-muted hover:text-text-main">Cancel</button>
@@ -185,11 +187,11 @@ const SessionCard: React.FC<{
                                                 value={meetingLink}
                                                 onChange={e => setMeetingLink(e.target.value)}
                                                 placeholder="Zoom/GMeet Link"
-                                                className="flex-grow bg-hover-bg border-none rounded-xl px-4 py-2 text-xs font-bold outline-none"
+                                                className="flex-grow bg-hover-bg dark:bg-black border-none dark:border dark:border-border-main dark:text-white rounded-xl px-4 py-2 text-xs font-bold outline-none"
                                             />
                                             <button 
                                                 onClick={() => { onUpdateLink?.(meetingLink); setShowLinkInput(false); }}
-                                                className="px-4 py-2 bg-text-main text-white rounded-xl text-xs font-bold"
+                                                className="px-4 py-2 bg-text-main dark:bg-white text-white dark:text-black rounded-xl text-xs font-bold"
                                             >
                                                 Save
                                             </button>
@@ -352,19 +354,19 @@ const DAOEditModal = ({ group, onClose }: { group: DAOGroup; onClose: () => void
         <div className="fixed inset-0 z-[110] flex items-end md:items-center justify-center bg-black/80 p-0 md:p-4">
             <motion.div 
                 initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
-                className="w-full max-w-lg bg-white rounded-t-3xl md:rounded-3xl flex flex-col border-2 border-black overflow-hidden shadow-2xl"
+                className="w-full max-w-lg bg-white dark:bg-black rounded-t-3xl md:rounded-3xl flex flex-col border-2 border-black dark:border-border-main overflow-hidden shadow-2xl"
             >
-                <div className="p-6 border-b border-border-main flex items-center justify-between bg-white shrink-0">
+                <div className="p-6 border-b border-border-main dark:border-border-main flex items-center justify-between bg-white dark:bg-black shrink-0">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
                             <Shield size={20} />
                         </div>
                         <div>
-                            <h2 className="text-lg font-bold text-text-main line-clamp-1">Edit {group.name}</h2>
-                            <p className="text-[10px] font-bold text-text-muted tracking-wide">Update group properties</p>
+                            <h2 className="text-lg font-bold text-text-main dark:text-white line-clamp-1">Edit {group.name}</h2>
+                            <p className="text-[10px] font-bold text-text-muted">Update group properties</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="p-2 bg-hover-bg rounded-xl text-text-muted hover:text-text-main transition-colors">
+                    <button onClick={onClose} className="p-2 bg-hover-bg dark:bg-hover-bg/20 rounded-xl text-text-muted hover:text-text-main transition-colors">
                         <X size={20} />
                     </button>
                 </div>
@@ -372,25 +374,25 @@ const DAOEditModal = ({ group, onClose }: { group: DAOGroup; onClose: () => void
                 <div className="p-6 space-y-6">
                     <div className="grid grid-cols-1 gap-4">
                         <div className="space-y-1">
-                            <label className="text-[10px] font-bold text-text-muted pl-1">Group name</label>
-                            <input value={name} onChange={e => setName(e.target.value)} className="w-full bg-hover-bg border-none rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20" />
+                            <label className="text-[10px] font-bold text-text-muted dark:text-text-muted pl-1">Group name</label>
+                            <input value={name} onChange={e => setName(e.target.value)} className="w-full bg-hover-bg dark:bg-black dark:text-white border-none dark:border dark:border-border-main rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20 transition-colors" />
                         </div>
                         <div className="space-y-1">
-                            <label className="text-[10px] font-bold text-text-muted pl-1">Join deadline</label>
-                            <input type="datetime-local" value={deadline} onChange={e => setDeadline(e.target.value)} className="w-full bg-hover-bg border-none rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20" />
+                            <label className="text-[10px] font-bold text-text-muted dark:text-text-muted pl-1">Join deadline</label>
+                            <input type="datetime-local" value={deadline} onChange={e => setDeadline(e.target.value)} className="w-full bg-hover-bg dark:bg-black dark:text-white border-none dark:border dark:border-border-main rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20 dark:[color-scheme:dark] transition-colors" />
                         </div>
                         <div className="space-y-1">
-                            <label className="text-[10px] font-bold text-text-muted pl-1">Topic</label>
-                            <input value={topic} onChange={e => setTopic(e.target.value)} className="w-full bg-hover-bg border-none rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20" />
+                            <label className="text-[10px] font-bold text-text-muted dark:text-text-muted pl-1">Topic</label>
+                            <input value={topic} onChange={e => setTopic(e.target.value)} className="w-full bg-hover-bg dark:bg-black dark:text-white border-none dark:border dark:border-border-main rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20 transition-colors" />
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-1">
-                                <label className="text-[10px] font-bold text-text-muted pl-1">Member limit</label>
-                                <input type="number" value={membersLimit} onChange={e => setMembersLimit(parseInt(e.target.value))} className="w-full bg-hover-bg border-none rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20" />
+                                <label className="text-[10px] font-bold text-text-muted dark:text-text-muted pl-1">Member limit</label>
+                                <input type="number" value={membersLimit} onChange={e => setMembersLimit(parseInt(e.target.value))} className="w-full bg-hover-bg dark:bg-black dark:text-white border-none dark:border dark:border-border-main rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20 transition-colors" />
                             </div>
                             <div className="space-y-1">
-                                <label className="text-[10px] font-bold text-text-muted pl-1">Stake points</label>
-                                <input type="number" value={stakedPoints} onChange={e => setStakedPoints(parseInt(e.target.value))} className="w-full bg-hover-bg border-none rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20" />
+                                <label className="text-[10px] font-bold text-text-muted dark:text-text-muted pl-1">Stake points</label>
+                                <input type="number" value={stakedPoints} onChange={e => setStakedPoints(parseInt(e.target.value))} className="w-full bg-hover-bg dark:bg-black dark:text-white border-none dark:border dark:border-border-main rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20 transition-colors" />
                             </div>
                         </div>
                     </div>
@@ -398,13 +400,50 @@ const DAOEditModal = ({ group, onClose }: { group: DAOGroup; onClose: () => void
                     <button 
                         onClick={handleSaveGroup} 
                         disabled={loading} 
-                        className="w-full py-4 bg-text-main text-white rounded-2xl font-bold text-xs tracking-wide flex items-center justify-center gap-2 hover:bg-black transition-all active:scale-[0.98]"
+                        className="w-full py-4 bg-text-main dark:bg-white text-white dark:text-black rounded-2xl font-bold text-xs flex items-center justify-center gap-2 hover:bg-black dark:hover:bg-white/90 transition-all active:scale-[0.98]"
                     >
                         {loading ? <RefreshCw className="animate-spin" size={16} /> : <Save size={16} />} 
                         Save changes
                     </button>
                 </div>
             </motion.div>
+        </div>
+    );
+};
+
+const RequestCard = ({ request, onAccept, onDecline, onMessage }: { request: LearningRequest, onAccept: () => void, onDecline: () => void, onMessage: () => void }) => {
+    return (
+        <div 
+            id={`request-${request.id}`}
+            className="p-4 bg-white border border-accent-gold/30 rounded-3xl relative overflow-hidden bg-accent-gold/5 shadow-sm scroll-mt-20"
+        >
+            <div className="flex items-start justify-between mb-3">
+                <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                        <div className="px-2 py-0.5 rounded-full text-[8px] font-black bg-accent-gold text-white">
+                            New Contract Proposal
+                        </div>
+                        <span className="text-[10px] font-black text-text-muted">{request.learnSkill}</span>
+                    </div>
+                    <h4 className="text-sm font-bold text-text-main line-clamp-1">{request.senderName} wants to collaborate</h4>
+                </div>
+                <button onClick={onMessage} className="p-2 bg-text-main text-white rounded-xl hover:bg-black transition-all shadow-md active:scale-95">
+                    <MessageCircle size={18} />
+                </button>
+            </div>
+            
+            <div className="p-3 bg-white/60 dark:bg-black/40 rounded-2xl mb-4 border border-black/5 dark:border-white/10 prose-xs dark:prose-invert">
+                <Markdown>{request.message}</Markdown>
+            </div>
+
+            <div className="flex gap-2">
+                <button onClick={onDecline} className="flex-1 py-3 text-[11px] font-bold text-text-muted hover:text-red-500 transition-colors">
+                    Decline proposal
+                </button>
+                <button onClick={onAccept} className="flex-2 py-3 bg-accent-gold text-white rounded-xl text-[11px] font-black shadow-lg shadow-accent-gold/20 active:scale-95 transition-all">
+                    View Entire Form
+                </button>
+            </div>
         </div>
     );
 };
@@ -431,6 +470,7 @@ export default function ProfilePage() {
   const [loadingMatches, setLoadingMatches] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [newPhoto, setNewPhoto] = useState<string | null>(null);
+  const [pendingRequests, setPendingRequests] = useState<LearningRequest[]>([]);
   const [sessionTab, setSessionTab] = useState<'ongoing' | 'upcoming' | 'past'>('upcoming');
 
   const handleDeleteDAO = async (group: DAOGroup) => {
@@ -655,11 +695,19 @@ export default function ProfilePage() {
         setMyDAOGroups(snap.docs.map(d => ({ id: d.id, ...d.data() } as DAOGroup)));
     });
 
+    const unsubRequests = onSnapshot(query(
+        collection(db, 'learningRequests'),
+        where('recipientId', '==', user.uid)
+    ), (snap) => {
+        setPendingRequests(snap.docs.map(d => ({ id: d.id, ...d.data() } as LearningRequest)));
+    });
+
     return () => { 
         unsubLearner(); 
         unsubTeacher();
         unsubCourses();
         unsubDAORef();
+        unsubRequests();
     };
   }, [user]);
 
@@ -766,14 +814,24 @@ export default function ProfilePage() {
     if (!window.location.hash) return;
     const hash = window.location.hash.replace('#', '');
     const isRateAction = hash.endsWith('-rate');
+    const isRequest = hash.startsWith('request-');
     const elementId = isRateAction ? hash.replace('-rate', '') : hash;
     
+    // Auto-set tab if it's a request or session to ensure it's visible
+    if (isRequest) {
+        setSessionTab('upcoming');
+    }
+
     // Wait for potential content loading
     const timeout = setTimeout(() => {
         const element = document.getElementById(elementId);
         if (element) {
             element.scrollIntoView({ behavior: 'smooth', block: 'center' });
             
+            // Highlight
+            element.classList.add('ring-2', 'ring-primary', 'ring-offset-2');
+            setTimeout(() => element.classList.remove('ring-2', 'ring-primary', 'ring-offset-2'), 3000);
+
             // If it's a rating action, auto-open the modal
             if (isRateAction) {
                 const sessionId = elementId.replace('session-', '');
@@ -781,15 +839,26 @@ export default function ProfilePage() {
                 if (sessionToRate) {
                     setSelectedSessionForRating(sessionToRate);
                     setShowRatingModal(true);
-                    // Clear hash to prevent repeated opens on re-renders
-                    window.history.replaceState(null, '', window.location.pathname);
                 }
             }
+
+            // If it's a request, auto-open the contract modal (entire form)
+            if (isRequest) {
+                const requestId = elementId.replace('request-', '');
+                const reqToOpen = pendingRequests.find(r => r.id === requestId);
+                if (reqToOpen) {
+                    setSelectedReq(reqToOpen);
+                    setShowContract(true);
+                }
+            }
+
+            // Clear hash to prevent repeated opens on re-renders
+            window.history.replaceState(null, '', window.location.pathname);
         }
     }, 800);
 
     return () => clearTimeout(timeout);
-  }, [window.location.hash, allSessions.length]);
+  }, [window.location.hash, allSessions.length, pendingRequests.length]);
 
   const handleMatchDiscovery = async (u1: UserProfile, u2: UserProfile) => {
     if (!u1 || !u2) return;
@@ -918,22 +987,40 @@ export default function ProfilePage() {
     }
     
     try {
-        await updateDoc(userRef, updates);
+        await updateDoc(userRef, updates).catch(e => handleFirestoreError(e, OperationType.UPDATE, `users/${user.uid}`));
         
         // Propagate changes if photoURL updated
         if (newPhoto) {
             const batch = writeBatch(db);
-            const coursesQ = query(collection(db, 'courses'), where('teacherId', '==', user.uid));
-            const coursesSnap = await getDocs(coursesQ);
-            coursesSnap.docs.forEach(d => {
-                batch.update(doc(db, 'courses', d.id), { teacherPhoto: newPhoto });
-            });
-            if (profile?.joinedGroups && profile.joinedGroups.length > 0) {
-                profile.joinedGroups.forEach(groupId => {
-                    batch.update(doc(db, `daoGroups/${groupId}/members`, user.uid), { photoURL: newPhoto });
+            
+            try {
+                // Update Courses
+                const coursesQ = query(collection(db, 'courses'), where('teacherId', '==', user.uid));
+                const coursesSnap = await getDocs(coursesQ);
+                coursesSnap.docs.forEach(d => {
+                    batch.update(doc(db, 'courses', d.id), { teacherPhoto: newPhoto });
                 });
+                
+                // Update DAOs
+                if (profile?.joinedGroups && profile.joinedGroups.length > 0) {
+                    profile.joinedGroups.forEach(groupId => {
+                        batch.update(doc(db, `daoGroups/${groupId}/members`, user.uid), { photoURL: newPhoto });
+                    });
+                }
+
+                // Update Conversations
+                const conversationsQ = query(collection(db, 'conversations'), where('participants', 'array-contains', user.uid));
+                const convSnap = await getDocs(conversationsQ);
+                convSnap.docs.forEach(d => {
+                    batch.update(doc(db, 'conversations', d.id), {
+                        [`participantInfo.${user.uid}.photoURL`]: newPhoto
+                    });
+                });
+
+                await batch.commit();
+            } catch (e) {
+                handleFirestoreError(e, OperationType.WRITE, 'profile-propagation');
             }
-            await batch.commit();
         }
 
         // Trigger Match Discovery
@@ -1200,11 +1287,11 @@ export default function ProfilePage() {
   const reputation = getReputation(avgRating);
 
   return (
-    <div className="min-h-screen bg-bg-main relative">
+    <div className="min-h-screen bg-bg-main dark:bg-black relative">
       {/* Profile Header */}
-      <div className="bg-white p-4 space-y-4 border-b border-border-main sticky top-0 z-10">
+      <div className="bg-white dark:bg-black p-4 space-y-4 border-b border-border-main dark:border-border-main sticky top-0 z-10">
         <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full overflow-hidden border border-border-main/50 ring-2 ring-primary/5 bg-hover-bg flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full overflow-hidden border border-border-main/50 dark:border-border-main ring-2 ring-primary/5 bg-hover-bg flex items-center justify-center">
                 {profile.photoURL ? (
                     <img src={profile.photoURL} alt={profile.displayName} className="w-full h-full object-cover shadow-sm" referrerPolicy="no-referrer" />
                 ) : (
@@ -1213,8 +1300,8 @@ export default function ProfilePage() {
             </div>
             <div className="flex-grow">
                 <div className="flex items-center gap-1.5">
-                    <h1 className="text-xl font-bold text-text-main tracking-tight">{profile.displayName}</h1>
-                    <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-hover-bg border border-border-main/50 text-[10px] font-bold text-text-muted">
+                    <h1 className="text-xl font-bold text-text-main dark:text-white tracking-tight">{profile.displayName}</h1>
+                    <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-hover-bg dark:bg-hover-bg/20 border border-border-main/50 dark:border-border-main text-[10px] font-bold text-text-muted">
                         {profile.role === 'tutor' ? 'GURU' : 'LEARNER'}
                     </div>
                     <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
@@ -1224,7 +1311,7 @@ export default function ProfilePage() {
                 </div>
                 <div className="flex items-center gap-2 text-xs text-text-muted font-bold mt-1">
                     <span className="flex items-center gap-1"><Zap size={10} className="text-accent-gold fill-accent-gold" /> {credits} credits</span>
-                    <span className="w-0.5 h-0.5 rounded-full bg-border-main" />
+                    <span className="w-0.5 h-0.5 rounded-full bg-border-main dark:bg-border-main" />
                     <span className="flex items-center gap-1 text-primary"><Star size={10} className="fill-primary" /> {avgRating.toFixed(1)}</span>
                 </div>
             </div>
@@ -1236,13 +1323,13 @@ export default function ProfilePage() {
         <div className="flex gap-2">
             <button 
                 onClick={() => setIsEditing(!isEditing)}
-                className="flex-1 py-2 bg-text-main text-white rounded-xl text-xs font-bold active:scale-[0.98] transition-all"
+                className="flex-1 py-2 bg-text-main dark:bg-white text-white dark:text-black rounded-xl text-xs font-bold active:scale-[0.98] transition-all"
             >
                 Edit Profile
             </button>
             <button 
                 onClick={() => { setLoadingMatches(true); setTimeout(() => setLoadingMatches(false), 800); }}
-                className="px-4 py-2 bg-hover-bg text-text-main rounded-xl text-xs font-bold border border-border-main/50"
+                className="px-4 py-2 bg-hover-bg dark:bg-hover-bg/20 text-text-main dark:text-white rounded-xl text-xs font-bold border border-border-main/50 dark:border-border-main"
             >
                 <RefreshCw size={14} className={loadingMatches ? 'animate-spin' : ''} />
             </button>
@@ -1278,7 +1365,7 @@ export default function ProfilePage() {
                             )}
                         </div>
                         <div className="flex-grow">
-                             <p className="text-[10px] font-bold text-text-main tracking-wide mb-1">Update avatar</p>
+                             <p className="text-[10px] font-bold text-text-main mb-1">Update avatar</p>
                              <p className="text-[9px] text-text-muted font-bold leading-tight">Recommended: Square, under 100KB. Click to upload.</p>
                         </div>
                     </div>
@@ -1310,26 +1397,26 @@ export default function ProfilePage() {
                     </div>
 
                     <div className="space-y-1">
-                        <label className="text-[10px] font-bold text-accent-gold ml-1 tracking-wide">Guru (Teach)</label>
+                        <label className="text-[10px] font-bold text-accent-gold ml-1">Guru (Teach)</label>
                         <div className="relative group">
                             <input 
                               value={teachSkill} 
                               onChange={e => setTeachSkill(e.target.value)} 
-                              className="w-full bg-hover-bg border border-border-main/50 rounded-xl text-sm px-4 py-3 outline-none focus:ring-1 focus:ring-accent-gold transition-all" 
+                              className="w-full bg-hover-bg dark:bg-black dark:text-white border border-border-main/50 dark:border-border-main rounded-xl text-sm px-4 py-3 outline-none focus:ring-1 focus:ring-accent-gold transition-all" 
                               placeholder="e.g. Figma, Swift" 
                             />
                         </div>
                     </div>
                     <div className="space-y-1">
-                        <label className="text-[10px] font-bold text-primary ml-1 tracking-wide">Seeker (Learn)</label>
+                        <label className="text-[10px] font-bold text-primary ml-1">Seeker (Learn)</label>
                         <input 
                           value={learnSkill} 
                           onChange={e => setLearnSkill(e.target.value)} 
-                          className="w-full bg-hover-bg border border-border-main/50 rounded-xl text-sm px-4 py-3 outline-none focus:ring-1 focus:ring-primary transition-all" 
+                          className="w-full bg-hover-bg dark:bg-black dark:text-white border border-border-main/50 dark:border-border-main rounded-xl text-sm px-4 py-3 outline-none focus:ring-1 focus:ring-primary transition-all" 
                           placeholder="e.g. Cooking, piano" 
                         />
                     </div>
-                    <button onClick={updateSkills} className="w-full bg-text-main text-white py-3.5 rounded-xl font-bold text-xs tracking-wide active:scale-[0.98] transition-all">Save changes</button>
+                    <button onClick={updateSkills} className="w-full bg-text-main text-white py-3.5 rounded-xl font-bold text-xs active:scale-[0.98] transition-all">Save changes</button>
                 </motion.div>
             )}
         </AnimatePresence>
@@ -1339,7 +1426,7 @@ export default function ProfilePage() {
             <div className="bg-white p-4 rounded-2xl border border-border-main space-y-3">
                 <div className="flex items-center gap-2">
                     <GraduationCap size={14} className="text-accent-gold" />
-                    <h3 className="text-[10px] font-bold text-text-muted tracking-wide">Mastery</h3>
+                    <h3 className="text-[10px] font-bold text-text-muted">Mastery</h3>
                 </div>
                 <div className="flex flex-wrap gap-1.5 min-h-[40px]">
                     {(profile.teachSkills || []).map((s, idx) => (
@@ -1354,7 +1441,7 @@ export default function ProfilePage() {
             <div className="bg-white p-4 rounded-2xl border border-border-main space-y-3">
                 <div className="flex items-center gap-2">
                     <BookOpen size={14} className="text-primary" />
-                    <h3 className="text-[10px] font-bold text-text-muted tracking-wide">Goals</h3>
+                    <h3 className="text-[10px] font-bold text-text-muted">Goals</h3>
                 </div>
                 <div className="flex flex-wrap gap-1.5 min-h-[40px]">
                     {(profile.learnSkills || []).map((s, idx) => (
@@ -1367,142 +1454,6 @@ export default function ProfilePage() {
                 </div>
             </div>
         </div>
-
-        {/* Quiz Performance Section */}
-        {joinedGroupStats.length > 0 && (
-            <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-bold text-text-main flex items-center gap-2">
-                        <BookOpenCheck size={18} className="text-primary" />
-                        Quiz Performance
-                    </h3>
-                    <span className="text-[10px] font-bold text-text-muted bg-hover-bg px-2 py-0.5 rounded-full">{joinedGroupStats.length} DAOs</span>
-                </div>
-                <div className="grid grid-cols-1 gap-3">
-                    {joinedGroupStats.map((stat) => (
-                        <div key={stat.id} className="p-4 bg-white border border-border-main rounded-2xl flex items-center gap-4 hover:border-primary/20 transition-all group">
-                            <div className="w-12 h-12 rounded-xl bg-hover-bg flex flex-col items-center justify-center border border-border-main/50 shrink-0">
-                                <p className="text-[10px] font-bold text-primary leading-none">{stat.quizzesPassed}</p>
-                                <p className="text-[7px] font-bold text-text-muted mt-0.5">Passed</p>
-                            </div>
-                            <div className="flex-grow min-w-0">
-                                <h4 className="text-sm font-bold text-text-main truncate">{stat.name}</h4>
-                                <p className="text-[10px] text-text-muted font-medium truncate">{stat.topic}</p>
-                            </div>
-                            <div className="text-right shrink-0 px-3 border-l border-border-main/50">
-                                <p className="text-[8px] font-bold text-text-muted tracking-wide mb-0.5">Latest score</p>
-                                <div className="flex items-center justify-end gap-1">
-                                    <div className="h-1 w-1 rounded-full bg-accent-gold" />
-                                    <p className="text-sm font-bold text-text-main">{stat.latestScore}<span className="text-[10px] text-text-muted font-bold ml-0.5">/100</span></p>
-                                </div>
-                            </div>
-                            <button 
-                                onClick={() => navigate(`/group?id=${stat.id}`)}
-                                className="p-2 text-text-muted hover:text-primary transition-colors"
-                            >
-                                <ChevronRight size={18} />
-                            </button>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        )}
-
-        {/* Sessions Section */}
-        <div className="space-y-4">
-            <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold text-text-main flex items-center gap-2">
-                    <Calendar size={18} className="text-accent-gold" />
-                    Protocol Sessions
-                </h3>
-                <div className="flex bg-hover-bg/50 p-1 rounded-xl border border-border-main/30">
-                    {(['ongoing', 'upcoming', 'past'] as const).map((tab) => (
-                        <button
-                            key={tab}
-                            onClick={() => setSessionTab(tab)}
-                            className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all ${
-                                sessionTab === tab 
-                                ? 'bg-white text-primary shadow-sm ring-1 ring-primary/5' 
-                                : 'text-text-muted hover:text-text-main'
-                            }`}
-                        >
-                            {tab}
-                        </button>
-                    ))}
-                </div>
-            </div>
-
-            <div className="grid gap-3">
-                {(() => {
-                    const filtered = allSessions.filter(s => {
-                        const sessDate = new Date(s.date);
-                        const [h, m] = s.time.split(':').map(Number);
-                        const start = new Date(sessDate.getFullYear(), sessDate.getMonth(), sessDate.getDate(), h, m);
-                        const dur = parseInt(s.duration) || 60;
-                        const end = new Date(start.getTime() + dur * 60000);
-                        const now = new Date();
-                        
-                        const isLive = now >= start && now <= end && s.status !== 'Completed' && s.status !== 'Cancelled';
-                        const isUpcoming = now < start && s.status !== 'Completed' && s.status !== 'Cancelled';
-                        const isPast = now > end || s.status === 'Completed' || s.status === 'Cancelled';
-
-                        if (sessionTab === 'ongoing') return isLive;
-                        if (sessionTab === 'upcoming') return isUpcoming;
-                        if (sessionTab === 'past') return isPast;
-                        return false;
-                    });
-
-                    if (filtered.length === 0) {
-                        return (
-                            <motion.div 
-                                initial={{ opacity: 0 }} 
-                                animate={{ opacity: 1 }}
-                                className="py-12 bg-hover-bg/20 border-2 border-dashed border-border-main/50 rounded-3xl text-center space-y-3"
-                            >
-                                <div className="w-12 h-12 bg-white rounded-2xl mx-auto flex items-center justify-center text-text-muted border border-border-main/30 shadow-sm">
-                                    <Clock size={20} className="opacity-40" />
-                                </div>
-                                <div className="space-y-1">
-                                    <p className="text-[11px] text-text-main font-black uppercase tracking-widest">No {sessionTab} sessions</p>
-                                    <p className="text-[10px] text-text-muted font-bold px-12">System check: No records found for this category.</p>
-                                </div>
-                            </motion.div>
-                        );
-                    }
-
-                    return filtered.map((sess, idx) => (
-                        <motion.div
-                            key={`${sessionTab}-${sess.id}-${idx}`}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: idx * 0.05 }}
-                        >
-                            <SessionCard 
-                                session={sess} 
-                                isTeacher={sess.teacherId === user.uid}
-                                onUpdateLink={(link) => updateSessionLink(sess.id, link)}
-                                onComplete={() => completeSession(sess.id)}
-                                onCancel={() => cancelSession(sess.id)}
-                                onRate={() => {
-                                    setSelectedSessionForRating(sess);
-                                    setShowRatingModal(true);
-                                }}
-                            />
-                        </motion.div>
-                    ));
-                })()}
-            </div>
-        </div>
-
-        {/* Rating Modal Rendering */}
-        {selectedSessionForRating && (
-            <RatingModal 
-                isOpen={showRatingModal}
-                onClose={() => { setShowRatingModal(false); setSelectedSessionForRating(null); }}
-                onRate={(score, review) => rateSession(selectedSessionForRating, score, review)}
-                name={selectedSessionForRating.teacherId === user.uid ? selectedSessionForRating.learnerName : selectedSessionForRating.teacherName}
-            />
-        )}
 
         {/* My Courses */}
         <div className="space-y-4">
@@ -1660,6 +1611,117 @@ export default function ProfilePage() {
             )}
         </div>
 
+        {/* Sessions Section */}
+        <div className="space-y-4">
+            <div className="flex items-center justify-between">
+                <h3 className="text-sm font-bold text-text-main flex items-center gap-2">
+                    <Calendar size={18} className="text-accent-gold" />
+                    Protocol Sessions
+                </h3>
+                <div className="flex bg-hover-bg/50 p-1 rounded-xl border border-border-main/30">
+                    {(['ongoing', 'upcoming', 'past'] as const).map((tab) => (
+                        <button
+                            key={tab}
+                            onClick={() => setSessionTab(tab)}
+                            className={`px-3 py-1.5 rounded-lg text-[10px] font-black transition-all ${
+                                sessionTab === tab 
+                                ? 'bg-white text-primary shadow-sm ring-1 ring-primary/5' 
+                                : 'text-text-muted hover:text-text-main'
+                            }`}
+                        >
+                            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            <div className="grid gap-3">
+                {(() => {
+                    const filteredSessions = allSessions.filter(s => {
+                        const sessDate = new Date(s.date);
+                        const [h, m] = s.time.split(':').map(Number);
+                        const start = new Date(sessDate.getFullYear(), sessDate.getMonth(), sessDate.getDate(), h, m);
+                        const dur = parseInt(s.duration) || 60;
+                        const end = new Date(start.getTime() + dur * 60000);
+                        const now = new Date();
+                        
+                        const isLive = now >= start && now <= end && s.status !== 'Completed' && s.status !== 'Cancelled';
+                        const isUpcoming = now < start && s.status !== 'Completed' && s.status !== 'Cancelled';
+                        const isPast = now > end || s.status === 'Completed' || s.status === 'Cancelled';
+
+                        if (sessionTab === 'ongoing') return isLive || s.status === 'Started';
+                        if (sessionTab === 'upcoming') return isUpcoming && s.status !== 'Started';
+                        if (sessionTab === 'past') return isPast;
+                        return false;
+                    });
+
+                    if (filteredSessions.length === 0 && (sessionTab !== 'upcoming' || pendingRequests.length === 0)) {
+                        return (
+                            <motion.div 
+                                initial={{ opacity: 0 }} 
+                                animate={{ opacity: 1 }}
+                                className="py-12 bg-hover-bg/20 border-2 border-dashed border-border-main/50 rounded-3xl text-center space-y-3"
+                            >
+                                <div className="w-12 h-12 bg-white rounded-2xl mx-auto flex items-center justify-center text-text-muted border border-border-main/30 shadow-sm">
+                                    <Clock size={20} className="opacity-40" />
+                                </div>
+                                <div className="space-y-1">
+                                    <p className="text-[11px] text-text-main font-black">No {sessionTab} sessions</p>
+                                    <p className="text-[10px] text-text-muted font-bold px-12">System check: No records found for this category.</p>
+                                </div>
+                            </motion.div>
+                        );
+                    }
+
+                    return (
+                        <>
+                            {sessionTab === 'upcoming' && pendingRequests.map((req, idx) => (
+                                <motion.div
+                                    key={`req-${req.id}-${idx}`}
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: idx * 0.05 }}
+                                >
+                                    <RequestCard 
+                                        request={req} 
+                                        onAccept={() => {
+                                            setSelectedReq(req);
+                                            setShowContract(true);
+                                        }}
+                                        onDecline={() => handleRequestAction(req, 'Decline')}
+                                        onMessage={() => {
+                                            const parts = [user.uid, req.senderId].sort();
+                                            navigate(`/chat/${parts.join('_')}`);
+                                        }}
+                                    />
+                                </motion.div>
+                            ))}
+                            {filteredSessions.map((sess, idx) => (
+                                <motion.div
+                                    key={`${sessionTab}-${sess.id}-${idx}`}
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: (sessionTab === 'upcoming' ? pendingRequests.length : 0 + idx) * 0.05 }}
+                                >
+                                    <SessionCard 
+                                        session={sess} 
+                                        isTeacher={sess.teacherId === user.uid}
+                                        onUpdateLink={(link) => updateSessionLink(sess.id, link)}
+                                        onComplete={() => completeSession(sess.id)}
+                                        onCancel={() => cancelSession(sess.id)}
+                                        onRate={() => {
+                                            setSelectedSessionForRating(sess);
+                                            setShowRatingModal(true);
+                                        }}
+                                    />
+                                </motion.div>
+                            ))}
+                        </>
+                    );
+                })()}
+            </div>
+        </div>
+
         {/* Matches (The "Suggestion" system) */}
         <div className="space-y-4">
             <h3 className="text-sm font-bold text-text-main flex items-center gap-2">
@@ -1710,6 +1772,46 @@ export default function ProfilePage() {
                 </div>
             )}
         </div>
+
+        {/* Quiz Performance Section */}
+        {joinedGroupStats.length > 0 && (
+            <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-bold text-text-main flex items-center gap-2">
+                        <BookOpenCheck size={18} className="text-primary" />
+                        Quiz Performance
+                    </h3>
+                    <span className="text-[10px] font-bold text-text-muted bg-hover-bg px-2 py-0.5 rounded-full">{joinedGroupStats.length} DAOs</span>
+                </div>
+                <div className="grid grid-cols-1 gap-3">
+                    {joinedGroupStats.map((stat) => (
+                        <div key={stat.id} className="p-4 bg-white border border-border-main rounded-2xl flex items-center gap-4 hover:border-primary/20 transition-all group">
+                            <div className="w-12 h-12 rounded-xl bg-hover-bg flex flex-col items-center justify-center border border-border-main/50 shrink-0">
+                                <p className="text-[10px] font-bold text-primary leading-none">{stat.quizzesPassed}</p>
+                                <p className="text-[7px] font-bold text-text-muted mt-0.5">Passed</p>
+                            </div>
+                            <div className="flex-grow min-w-0">
+                                <h4 className="text-sm font-bold text-text-main truncate">{stat.name}</h4>
+                                <p className="text-[10px] text-text-muted font-medium truncate">{stat.topic}</p>
+                            </div>
+                            <div className="text-right shrink-0 px-3 border-l border-border-main/50">
+                                <p className="text-[8px] font-bold text-text-muted mb-0.5">Latest score</p>
+                                <div className="flex items-center justify-end gap-1">
+                                    <div className="h-1 w-1 rounded-full bg-accent-gold" />
+                                    <p className="text-sm font-bold text-text-main">{stat.latestScore}<span className="text-[10px] text-text-muted font-bold ml-0.5">/100</span></p>
+                                </div>
+                            </div>
+                            <button 
+                                onClick={() => navigate(`/group?id=${stat.id}`)}
+                                className="p-2 text-text-muted hover:text-primary transition-colors"
+                            >
+                                <ChevronRight size={18} />
+                            </button>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        )}
       </div>
 
       {/* Contract Modal */}
@@ -1775,6 +1877,14 @@ export default function ProfilePage() {
                 }}
             />
         )}
+        {selectedSessionForRating && (
+            <RatingModal 
+                isOpen={showRatingModal}
+                onClose={() => { setShowRatingModal(false); setSelectedSessionForRating(null); }}
+                onRate={(score, review) => rateSession(selectedSessionForRating, score, review)}
+                name={selectedSessionForRating.teacherId === user.uid ? selectedSessionForRating.learnerName : selectedSessionForRating.teacherName}
+            />
+        )}
       </AnimatePresence>
 
       {/* Course Edit Modal */}
@@ -1785,49 +1895,49 @@ export default function ProfilePage() {
                     initial={{ scale: 0.9, opacity: 0 }} 
                     animate={{ scale: 1, opacity: 1 }} 
                     exit={{ scale: 0.9, opacity: 0 }}
-                    className="w-full max-w-sm bg-white rounded-[2.5rem] p-8 space-y-6 border-2 border-black relative overflow-hidden"
+                    className="w-full max-w-sm bg-white dark:bg-black rounded-[2.5rem] p-8 space-y-6 border-2 border-black dark:border-border-main relative overflow-hidden"
                 >
                     <div className="flex items-center justify-between">
-                        <h2 className="text-lg font-bold text-text-main tracking-tight">Edit course</h2>
-                        <button onClick={() => setShowCourseEdit(false)} className="p-2 bg-hover-bg rounded-xl text-text-muted hover:text-text-main">
+                        <h2 className="text-lg font-bold text-text-main dark:text-white tracking-tight">Edit course</h2>
+                        <button onClick={() => setShowCourseEdit(false)} className="p-2 bg-hover-bg dark:bg-hover-bg/20 rounded-xl text-text-muted hover:text-text-main">
                             <X size={20} />
                         </button>
                     </div>
 
                     <div className="space-y-4">
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-text-muted tracking-wide ml-1">Course title</label>
+                            <label className="text-[10px] font-bold text-text-muted dark:text-text-muted ml-1">Course title</label>
                             <input 
                                 value={selectedCourse.title} 
                                 onChange={e => setSelectedCourse({...selectedCourse, title: e.target.value})}
-                                className="w-full bg-hover-bg border-2 border-transparent focus:border-primary/20 rounded-2xl px-5 py-4 text-sm font-bold outline-none transition-all"
+                                className="w-full bg-hover-bg dark:bg-black dark:text-white border-2 border-transparent dark:border dark:border-border-main focus:border-primary/20 rounded-2xl px-5 py-4 text-sm font-bold outline-none transition-all"
                                 placeholder="Enter title"
                             />
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-text-muted tracking-wide ml-1">Video/Resource URL</label>
+                            <label className="text-[10px] font-bold text-text-muted dark:text-text-muted ml-1">Video/Resource URL</label>
                             <input 
                                 value={selectedCourse.link} 
                                 onChange={e => setSelectedCourse({...selectedCourse, link: e.target.value})}
-                                className="w-full bg-hover-bg border-2 border-transparent focus:border-primary/20 rounded-2xl px-5 py-4 text-sm font-bold outline-none transition-all"
+                                className="w-full bg-hover-bg dark:bg-black dark:text-white border-2 border-transparent dark:border dark:border-border-main focus:border-primary/20 rounded-2xl px-5 py-4 text-sm font-bold outline-none transition-all"
                                 placeholder="e.g. YouTube link"
                             />
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-text-muted tracking-wide ml-1">Thumbnail URL</label>
+                            <label className="text-[10px] font-bold text-text-muted dark:text-text-muted ml-1">Thumbnail URL</label>
                             <input 
                                 value={selectedCourse.thumbnail} 
                                 onChange={e => setSelectedCourse({...selectedCourse, thumbnail: e.target.value})}
-                                className="w-full bg-hover-bg border-2 border-transparent focus:border-primary/20 rounded-2xl px-5 py-4 text-sm font-bold outline-none transition-all"
+                                className="w-full bg-hover-bg dark:bg-black dark:text-white border-2 border-transparent dark:border dark:border-border-main focus:border-primary/20 rounded-2xl px-5 py-4 text-sm font-bold outline-none transition-all"
                                 placeholder="Image URL"
                             />
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-text-muted tracking-wide ml-1">DAO Group Link (Optional)</label>
+                            <label className="text-[10px] font-bold text-text-muted dark:text-text-muted ml-1">DAO Group Link (Optional)</label>
                             <input 
                                 value={selectedCourse.daoGroupLink || ''} 
                                 onChange={e => setSelectedCourse({...selectedCourse, daoGroupLink: e.target.value})}
-                                className="w-full bg-hover-bg border-2 border-transparent focus:border-primary/20 rounded-2xl px-5 py-4 text-sm font-bold outline-none transition-all"
+                                className="w-full bg-hover-bg dark:bg-black dark:text-white border-2 border-transparent dark:border dark:border-border-main focus:border-primary/20 rounded-2xl px-5 py-4 text-sm font-bold outline-none transition-all"
                                 placeholder="DAO Link"
                             />
                         </div>
@@ -1835,7 +1945,7 @@ export default function ProfilePage() {
 
                     <button 
                         onClick={updateCourse}
-                        className="w-full py-4 bg-primary text-white rounded-2xl font-bold text-xs tracking-wide shadow-xl shadow-primary/20 active:scale-[0.98] transition-all"
+                        className="w-full py-4 bg-primary text-white rounded-2xl font-bold text-xs shadow-xl shadow-primary/20 active:scale-[0.98] transition-all"
                     >
                         Update course
                     </button>

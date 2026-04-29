@@ -37,14 +37,14 @@
 }
 
 .dark {
-  --bg-main: #18191a;
-  --card-bg: #242526;
-  --text-main: #e4e6eb;
-  --text-muted: #b0b3b8;
-  --border-main: #3e4042;
-  --hover-bg: #3a3b3c;
-  --primary: #2d88ff;
-  --primary-dark: #1b66c9;
+  --bg-main: #0f0f0f;
+  --card-bg: #0f0f0f;
+  --text-main: #f1f1f1;
+  --text-muted: #aaaaaa;
+  --border-main: #2a2a2a;
+  --hover-bg: #272727;
+  --primary: #3ea6ff;
+  --primary-dark: #1a73e8;
 }
 
 @layer base {
@@ -61,6 +61,18 @@
   @apply bg-card-bg;
 }
 
+.dark .border-black {
+  @apply border-border-main;
+}
+
+.dark .bg-text-main {
+  @apply bg-white text-bg-main!;
+}
+
+.dark .text-text-muted {
+  @apply text-text-muted;
+}
+
 .dark button.bg-text-main, 
 .dark a.bg-text-main,
 .dark div.bg-text-main {
@@ -71,6 +83,17 @@
   @apply text-primary;
 }
 
-.nav-inactive {
-  @apply text-text-muted;
+@layer utilities {
+  .prose-xs {
+    @apply text-[11px] leading-relaxed font-medium text-text-main;
+  }
+  .prose-xs p {
+    @apply mb-2 last:mb-0;
+  }
+  .prose-xs strong {
+    @apply font-bold;
+  }
+  .prose-xs em {
+    @apply italic;
+  }
 }

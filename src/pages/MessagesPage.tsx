@@ -72,13 +72,13 @@ export default function MessagesPage() {
 
     return (
         <div className="flex flex-col h-full bg-white">
-            <div className="p-4 border-b border-border-main bg-white sticky top-0 z-10 space-y-4">
+            <div className="p-4 border-b border-border-main bg-white dark:bg-black sticky top-0 z-10 space-y-4">
                 <div className="flex items-center justify-between">
-                    <h1 className="text-xl font-bold text-text-main">Inbox</h1>
-                    <div className="flex bg-hover-bg p-1 rounded-xl">
+                    <h1 className="text-xl font-bold text-text-main dark:text-white">Inbox</h1>
+                    <div className="flex bg-hover-bg dark:bg-hover-bg/20 p-1 rounded-xl">
                         <button 
                             onClick={() => setActiveTab('chats')}
-                            className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'chats' ? 'bg-white text-text-main shadow-sm' : 'text-text-muted hover:text-text-main'}`}
+                            className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'chats' ? 'bg-white dark:bg-black text-text-main dark:text-white shadow-sm' : 'text-text-muted hover:text-text-main'}`}
                         >
                             Chats
                             {conversations.some(c => (c.unreadCount?.[user?.uid || ''] || 0) > 0) && (
@@ -87,7 +87,7 @@ export default function MessagesPage() {
                         </button>
                         <button 
                             onClick={() => setActiveTab('requests')}
-                            className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all relative ${activeTab === 'requests' ? 'bg-white text-text-main shadow-sm' : 'text-text-muted hover:text-text-main'}`}
+                            className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all relative ${activeTab === 'requests' ? 'bg-white dark:bg-black text-text-main dark:text-white shadow-sm' : 'text-text-muted hover:text-text-main'}`}
                         >
                             Requests
                             {requests.length > 0 && (
@@ -105,7 +105,7 @@ export default function MessagesPage() {
                         placeholder={activeTab === 'chats' ? "Search conversations..." : "Search requests..."}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 bg-hover-bg border-none rounded-xl text-sm font-medium focus:ring-1 focus:ring-primary focus:bg-white transition-all outline-none"
+                        className="w-full pl-10 pr-4 py-2.5 bg-hover-bg dark:bg-black border-none dark:border dark:border-border-main rounded-xl text-sm font-medium focus:ring-1 focus:ring-primary focus:bg-white dark:focus:bg-black dark:text-white transition-all outline-none"
                     />
                 </div>
             </div>

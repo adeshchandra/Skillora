@@ -274,14 +274,14 @@ export default function UserViewPage() {
                                     )}
                                 </h2>
                                 <div className="px-1.5 py-0.5 rounded-md bg-hover-bg border border-border-main/50 text-[10px] font-bold text-text-muted">
-                                    {profile.role === 'tutor' ? 'GURU' : 'LEARNER'}
+                                    {profile.role === 'tutor' ? 'Guru' : 'Learner'}
                                 </div>
                             </div>
                             <div className="flex flex-col items-center gap-2">
                                 <div className={`px-2.5 py-0.5 rounded-lg border text-[10px] font-bold ${reputation.color}`}>
                                     {reputation.label}
                                 </div>
-                                <div className="flex items-center justify-center gap-1.5 text-[10px] font-medium text-text-muted tracking-wide">
+                                <div className="flex items-center justify-center gap-1.5 text-[10px] font-medium text-text-muted">
                                     <MapPin size={10} className="text-primary" />
                                     {profile.location || 'Distributed Node'}
                                 </div>
@@ -330,14 +330,14 @@ export default function UserViewPage() {
 
                         <div className="grid grid-cols-2 gap-3 w-full">
                             <div className="bg-hover-bg/50 rounded-2xl p-4 border border-border-main/20">
-                                <p className="text-[9px] font-bold text-text-muted tracking-widest mb-1">Knowledge</p>
+                                <p className="text-[9px] font-bold text-text-muted mb-1">Knowledge</p>
                                 <div className="flex items-center justify-center gap-1.5">
                                     <Zap size={14} className="text-accent-gold" fill="currentColor" />
                                     <span className="text-lg font-bold text-text-main">{profile.credits || 0}</span>
                                 </div>
                             </div>
                             <div className="bg-hover-bg/50 rounded-2xl p-4 border border-border-main/20">
-                                <p className="text-[9px] font-bold text-text-muted tracking-widest mb-1">Impact</p>
+                                <p className="text-[9px] font-bold text-text-muted mb-1">Impact</p>
                                 <div className="flex items-center justify-center gap-1.5">
                                     <Users size={14} className="text-primary" fill="currentColor" />
                                     <span className="text-lg font-bold text-text-main">{totalStudents}</span>
@@ -350,7 +350,7 @@ export default function UserViewPage() {
                 {/* Status Chips */}
                 <div className="flex gap-2 p-1 bg-white border border-border-main rounded-2xl">
                     <div className="flex-1 p-3 flex flex-col gap-2 border-r border-border-main/50">
-                        <span className="text-[9px] font-bold text-text-muted tracking-wide">Expertise</span>
+                        <span className="text-[9px] font-bold text-text-muted">Expertise</span>
                         <div className="flex flex-wrap gap-1">
                             {(profile.teachSkills || []).slice(0, 2).map((s, idx) => (
                                 <span key={`teach-${s}-${idx}`} className="text-[9px] font-medium bg-primary/5 text-primary px-2 py-0.5 rounded border border-primary/10">{s}</span>
@@ -359,7 +359,7 @@ export default function UserViewPage() {
                         </div>
                     </div>
                     <div className="flex-1 p-3 flex flex-col gap-2">
-                        <span className="text-[9px] font-bold text-text-muted tracking-wide">Learning</span>
+                        <span className="text-[9px] font-bold text-text-muted">Learning</span>
                         <div className="flex flex-wrap gap-1">
                             {(profile.learnSkills || []).slice(0, 2).map((s, idx) => (
                                 <span key={`learn-${s}-${idx}`} className="text-[9px] font-medium bg-accent-gold/5 text-accent-gold px-2 py-0.5 rounded border border-accent-gold/10">{s}</span>
@@ -374,19 +374,19 @@ export default function UserViewPage() {
                     <div className="flex gap-2 p-1 bg-white border border-border-main rounded-2xl">
                         <button 
                             onClick={() => setActiveTab('courses')}
-                            className={`flex-1 py-3 rounded-xl text-[10px] font-bold tracking-wide transition-all ${activeTab === 'courses' ? 'bg-text-main text-white shadow-lg' : 'text-text-muted hover:bg-hover-bg'}`}
+                            className={`flex-1 py-3 rounded-xl text-[10px] font-bold transition-all ${activeTab === 'courses' ? 'bg-text-main text-white shadow-lg' : 'text-text-muted hover:bg-hover-bg'}`}
                         >
                             Published ({courses.length})
                         </button>
                         <button 
                             onClick={() => setActiveTab('daos')}
-                            className={`flex-1 py-3 rounded-xl text-[10px] font-bold tracking-wide transition-all ${activeTab === 'daos' ? 'bg-text-main text-white shadow-lg' : 'text-text-muted hover:bg-hover-bg'}`}
+                            className={`flex-1 py-3 rounded-xl text-[10px] font-bold transition-all ${activeTab === 'daos' ? 'bg-text-main text-white shadow-lg' : 'text-text-muted hover:bg-hover-bg'}`}
                         >
                             DAOs ({daos.length})
                         </button>
                         <button 
                             onClick={() => setActiveTab('experience')}
-                            className={`flex-1 py-3 rounded-xl text-[10px] font-bold tracking-wide transition-all ${activeTab === 'experience' ? 'bg-text-main text-white shadow-lg' : 'text-text-muted hover:bg-hover-bg'}`}
+                            className={`flex-1 py-3 rounded-xl text-[10px] font-bold transition-all ${activeTab === 'experience' ? 'bg-text-main text-white shadow-lg' : 'text-text-muted hover:bg-hover-bg'}`}
                         >
                             History ({sessions.length})
                         </button>

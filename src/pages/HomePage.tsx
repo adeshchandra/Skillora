@@ -4,7 +4,7 @@ import { db } from '../lib/firebase';
 import { useAuth } from '../App';
 import { Course, UserInterest } from '../types';
 import { POPULAR_SKILLS } from '../constants';
-import { Star, ExternalLink, Play, User as UserIcon, X, Search as SearchIcon } from 'lucide-react';
+import { Star, ExternalLink, Play, User as UserIcon, X, Search as SearchIcon, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import { getUserInterests, rankItems } from '../lib/tracking';
@@ -28,7 +28,7 @@ const FilterSystem = ({ selectedTags, setSelectedTags, searchQuery, setSearchQue
   };
 
   return (
-    <div className="bg-white border-b border-border-main">
+    <div className="bg-white dark:bg-black border-b border-border-main dark:border-border-main">
       <div className="px-4 py-3 space-y-3">
         {/* Search Bar */}
         <div className="relative flex items-center">
@@ -38,7 +38,7 @@ const FilterSystem = ({ selectedTags, setSelectedTags, searchQuery, setSearchQue
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search skills, teachers, topics..."
-                className="w-full bg-hover-bg border-none rounded-xl py-2 pl-10 pr-4 text-xs font-semibold focus:ring-1 focus:ring-primary outline-none"
+                className="w-full bg-hover-bg dark:bg-black border-none dark:border dark:border-border-main rounded-xl py-2 pl-10 pr-4 text-xs font-semibold focus:ring-1 focus:ring-primary dark:focus:bg-black dark:text-white outline-none"
             />
             {searchQuery && (
                 <button onClick={() => setSearchQuery('')} className="absolute right-3 p-1 text-text-muted">
@@ -89,6 +89,9 @@ export default function HomePage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [userInterests, setUserInterests] = useState<UserInterest | null>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [pullDistance, setPullDistance] = useState(0);
+  const [startY, setStartY] = useState(0);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isScrolling, setIsScrolling] = useState(false);
@@ -121,16 +124,58 @@ export default function HomePage() {
     };
   }, []);
 
-  useEffect(() => {
-    // Fetch top 50 recent courses to rank locally
+  const fetchCourses = (isRefreshing = false) => {
+    if (isRefreshing) setRefreshing(true);
+    else setLoading(true);
+
     const q = query(collection(db, 'courses'), orderBy('createdAt', 'desc'), limit(50));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Course));
+      let data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Course));
+      
+      if (isRefreshing) {
+        // Keep top 5 most recent, shuffle the rest (11-50) to give that "YouTube" feel
+        const recent = data.slice(0, 8);
+        const older = data.slice(8);
+        const shuffled = [...older].sort(() => Math.random() - 0.5);
+        data = [...recent, ...shuffled];
+      }
+
       setCourses(data);
       setLoading(false);
+      setRefreshing(false);
     });
     return unsubscribe;
+  };
+
+  useEffect(() => {
+    const unsubscribe = fetchCourses();
+    return unsubscribe;
   }, []);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (window.scrollY === 0) {
+      setStartY(e.touches[0].clientY);
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (startY) {
+      const distance = e.touches[0].clientY - startY;
+      if (distance > 0 && window.scrollY === 0) {
+        // Resistance logic: pull distance grows slower as it gets larger
+        const resistedDistance = Math.min(distance * 0.4, 150);
+        setPullDistance(resistedDistance);
+      }
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (pullDistance > 60) {
+      fetchCourses(true);
+    }
+    setPullDistance(0);
+    setStartY(0);
+  };
 
   const filteredCourses = rankItems(
     courses.filter(course => {
@@ -147,7 +192,28 @@ export default function HomePage() {
   );
 
   return (
-    <div className="min-h-screen">
+    <div 
+      className="min-h-screen relative"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* Pull to refresh indicator */}
+      {(pullDistance > 0 || refreshing) && (
+        <div 
+          className="absolute left-0 right-0 flex justify-center z-[60] pointer-events-none"
+          style={{ top: refreshing ? '80px' : `${Math.min(pullDistance, 100)}px` }}
+        >
+          <motion.div 
+            animate={refreshing ? { rotate: 360 } : { rotate: pullDistance * 2 }}
+            transition={refreshing ? { repeat: Infinity, duration: 1, ease: "linear" } : { duration: 0 }}
+            className={`w-8 h-8 rounded-full bg-white dark:bg-black shadow-lg border border-border-main flex items-center justify-center ${refreshing ? 'text-primary' : 'text-text-muted'}`}
+          >
+            <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
+          </motion.div>
+        </div>
+      )}
+
       <motion.div 
         animate={{ 
           y: isScrolling ? -200 : 0, // Push it up when scrolling

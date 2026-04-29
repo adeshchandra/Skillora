@@ -18,40 +18,31 @@ service cloud.firestore {
 
     function isValidUser(data) {
       return data.get('uid', '') == request.auth.uid 
-        && data.get('email', '') is string && data.get('email', '').matches('^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$')
-        && data.get('displayName', '') is string && data.get('displayName', '').size() <= 128
+        && (data.get('email', '') == '' || data.get('email', '') is string)
+        && (data.get('displayName', '') == '' || (data.get('displayName', '') is string && data.get('displayName', '').size() <= 256))
         && (data.get('photoURL', null) == null || data.photoURL is string)
-        && data.get('credits', 0) is number
-        && (data.get('role', null) == null || data.role in ['student', 'tutor'])
-        && (data.get('teachSkills', null) == null || data.teachSkills is list)
-        && (data.get('learnSkills', null) == null || data.learnSkills is list)
-        && (data.get('rating', null) == null || data.rating is number)
-        && (data.get('reviewCount', null) == null || data.reviewCount is number)
-        && (data.get('location', null) == null || data.location is string)
-        && (data.get('onboardingCompleted', null) == null || data.onboardingCompleted is bool)
-        && (data.get('joinedGroups', null) == null || data.joinedGroups is list)
-        && (data.get('createdAt', null) == null || data.createdAt is string)
-        && (data.get('privacy', null) == null || data.privacy is map)
-        && (data.get('bio', null) == null || data.bio is string);
+        && (data.get('credits', null) == null || data.credits is number)
+        && (data.get('role', null) == null || data.role is string)
+        && (data.get('createdAt', null) == null || data.createdAt is string || data.createdAt is timestamp);
     }
 
     function isValidQuiz(data) {
-      return isValidId(data.groupId)
-        && data.questions is list
-        && data.availableFrom is string
-        && data.availableUntil is string
+      return isValidId(data.get('groupId', ''))
+        && data.get('questions', []) is list
+        && data.get('availableFrom', '') is string
+        && data.get('availableUntil', '') is string
         && (data.get('createdAt', null) == null || data.createdAt is timestamp || data.createdAt is string);
     }
 
     function isValidQuizScore(data) {
-      return isValidId(data.userId) && isValidId(data.quizId) && isValidId(data.groupId)
-        && data.score is number
+      return isValidId(data.get('userId', '')) && isValidId(data.get('quizId', '')) && isValidId(data.get('groupId', ''))
+        && data.get('score', 0) is number
         && (data.get('totalQuestions', null) == null || data.totalQuestions is number)
         && (data.get('completedAt', null) == null || data.completedAt is timestamp || data.completedAt is string);
     }
     function isValidCourse(data) {
-      return isValidId(data.teacherId)
-        && data.title is string && data.title.size() <= 200
+      return isValidId(data.get('teacherId', ''))
+        && data.get('title', '') is string && data.get('title', '').size() <= 200
         && (data.get('link', null) == null || data.link is string)
         && (data.get('rating', null) == null || data.rating is number)
         && (data.get('reviewCount', null) == null || data.reviewCount is number)
@@ -64,18 +55,18 @@ service cloud.firestore {
     }
 
     function isValidLearningRequest(data) {
-      return (data.senderId == request.auth.uid || data.recipientId == request.auth.uid)
-        && data.senderName is string && data.recipientName is string
-        && data.learnSkill is string && data.learnSkill.size() <= 150
-        && (data.get('teachSkill', null) == null || data.teachSkill is string)
-        && data.credits is number && data.credits >= 0
-        && (data.get('type', null) == null || data.type in ['Exchange', 'Learning'])
-        && (data.get('status', null) == null || data.status in ['Pending', 'Accepted', 'Declined', 'Decline'])
-        && (data.get('duration', null) == null || data.duration is string)
-        && (data.get('contactMedia', null) == null || data.contactMedia is string)
-        && (data.get('contactInfo', null) == null || data.contactInfo is string)
-        && (data.get('message', null) == null || data.message is string)
-        && (data.get('createdAt', null) == null || data.createdAt is timestamp || data.createdAt is string);
+      return (data.get('senderId', '') == request.auth.uid || data.get('recipientId', '') == request.auth.uid)
+        && data.get('senderName', '') is string && data.get('recipientName', '') is string
+        && data.get('learnSkill', '') is string && data.get('learnSkill', '').size() <= 150
+        && (data.get('teachSkill', null) == null || data.get('teachSkill', '') is string)
+        && data.get('credits', 0) is number && data.get('credits', 0) >= 0
+        && (data.get('type', null) == null || data.get('type', '') in ['Exchange', 'Learning'])
+        && (data.get('status', null) == null || data.get('status', '') in ['Pending', 'Accepted', 'Declined', 'Decline'])
+        && (data.get('duration', null) == null || data.get('duration', '') is string)
+        && (data.get('contactMedia', null) == null || data.get('contactMedia', '') is string)
+        && (data.get('contactInfo', null) == null || data.get('contactInfo', '') is string)
+        && (data.get('message', null) == null || data.get('message', '') is string)
+        && (data.get('createdAt', null) == null || data.get('createdAt', null) is timestamp || data.get('createdAt', null) is string);
     }
 
     function isValidNotification(data) {
@@ -98,8 +89,13 @@ service cloud.firestore {
       allow read: if true;
       allow create: if isSignedIn() && isValidUser(incoming());
       allow update: if isSignedIn() && (
-        (isOwner(userId) && isValidUser(incoming())) ||
-        // Allow peer updates for rating metrics (remains open for peer feedback logic)
+        (isOwner(userId) && (
+          // Action: Profile Update
+          (incoming().diff(existing()).affectedKeys().hasOnly(['photoURL', 'displayName', 'bio', 'location', 'teachSkills', 'learnSkills', 'privacy', 'onboardingCompleted', 'credits', 'role'])) ||
+          // Fallback
+          isValidUser(incoming())
+        )) ||
+        // Action: Peer update (rating)
         (incoming().diff(existing()).affectedKeys().hasOnly(['rating', 'reviewCount']))
       );
 
@@ -114,7 +110,12 @@ service cloud.firestore {
       allow read: if true;
       allow create: if isSignedIn() && incoming().teacherId == request.auth.uid && isValidCourse(incoming());
       allow update: if isSignedIn() && (
-        (existing().teacherId == request.auth.uid && isValidCourse(incoming())) ||
+        (existing().teacherId == request.auth.uid && isValidCourse(incoming()) && (
+           // Action: Meta Update (Propagation)
+           (incoming().diff(existing()).affectedKeys().hasOnly(['teacherPhoto', 'teacherName'])) ||
+           // Fallback
+           true
+        )) ||
         (incoming().diff(existing()).affectedKeys().hasOnly(['rating', 'reviewCount']))
       );
       allow delete: if isSignedIn() && existing().teacherId == request.auth.uid;
@@ -187,25 +188,19 @@ service cloud.firestore {
 
     match /learningRequests/{requestId} {
       function isParticipant() {
-        let isAuth = isSignedIn();
-        let userId = request.auth.uid;
-        
-        // Creation or Update (incoming data)
-        let isCreate = request.method == 'create';
-        let data = isCreate ? incoming() : existing();
-        
-        return isAuth && (
-          data.get('senderId', '') == userId || 
-          data.get('recipientId', '') == userId ||
-          (data.get('conversationId', null) != null && 
-           get(/databases/$(database)/documents/conversations/$(data.conversationId)).data.participants.hasAny([userId]))
+        return isSignedIn() && (
+          existing().get('senderId', '') == request.auth.uid || 
+          existing().get('recipientId', '') == request.auth.uid ||
+          (existing().get('conversationId', null) != null && 
+           exists(/databases/$(database)/documents/conversations/$(existing().get('conversationId', ''))) &&
+           request.auth.uid in get(/databases/$(database)/documents/conversations/$(existing().get('conversationId', ''))).data.get('participants', []))
         );
       }
       allow read: if isParticipant();
-      allow create: if isSignedIn() && incoming().senderId == request.auth.uid && isValidLearningRequest(incoming());
+      allow create: if isSignedIn() && incoming().get('senderId', '') == request.auth.uid && isValidLearningRequest(incoming());
       allow update: if isParticipant() && (
-        existing().status == 'Pending' || 
-        (incoming().diff(existing()).affectedKeys().hasOnly(['status']) && incoming().status in ['Accepted', 'Declined', 'Decline'])
+        existing().get('status', 'Pending') == 'Pending' || 
+        (incoming().diff(existing()).affectedKeys().hasOnly(['status']) && incoming().get('status', '') in ['Accepted', 'Declined', 'Decline'])
       );
       allow delete: if isParticipant();
     }

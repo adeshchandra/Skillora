@@ -24,13 +24,13 @@ import { db } from '../lib/firebase';
 const MenuItem = ({ icon: Icon, label, onClick, rightElement, description }: any) => (
   <button 
     onClick={onClick}
-    className="w-full flex items-center gap-4 p-4 hover:bg-hover-bg transition-all active:bg-border-main border-b border-border-main/50 last:border-0"
+    className="w-full flex items-center gap-4 p-4 hover:bg-hover-bg dark:hover:bg-hover-bg/10 transition-all active:bg-border-main border-b border-border-main/50 dark:border-border-main last:border-0"
   >
     <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center text-primary group-hover:bg-primary/10 transition-colors">
       <Icon size={20} />
     </div>
     <div className="flex-grow text-left">
-      <p className="text-sm font-bold text-text-main leading-tight">{label}</p>
+      <p className="text-sm font-bold text-text-main dark:text-white leading-tight">{label}</p>
       {description && <p className="text-[10px] text-text-muted font-medium mt-0.5">{description}</p>}
     </div>
     {rightElement || <ChevronRight size={16} className="text-text-muted opacity-50" />}
@@ -40,7 +40,7 @@ const MenuItem = ({ icon: Icon, label, onClick, rightElement, description }: any
 const Section = ({ title, children }: any) => (
   <div className="space-y-2">
     <h3 className="px-4 text-[11px] font-black uppercase tracking-widest text-text-muted">{title}</h3>
-    <div className="bg-white border-y border-border-main overflow-hidden">
+    <div className="bg-white dark:bg-black border-y border-border-main dark:border-border-main overflow-hidden">
       {children}
     </div>
   </div>
@@ -165,16 +165,16 @@ export default function SettingsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-bg-main flex flex-col pb-20">
+    <div className="min-h-screen bg-bg-main dark:bg-black flex flex-col pb-20">
       {/* Header */}
-      <div className="bg-white border-b border-border-main p-4 flex items-center gap-4 sticky top-0 z-50">
+      <div className="bg-white dark:bg-black border-b border-border-main dark:border-border-main p-4 flex items-center gap-4 sticky top-0 z-50">
         <button 
           onClick={() => navigate(-1)} 
-          className="p-2 -ml-2 rounded-xl hover:bg-hover-bg transition-colors"
+          className="p-2 -ml-2 rounded-xl hover:bg-hover-bg dark:hover:bg-hover-bg/20 transition-colors"
         >
-          <ArrowLeft size={22} className="text-text-main" />
+          <ArrowLeft size={22} className="text-text-main dark:text-white" />
         </button>
-        <h1 className="text-lg font-black text-text-main tracking-tighter uppercase">Settings</h1>
+        <h1 className="text-lg font-black text-text-main dark:text-white tracking-tighter uppercase">Settings</h1>
       </div>
 
       {/* Content */}
@@ -190,7 +190,7 @@ export default function SettingsPage() {
         <div className="px-4 pt-4">
           <button 
             onClick={() => setShowLogoutConfirm(true)}
-            className="w-full flex items-center justify-center gap-2 py-4 bg-red-50 text-red-600 rounded-2xl font-black text-xs uppercase tracking-widest border border-red-100 hover:bg-red-100 transition-all active:scale-[0.98]"
+            className="w-full flex items-center justify-center gap-2 py-4 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded-2xl font-black text-xs uppercase tracking-widest border border-red-100 dark:border-red-500/20 hover:bg-red-100 dark:hover:bg-red-500/20 transition-all active:scale-[0.98]"
           >
             <LogOut size={16} />
             Logout from Session
