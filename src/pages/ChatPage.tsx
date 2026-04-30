@@ -62,7 +62,7 @@ const PersistenceAgreement = ({ onAgree }: { onAgree: () => void }) => (
         <motion.div 
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="bg-white dark:bg-card-bg rounded-[32px] p-8 max-w-sm w-full text-center space-y-6 border border-border-main dark:border-border-main shadow-2xl"
+            className="bg-white rounded-[32px] p-8 max-w-sm w-full text-center space-y-6 border border-border-main shadow-2xl"
         >
             <div className="w-16 h-16 bg-primary/10 rounded-2xl mx-auto flex items-center justify-center text-primary">
                 <Shield size={32} />
@@ -122,13 +122,13 @@ const SkillRequestBubble = ({ requestId, isMe, onOpenNegotiation }: { requestId:
     const isRecipient = request.recipientId === user?.uid;
 
     return (
-        <div className={`w-full max-w-[280px] rounded-[24px] overflow-hidden border border-border-main/50 dark:border-border-main/30 bg-white dark:bg-card-bg shadow-xl transition-colors ${isMe ? 'ml-auto' : ''}`}>
-            <div className="p-4 bg-primary/5 dark:bg-primary/20 border-b border-primary/10 dark:border-primary/30 flex items-center justify-between transition-colors">
+        <div className={`w-full max-w-[280px] rounded-[24px] overflow-hidden border border-border-main/50 bg-white shadow-xl transition-colors ${isMe ? 'ml-auto' : ''}`}>
+            <div className="p-4 bg-primary/5 border-b border-primary/10 flex items-center justify-between transition-colors">
                 <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-primary/10 dark:bg-primary/40 flex items-center justify-center text-primary dark:text-white transition-colors">
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary transition-colors">
                         <Handshake size={16} />
                     </div>
-                    <span className="text-[10px] font-black text-primary dark:text-primary transition-colors">Skill Request</span>
+                    <span className="text-[10px] font-black text-primary transition-colors">Skill Request</span>
                 </div>
                 <span className={`px-2 py-0.5 rounded text-[8px] font-black ${
                     request.status === 'Accepted' ? 'bg-green-500 text-white' : 
@@ -141,19 +141,19 @@ const SkillRequestBubble = ({ requestId, isMe, onOpenNegotiation }: { requestId:
             <div className="p-4 space-y-3">
                 <div className="space-y-1">
                     <p className="text-[9px] font-bold text-text-muted">Learn</p>
-                    <p className="text-xs font-bold text-text-main dark:text-white leading-tight transition-colors">{request.learnSkill}</p>
+                    <p className="text-xs font-bold text-text-main leading-tight transition-colors">{request.learnSkill}</p>
                 </div>
 
                 {request.teachSkill && (
                     <div className="space-y-1">
                         <p className="text-[9px] font-bold text-text-muted">Teach</p>
-                        <p className="text-xs font-bold text-text-main dark:text-white leading-tight transition-colors">{request.teachSkill}</p>
+                        <p className="text-xs font-bold text-text-main leading-tight transition-colors">{request.teachSkill}</p>
                     </div>
                 )}
 
-                <div className="grid grid-cols-2 gap-2 pt-1 border-t border-border-main/10 dark:border-border-main/5 mt-2">
+                <div className="grid grid-cols-2 gap-2 pt-1 border-t border-border-main/10 mt-2">
                     <div className="flex items-center gap-1.5 text-[10px] font-bold text-text-muted">
-                        <Clock size={12} className="text-primary dark:text-primary" />
+                        <Clock size={12} className="text-primary" />
                         {request.duration}
                     </div>
                     <div className="flex items-center gap-1.5 text-[10px] font-bold text-text-muted">
@@ -163,7 +163,7 @@ const SkillRequestBubble = ({ requestId, isMe, onOpenNegotiation }: { requestId:
                 </div>
 
                 {request.message && (
-                    <div className="p-3 bg-hover-bg/30 dark:bg-black/40 rounded-xl prose-xs dark:prose-invert transition-colors">
+                    <div className="p-3 bg-hover-bg/30 rounded-xl prose-xs transition-colors">
                         <Markdown>{request.message}</Markdown>
                     </div>
                 )}
@@ -171,7 +171,7 @@ const SkillRequestBubble = ({ requestId, isMe, onOpenNegotiation }: { requestId:
                 {!isMe && request.status === 'Pending' && (
                     <button 
                         onClick={() => onOpenNegotiation(request)}
-                        className="w-full py-2 bg-primary text-white rounded-xl text-[10px] font-bold hover:bg-primary-dark transition-all shadow-md shadow-primary/10 border border-primary dark:border-transparent active:scale-95"
+                        className="w-full py-2 bg-primary text-white rounded-xl text-[10px] font-bold hover:bg-primary-dark transition-all shadow-md shadow-primary/10 border border-primary active:scale-95"
                     >
                         Negotiate Contract
                     </button>
@@ -360,7 +360,7 @@ export default function ChatPage() {
 
     if (loading) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-screen bg-white dark:bg-black transition-colors">
+            <div className="flex flex-col items-center justify-center min-h-screen bg-white transition-colors">
                 <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
             </div>
         );
@@ -370,7 +370,7 @@ export default function ChatPage() {
     const otherInfo = otherId ? conversation?.participantInfo[otherId] : null;
 
     return (
-        <div className="flex flex-col h-[100dvh] bg-bg-main dark:bg-black overflow-hidden fixed inset-0 transition-colors">
+        <div className="flex flex-col h-[100dvh] bg-bg-main overflow-hidden fixed inset-0 transition-colors">
             {showAgreement && <PersistenceAgreement onAgree={handleAgree} />}
             <input 
                 type="file" 
@@ -381,12 +381,12 @@ export default function ChatPage() {
             />
 
             {/* Header */}
-            <div className="h-14 bg-white dark:bg-black border-b border-border-main dark:border-border-main/50 flex items-center px-4 shrink-0 transition-all sticky top-0 z-40">
-                <button onClick={() => navigate('/messages')} className="p-2 -ml-2 rounded-xl hover:bg-hover-bg dark:hover:bg-hover-bg/10 transition-colors mr-2">
-                    <ArrowLeft size={20} className="text-text-main dark:text-white" />
+            <div className="h-14 bg-white border-b border-border-main flex items-center px-4 shrink-0 transition-all sticky top-0 z-40">
+                <button onClick={() => navigate('/messages')} className="p-2 -ml-2 rounded-xl hover:bg-hover-bg transition-colors mr-2">
+                    <ArrowLeft size={20} className="text-text-main" />
                 </button>
                 <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <div className="w-9 h-9 rounded-xl overflow-hidden bg-hover-bg dark:bg-black border border-border-main/50 dark:border-border-main/30 cursor-pointer shadow-sm transition-colors" onClick={() => otherId && navigate(`/user/${otherId}`)}>
+                    <div className="w-9 h-9 rounded-xl overflow-hidden bg-hover-bg border border-border-main/50 cursor-pointer shadow-sm transition-colors" onClick={() => otherId && navigate(`/user/${otherId}`)}>
                         {otherInfo?.photoURL ? (
                             <img src={otherInfo.photoURL} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                         ) : (
@@ -396,7 +396,7 @@ export default function ChatPage() {
                         )}
                     </div>
                     <div className="min-w-0 cursor-pointer" onClick={() => otherId && navigate(`/user/${otherId}`)}>
-                        <h2 className="text-sm font-bold text-text-main dark:text-white truncate tracking-tight transition-colors">{otherInfo?.displayName}</h2>
+                        <h2 className="text-sm font-bold text-text-main truncate tracking-tight transition-colors">{otherInfo?.displayName}</h2>
                         <div className="flex items-center gap-1">
                             <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
                             <span className="text-[9px] font-bold text-text-muted">Active Now</span>
@@ -406,12 +406,12 @@ export default function ChatPage() {
             </div>
 
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto px-4 py-2 space-y-4 dark:bg-black transition-colors">
+            <div className="flex-1 overflow-y-auto px-4 py-2 space-y-4 transition-colors">
                 <div className="py-8 text-center">
-                    <div className="w-12 h-12 bg-white dark:bg-hover-bg/10 rounded-2xl mx-auto flex items-center justify-center border border-border-main/50 dark:border-border-main/30 mb-3 shadow-sm transition-colors">
+                    <div className="w-12 h-12 bg-white rounded-2xl mx-auto flex items-center justify-center border border-border-main/50 mb-3 shadow-sm transition-colors">
                         <UserIcon className="text-text-muted" size={20} />
                     </div>
-                    <h3 className="text-xs font-bold text-text-main dark:text-white leading-none transition-colors">Conversation with {otherInfo?.displayName}</h3>
+                    <h3 className="text-xs font-bold text-text-main leading-none transition-colors">Conversation with {otherInfo?.displayName}</h3>
                     <p className="text-[9px] text-text-muted font-medium mt-1">Secure Skill Sync Channel</p>
                 </div>
 
@@ -424,7 +424,7 @@ export default function ChatPage() {
                             <div key={`${msg.id}-${i}`} className="space-y-1">
                                 {showTime && msg.createdAt && (
                                     <div className="text-center py-2">
-                                        <span className="text-[8px] font-black text-text-muted px-2 py-0.5 bg-hover-bg dark:bg-hover-bg/20 rounded transition-colors">
+                                        <span className="text-[8px] font-black text-text-muted px-2 py-0.5 bg-hover-bg rounded transition-colors">
                                             {format(msg.createdAt.toDate(), 'h:mm a')}
                                         </span>
                                     </div>
@@ -436,19 +436,19 @@ export default function ChatPage() {
                                                 animate={{ opacity: 1, y: 0 }}
                                                 className="w-full max-w-[280px] my-2"
                                             >
-                                                <div className="bg-primary/5 dark:bg-primary/20 border border-primary/10 dark:border-primary/40 rounded-2xl p-4 text-center space-y-2 relative overflow-hidden transition-all">
+                                                <div className="bg-primary/5 border border-primary/10 rounded-2xl p-4 text-center space-y-2 relative overflow-hidden transition-all">
                                                     <div className="absolute -right-2 -top-2 opacity-10">
                                                         <Sparkles size={48} className="text-primaryRotate" />
                                                     </div>
                                                     <div className="flex justify-center">
-                                                        <div className="w-8 h-8 rounded-lg bg-primary/10 dark:bg-primary/30 flex items-center justify-center text-primary dark:text-white transition-colors">
+                                                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary transition-colors">
                                                             <Sparkles size={16} />
                                                         </div>
                                                     </div>
-                                                    <p className="text-[11px] font-medium text-text-main dark:text-white/90 leading-relaxed transition-colors">
+                                                    <p className="text-[11px] font-medium text-text-main leading-relaxed transition-colors">
                                                         {msg.text}
                                                     </p>
-                                                    <div className="h-[1px] w-8 bg-primary/20 dark:bg-primary/40 mx-auto" />
+                                                    <div className="h-[1px] w-8 bg-primary/20 mx-auto" />
                                                     <p className="text-[8px] font-black text-primary">Verified Skillora Suggestion</p>
                                                 </div>
                                             </motion.div>
@@ -468,7 +468,7 @@ export default function ChatPage() {
                                                 className={`max-w-[85%] ${msg.image ? 'p-1' : 'px-4 py-2.5'} rounded-[24px] text-sm font-medium shadow-sm transition-all ${
                                                     isMe 
                                                     ? 'bg-primary text-white rounded-br-none' 
-                                                    : 'bg-white dark:bg-card-bg text-text-main dark:text-white border border-border-main/50 dark:border-border-main/30 rounded-bl-none'
+                                                    : 'bg-white text-text-main border border-border-main/50 rounded-bl-none'
                                                 }`}
                                             >
                                                 {msg.image ? (
@@ -486,7 +486,7 @@ export default function ChatPage() {
             </div>
 
             {/* Input Area */}
-            <div className="p-4 bg-white dark:bg-black border-t border-border-main dark:border-border-main/50 pb-[max(1rem,env(safe-area-inset-bottom))] shrink-0 relative z-30 transition-colors">
+            <div className="p-4 bg-white border-t border-border-main shrink-0 relative z-30 transition-colors">
                 {isUploading && (
                     <div className="absolute top-0 left-0 right-0 h-1 bg-primary/20 animate-pulse">
                         <div className="h-full bg-primary animate-[shimmer_2s_infinite]" style={{ width: '40%' }} />
@@ -497,7 +497,7 @@ export default function ChatPage() {
                         <button 
                             type="button" 
                             onClick={() => setIsRequestModalOpen(true)}
-                            className="p-2 text-primary hover:bg-primary/5 dark:hover:bg-primary/20 rounded-xl transition-colors shrink-0"
+                            className="p-2 text-primary hover:bg-primary/5 rounded-xl transition-colors shrink-0"
                             title="Skill Request"
                         >
                             <Plus size={20} />
@@ -505,7 +505,7 @@ export default function ChatPage() {
                         <button 
                             type="button" 
                             onClick={() => fileInputRef.current?.click()}
-                            className="p-2 text-text-muted hover:text-primary dark:hover:text-primary rounded-xl transition-colors shrink-0"
+                            className="p-2 text-text-muted hover:text-primary rounded-xl transition-colors shrink-0"
                             title="Send Image"
                         >
                             <ImageIcon size={20} />
@@ -517,7 +517,7 @@ export default function ChatPage() {
                             value={newMessage}
                             onChange={(e) => setNewMessage(e.target.value)}
                             placeholder="Type an idea..."
-                            className="w-full px-4 py-3 bg-hover-bg/40 dark:bg-hover-bg/10 border-2 border-transparent dark:border dark:border-border-main/50 rounded-2xl text-[13px] font-bold text-text-main dark:text-white focus:ring-2 focus:ring-primary/20 focus:bg-white dark:focus:bg-hover-bg/20 focus:border-primary dark:focus:border-primary outline-none shadow-sm transition-all pr-12"
+                            className="w-full px-4 py-3 bg-hover-bg/40 border-2 border-transparent rounded-2xl text-[13px] font-bold text-text-main focus:ring-2 focus:ring-primary/20 focus:bg-white focus:border-primary outline-none shadow-sm transition-all pr-12"
                         />
                         <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-primary transition-colors">
                             <Smile size={18} />
@@ -526,7 +526,7 @@ export default function ChatPage() {
                     <button 
                         type="submit"
                         disabled={!newMessage.trim() || isUploading}
-                        className="p-3 bg-primary text-white rounded-2xl shadow-lg border-2 border-primary-dark dark:border-primary disabled:opacity-50 disabled:grayscale hover:bg-primary-dark transition-all active:scale-[0.98] shrink-0"
+                        className="p-3 bg-primary text-white rounded-2xl shadow-lg border-2 border-primary-dark disabled:opacity-50 disabled:grayscale hover:bg-primary-dark transition-all active:scale-[0.98] shrink-0"
                     >
                         <Send size={18} strokeWidth={3} />
                     </button>

@@ -224,32 +224,32 @@ export default function UserViewPage() {
     const allRatings = [...courses.map(c => c.rating || 0), ...daos.map(d => d.rating || 0)];
     const avgRating = allRatings.length > 0 ? allRatings.reduce((a, b) => a + b, 0) / allRatings.length : 0;
 
-    const getReputation = (rating: number) => {
-        if (rating >= 4.5) return { label: "Visionary Elite", color: "text-accent-gold bg-accent-gold/5 border-accent-gold/20" };
-        if (rating >= 4.0) return { label: "Trusted Mentor", color: "text-primary bg-primary/5 border-primary/20" };
-        if (rating >= 3.5) return { label: "Rising Expert", color: "text-green-600 bg-green-50 border-green-200" };
-        return { label: "Skill Seeker", color: "text-text-muted bg-hover-bg border-border-main" };
-    };
+        const getReputation = (rating: number) => {
+            if (rating >= 4.5) return { label: "Visionary Elite", color: "text-accent-gold bg-accent-gold/5 border-accent-gold/20" };
+            if (rating >= 4.0) return { label: "Trusted Mentor", color: "text-primary bg-primary/5 border-primary/20" };
+            if (rating >= 3.5) return { label: "Rising Expert", color: "text-green-600 bg-green-50 border-green-200" };
+            return { label: "Skill Seeker", color: "text-text-muted bg-hover-bg border-border-main" };
+        };
 
     const reputation = getReputation(avgRating);
 
     return (
-        <div className="min-h-screen bg-bg-main dark:bg-black pb-24 transition-colors">
+        <div className="min-h-screen bg-bg-main pb-24 transition-colors">
             {/* Header */}
-            <div className="bg-white dark:bg-black border-b border-border-main dark:border-border-main/50 p-4 flex items-center justify-between sticky top-0 z-50 transition-colors">
-                <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-xl hover:bg-hover-bg dark:hover:bg-hover-bg/20 transition-colors">
-                    <ArrowLeft size={22} className="text-text-main dark:text-white" />
+            <div className="bg-white border-b border-border-main p-4 flex items-center justify-between sticky top-0 z-50 transition-colors">
+                <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-xl hover:bg-hover-bg transition-colors">
+                    <ArrowLeft size={22} className="text-text-main" />
                 </button>
-                <h1 className="text-sm font-bold text-text-main dark:text-white tracking-tight">Member profile</h1>
+                <h1 className="text-sm font-bold text-text-main tracking-tight">Member profile</h1>
                 <div className="w-10" /> {/* Spacer */}
             </div>
 
             <div className="p-4 space-y-6">
                 {/* Minimal Professional Profile Section */}
-                <div className="bg-white dark:bg-card-bg rounded-[2rem] border border-border-main dark:border-border-main/50 p-6 shadow-sm shadow-black/5 dark:shadow-none transition-all">
+                <div className="bg-white rounded-[2rem] border border-border-main p-6 shadow-sm shadow-black/5 transition-all">
                     <div className="flex flex-col items-center text-center">
                         <div className="relative mb-6">
-                            <div className="w-24 h-24 rounded-[32px] overflow-hidden bg-hover-bg dark:bg-black border-2 border-border-main dark:border-border-main/50 shadow-lg">
+                            <div className="w-24 h-24 rounded-[32px] overflow-hidden bg-hover-bg border-2 border-border-main shadow-lg">
                                 <img 
                                     src={profile.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.uid}`} 
                                     alt={profile.displayName} 
@@ -257,14 +257,14 @@ export default function UserViewPage() {
                                     referrerPolicy="no-referrer"
                                 />
                             </div>
-                            <div className="absolute -bottom-2 -right-2 bg-text-main dark:bg-white w-8 h-8 rounded-xl flex items-center justify-center text-white dark:text-black border-4 border-white dark:border-black shadow-sm transition-colors">
+                            <div className="absolute -bottom-2 -right-2 bg-text-main w-8 h-8 rounded-xl flex items-center justify-center text-white border-4 border-white shadow-sm transition-colors">
                                 <Shield size={14} fill="currentColor" />
                             </div>
                         </div>
 
                         <div className="space-y-1.5 mb-6">
                             <div className="flex flex-col items-center gap-1.5">
-                                <h2 className="text-xl font-bold text-text-main dark:text-white tracking-tight flex items-center gap-2">
+                                <h2 className="text-xl font-bold text-text-main tracking-tight flex items-center gap-2">
                                     {profile.displayName}
                                     {liveSession && (
                                         <div className="flex items-center gap-1.5 px-2 py-0.5 bg-red-500 rounded-lg text-[8px] font-bold text-white animate-pulse">
@@ -273,7 +273,7 @@ export default function UserViewPage() {
                                         </div>
                                     )}
                                 </h2>
-                                <div className="px-1.5 py-0.5 rounded-md bg-hover-bg dark:bg-hover-bg/20 border border-border-main/50 dark:border-border-main/30 text-[10px] font-bold text-text-muted">
+                                <div className="px-1.5 py-0.5 rounded-md bg-hover-bg border border-border-main/50 text-[10px] font-bold text-text-muted">
                                     {profile.role === 'tutor' ? 'Guru' : 'Learner'}
                                 </div>
                             </div>
@@ -290,7 +290,7 @@ export default function UserViewPage() {
                                         <button 
                                             onClick={handleStartChat}
                                             disabled={isStartingChat}
-                                            className="px-4 py-2 rounded-xl text-[10px] font-bold bg-text-main dark:bg-white text-white dark:text-black hover:bg-black dark:hover:bg-white/90 transition-all active:scale-[0.98] flex items-center gap-2 shadow-sm"
+                                            className="px-4 py-2 rounded-xl text-[10px] font-bold bg-text-main text-white hover:bg-black transition-all active:scale-[0.98] flex items-center gap-2 shadow-sm"
                                         >
                                             <MessageSquare size={14} />
                                             {isStartingChat ? 'Connecting...' : 'Message'}
@@ -329,18 +329,18 @@ export default function UserViewPage() {
                         </div>
 
                         <div className="grid grid-cols-2 gap-3 w-full">
-                            <div className="bg-hover-bg/50 dark:bg-hover-bg/10 rounded-2xl p-4 border border-border-main/20 dark:border-border-main/10 transition-colors">
+                            <div className="bg-hover-bg/50 rounded-2xl p-4 border border-border-main/20 transition-colors">
                                 <p className="text-[9px] font-bold text-text-muted mb-1">Knowledge</p>
                                 <div className="flex items-center justify-center gap-1.5">
                                     <Zap size={14} className="text-accent-gold" fill="currentColor" />
-                                    <span className="text-lg font-bold text-text-main dark:text-white">{profile.credits || 0}</span>
+                                    <span className="text-lg font-bold text-text-main">{profile.credits || 0}</span>
                                 </div>
                             </div>
-                            <div className="bg-hover-bg/50 dark:bg-hover-bg/10 rounded-2xl p-4 border border-border-main/20 dark:border-border-main/10 transition-colors">
+                            <div className="bg-hover-bg/50 rounded-2xl p-4 border border-border-main/20 transition-colors">
                                 <p className="text-[9px] font-bold text-text-muted mb-1">Impact</p>
                                 <div className="flex items-center justify-center gap-1.5">
                                     <Users size={14} className="text-primary" fill="currentColor" />
-                                    <span className="text-lg font-bold text-text-main dark:text-white">{totalStudents}</span>
+                                    <span className="text-lg font-bold text-text-main">{totalStudents}</span>
                                 </div>
                             </div>
                         </div>
@@ -348,12 +348,12 @@ export default function UserViewPage() {
                 </div>
 
                 {/* Status Chips */}
-                <div className="flex gap-2 p-1 bg-white dark:bg-card-bg border border-border-main dark:border-border-main/50 rounded-2xl shadow-sm transition-colors">
-                    <div className="flex-1 p-3 flex flex-col gap-2 border-r border-border-main/50 dark:border-border-main/30">
+                <div className="flex gap-2 p-1 bg-white border border-border-main rounded-2xl shadow-sm transition-colors">
+                    <div className="flex-1 p-3 flex flex-col gap-2 border-r border-border-main/50 text-text-main">
                         <span className="text-[9px] font-bold text-text-muted">Expertise</span>
                         <div className="flex flex-wrap gap-1">
                             {(profile.teachSkills || []).slice(0, 2).map((s, idx) => (
-                                <span key={`teach-${s}-${idx}`} className="text-[9px] font-medium bg-primary/5 dark:bg-primary/10 text-primary px-2 py-0.5 rounded border border-primary/10 dark:border-primary/20">{s}</span>
+                                <span key={`teach-${s}-${idx}`} className="text-[9px] font-medium bg-primary/5 text-primary px-2 py-0.5 rounded border border-primary/10">{s}</span>
                             ))}
                             {(profile.teachSkills || []).length === 0 && <span className="text-[9px] font-medium text-text-muted italic">Private</span>}
                         </div>
@@ -362,7 +362,7 @@ export default function UserViewPage() {
                         <span className="text-[9px] font-bold text-text-muted">Learning</span>
                         <div className="flex flex-wrap gap-1">
                             {(profile.learnSkills || []).slice(0, 2).map((s, idx) => (
-                                <span key={`learn-${s}-${idx}`} className="text-[9px] font-medium bg-accent-gold/5 dark:bg-accent-gold/10 text-accent-gold px-2 py-0.5 rounded border border-accent-gold/10 dark:border-accent-gold/20">{s}</span>
+                                <span key={`learn-${s}-${idx}`} className="text-[9px] font-medium bg-accent-gold/5 text-accent-gold px-2 py-0.5 rounded border border-accent-gold/10">{s}</span>
                             ))}
                             {(profile.learnSkills || []).length === 0 && <span className="text-[9px] font-medium text-text-muted italic">Focusing...</span>}
                         </div>
@@ -371,22 +371,22 @@ export default function UserViewPage() {
 
                 {/* Tabs Area */}
                 <div className="space-y-4">
-                    <div className="flex gap-2 p-1 bg-white dark:bg-card-bg border border-border-main dark:border-border-main/50 rounded-2xl shadow-sm transition-colors">
+                    <div className="flex gap-2 p-1 bg-white border border-border-main rounded-2xl shadow-sm transition-colors">
                         <button 
                             onClick={() => setActiveTab('courses')}
-                            className={`flex-1 py-3 rounded-xl text-[10px] font-bold transition-all ${activeTab === 'courses' ? 'bg-text-main dark:bg-white text-white dark:text-black shadow-lg' : 'text-text-muted hover:bg-hover-bg dark:hover:bg-hover-bg/30'}`}
+                            className={`flex-1 py-3 rounded-xl text-[10px] font-bold transition-all ${activeTab === 'courses' ? 'bg-text-main text-white shadow-lg' : 'text-text-muted hover:bg-hover-bg'}`}
                         >
                             Published ({courses.length})
                         </button>
                         <button 
                             onClick={() => setActiveTab('daos')}
-                            className={`flex-1 py-3 rounded-xl text-[10px] font-bold transition-all ${activeTab === 'daos' ? 'bg-text-main dark:bg-white text-white dark:text-black shadow-lg' : 'text-text-muted hover:bg-hover-bg dark:hover:bg-hover-bg/30'}`}
+                            className={`flex-1 py-3 rounded-xl text-[10px] font-bold transition-all ${activeTab === 'daos' ? 'bg-text-main text-white shadow-lg' : 'text-text-muted hover:bg-hover-bg'}`}
                         >
                             DAOs ({daos.length})
                         </button>
                         <button 
                             onClick={() => setActiveTab('experience')}
-                            className={`flex-1 py-3 rounded-xl text-[10px] font-bold transition-all ${activeTab === 'experience' ? 'bg-text-main dark:bg-white text-white dark:text-black shadow-lg' : 'text-text-muted hover:bg-hover-bg dark:hover:bg-hover-bg/30'}`}
+                            className={`flex-1 py-3 rounded-xl text-[10px] font-bold transition-all ${activeTab === 'experience' ? 'bg-text-main text-white shadow-lg' : 'text-text-muted hover:bg-hover-bg'}`}
                         >
                             History ({sessions.length})
                         </button>
@@ -396,7 +396,7 @@ export default function UserViewPage() {
                         {activeTab === 'courses' ? (
                             <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
                                 {courses.length === 0 ? (
-                                    <div className="py-20 text-center space-y-3 bg-white dark:bg-card-bg rounded-[2rem] border border-dashed border-border-main dark:border-border-main/30 shadow-sm transition-colors">
+                                    <div className="py-20 text-center space-y-3 bg-white rounded-[2rem] border border-dashed border-border-main shadow-sm transition-colors">
                                         <BookOpen size={24} className="mx-auto text-text-muted opacity-30" />
                                         <p className="text-xs font-bold text-text-muted">No published content (yet).</p>
                                     </div>
@@ -409,7 +409,7 @@ export default function UserViewPage() {
                         ) : activeTab === 'daos' ? (
                             <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
                                 {daos.length === 0 ? (
-                                    <div className="py-20 text-center space-y-3 bg-white dark:bg-card-bg rounded-[2rem] border border-dashed border-border-main dark:border-border-main/30 shadow-sm transition-colors">
+                                    <div className="py-20 text-center space-y-3 bg-white rounded-[2rem] border border-dashed border-border-main shadow-sm transition-colors">
                                         <Shield size={24} className="mx-auto text-text-muted opacity-30" />
                                         <p className="text-xs font-bold text-text-muted">No managed DAO groups.</p>
                                     </div>
@@ -428,7 +428,7 @@ export default function UserViewPage() {
                         ) : (
                             <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 space-y-4">
                                 {sessions.length === 0 ? (
-                                    <div className="py-20 text-center space-y-3 bg-white dark:bg-card-bg rounded-[2rem] border border-dashed border-border-main dark:border-border-main/30 shadow-sm transition-colors">
+                                    <div className="py-20 text-center space-y-3 bg-white rounded-[2rem] border border-dashed border-border-main shadow-sm transition-colors">
                                         <Clock size={24} className="mx-auto text-text-muted opacity-30" />
                                         <p className="text-xs font-bold text-text-muted">No ongoing or past agreements.</p>
                                     </div>
@@ -437,36 +437,36 @@ export default function UserViewPage() {
                                         const bothRated = sess.teacherRatedAt && sess.learnerRatedAt;
                                         const isTeacher = sess.teacherId === userId;
                                         return (
-                                            <div key={`${sess.id}-${idx}`} className="bg-white dark:bg-card-bg rounded-2xl border border-border-main dark:border-border-main/50 p-4 space-y-3 shadow-sm border-l-4 border-l-primary transition-all">
+                                            <div key={`${sess.id}-${idx}`} className="bg-white rounded-2xl border border-border-main p-4 space-y-3 shadow-sm border-l-4 border-l-primary transition-all">
                                                 <div className="flex items-center justify-between">
-                                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${sess.status === 'Completed' ? 'bg-green-50 dark:bg-green-500/10 text-green-600 dark:text-green-500' : 'bg-primary/10 text-primary'}`}>
+                                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${sess.status === 'Completed' ? 'bg-green-50 text-green-600' : 'bg-primary/10 text-primary'}`}>
                                                         {sess.status}
                                                     </span>
                                                     <span className="text-[9px] font-bold text-text-muted">{sess.date}</span>
                                                 </div>
                                                 <div>
-                                                    <h4 className="text-xs font-bold text-text-main dark:text-white line-clamp-1">{sess.subject}</h4>
+                                                    <h4 className="text-xs font-bold text-text-main line-clamp-1">{sess.subject}</h4>
                                                     <p className="text-[10px] text-text-muted font-medium mb-2">
                                                         {isTeacher ? 'Expert Guru' : 'Collaborator'} • {isTeacher ? sess.learnerName : sess.teacherName}
                                                     </p>
                                                 </div>
                                                 
                                                 {bothRated ? (
-                                                    <div className="bg-hover-bg/40 dark:bg-hover-bg/10 border border-border-main/30 dark:border-border-main/20 rounded-xl p-3 space-y-2 transition-colors">
+                                                    <div className="bg-hover-bg/40 border border-border-main/30 rounded-xl p-3 space-y-2 transition-colors">
                                                         <div className="flex items-center gap-1">
                                                             {[1,2,3,4,5].map(s => (
                                                                 <Star 
                                                                     key={`star-${sess.id}-${s}`} size={10} 
-                                                                    className={s <= (isTeacher ? (sess.learnerRating || 0) : (sess.teacherRating || 0)) ? "text-accent-gold fill-accent-gold" : "text-border-main dark:text-border-main/50"} 
+                                                                    className={s <= (isTeacher ? (sess.learnerRating || 0) : (sess.teacherRating || 0)) ? "text-accent-gold fill-accent-gold" : "text-border-main"} 
                                                                 />
                                                             ))}
                                                         </div>
-                                                        <p className="text-[10px] text-text-main dark:text-text-muted font-medium italic leading-relaxed">
+                                                        <p className="text-[10px] text-text-main font-medium italic leading-relaxed">
                                                             "{isTeacher ? sess.learnerReview : sess.teacherReview}"
                                                         </p>
                                                     </div>
                                                 ) : sess.status === 'Completed' && (
-                                                    <div className="py-2 text-center bg-hover-bg/30 dark:bg-hover-bg/10 rounded-lg text-[9px] text-text-muted font-bold tracking-tight">
+                                                    <div className="py-2 text-center bg-hover-bg/30 rounded-lg text-[9px] text-text-muted font-bold tracking-tight">
                                                         Mutual rating pending for feedback visibility
                                                     </div>
                                                 )}

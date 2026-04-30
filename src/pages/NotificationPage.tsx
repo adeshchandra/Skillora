@@ -65,7 +65,7 @@ const NotificationItem = ({ notification }: NotificationItemProps) => {
         {getIcon()}
       </div>
       <div className="flex-grow pt-0.5 pr-4">
-        <p className={`text-[13px] leading-snug mb-1 ${!notification.read ? 'font-bold text-text-main' : 'font-medium text-text-muted'}`}>
+        <p className={`text-[13px] leading-snug mb-1 ${!notification.read ? 'font-bold text-text-main' : 'font-medium text-text-muted transition-colors'}`}>
             {notification.message}
         </p>
         <p className="text-[10px] font-bold text-text-muted uppercase tracking-wider">
@@ -101,9 +101,9 @@ export default function NotificationPage() {
   }, [user]);
 
   return (
-    <div className="min-h-screen bg-white">
-      <header className="sticky top-0 bg-white z-40 px-4 h-14 border-b border-border-main flex items-center justify-between">
-         <h1 className="text-xl font-bold text-text-main">Notifications</h1>
+    <div className="min-h-screen bg-white transition-colors">
+      <header className="sticky top-0 bg-white z-40 px-4 h-14 border-b border-border-main flex items-center justify-between transition-colors">
+         <h1 className="text-xl font-bold text-text-main transition-colors">Notifications</h1>
       </header>
 
       {loading ? (

@@ -25,10 +25,10 @@ const RatingModal = ({ isOpen, onClose, onRate, name }: { isOpen: boolean, onClo
                         initial={{ scale: 0.95, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0.95, opacity: 0 }}
-                        className="bg-white dark:bg-card-bg w-full max-w-sm rounded-[32px] p-6 border border-border-main dark:border-border-main space-y-6 shadow-2xl"
+                        className="bg-white w-full max-w-sm rounded-[32px] p-6 border border-border-main space-y-6 shadow-2xl"
                     >
                         <div className="text-center space-y-1">
-                            <h4 className="text-lg font-bold text-text-main dark:text-white tracking-tighter">Rate {name}</h4>
+                            <h4 className="text-lg font-bold text-text-main tracking-tighter">Rate {name}</h4>
                             <p className="text-xs text-text-muted leading-relaxed font-medium">Please provide your feedback on the contract/learning session.</p>
                         </div>
                         <div className="flex justify-center gap-2">
@@ -36,7 +36,7 @@ const RatingModal = ({ isOpen, onClose, onRate, name }: { isOpen: boolean, onClo
                                 <button
                                     key={s}
                                     onClick={() => setScore(s)}
-                                    className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all font-black text-sm border ${score === s ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20' : 'bg-hover-bg dark:bg-hover-bg/10 text-text-muted border-border-main/50 hover:bg-border-main dark:hover:bg-hover-bg/20'}`}
+                                    className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all font-black text-sm border ${score === s ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20' : 'bg-hover-bg text-text-muted border-border-main/50 hover:bg-border-main'}`}
                                 >
                                     {s}
                                 </button>
@@ -46,7 +46,7 @@ const RatingModal = ({ isOpen, onClose, onRate, name }: { isOpen: boolean, onClo
                             value={review}
                             onChange={e => setReview(e.target.value)}
                             placeholder="Write your review here..."
-                            className="w-full bg-hover-bg dark:bg-hover-bg/20 border-none dark:border dark:border-border-main/50 rounded-2xl px-4 py-4 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20 dark:text-white resize-none min-h-[100px] transition-all"
+                            className="w-full bg-hover-bg border-none rounded-2xl px-4 py-4 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20 transition-all font-sans"
                         />
                         <div className="flex gap-3">
                             <button onClick={onClose} className="flex-1 py-3 text-xs font-bold text-text-muted hover:text-text-main">Cancel</button>
@@ -121,7 +121,7 @@ const SessionCard: React.FC<{
     return (
         <div 
             id={`session-${session.id}`}
-            className={`p-4 bg-white dark:bg-card-bg border rounded-3xl relative overflow-hidden transition-all duration-500 scroll-mt-20 ${status === 'Live' ? 'border-primary ring-4 ring-primary/10 bg-primary/5 dark:bg-primary/5' : 'border-border-main dark:border-border-main/50 shadow-sm'}`}
+            className={`p-4 bg-white border rounded-3xl relative overflow-hidden transition-all duration-500 scroll-mt-20 ${status === 'Live' ? 'border-primary ring-4 ring-primary/10 bg-primary/5' : 'border-border-main shadow-sm'}`}
         >
             {status === 'Live' && (
                 <div className="absolute top-0 right-0 px-3 py-1 bg-red-500 text-white text-[8px] font-black animate-pulse">
@@ -178,7 +178,7 @@ const SessionCard: React.FC<{
             <div className="flex flex-col gap-2">
                 {status !== 'Completed' && status !== 'Cancelled' && (
                     <>
-                        <div className="bg-white dark:bg-hover-bg/5 border-2 border-border-main dark:border-border-main/50 rounded-2xl overflow-hidden p-1.5 flex flex-col gap-1.5 transition-all">
+                        <div className="bg-white border-2 border-border-main rounded-2xl overflow-hidden p-1.5 flex flex-col gap-1.5 transition-all">
                             {isTeacher ? (
                                 <>
                                     {showLinkInput ? (
@@ -187,11 +187,11 @@ const SessionCard: React.FC<{
                                                 value={meetingLink}
                                                 onChange={e => setMeetingLink(e.target.value)}
                                                 placeholder="Zoom/GMeet Link"
-                                                className="flex-grow bg-hover-bg dark:bg-hover-bg/20 border-none dark:border dark:border-border-main/50 dark:text-white rounded-xl px-4 py-2 text-xs font-bold outline-none focus:bg-hover-bg/40 focus:ring-1 focus:ring-primary transition-all"
+                                                className="flex-grow bg-hover-bg border-none rounded-xl px-4 py-2 text-xs font-bold outline-none focus:bg-hover-bg/40 focus:ring-1 focus:ring-primary transition-all text-text-main"
                                             />
                                             <button 
                                                 onClick={() => { onUpdateLink?.(meetingLink); setShowLinkInput(false); }}
-                                                className="px-4 py-2 bg-text-main dark:bg-white text-white dark:text-black rounded-xl text-xs font-bold"
+                                                className="px-4 py-2 bg-text-main text-white rounded-xl text-xs font-bold"
                                             >
                                                 Save
                                             </button>
@@ -354,19 +354,19 @@ const DAOEditModal = ({ group, onClose }: { group: DAOGroup; onClose: () => void
         <div className="fixed inset-0 z-[110] flex items-end md:items-center justify-center bg-text-main/20 backdrop-blur-sm p-0 md:p-4">
             <motion.div 
                 initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
-                className="w-full max-w-lg bg-white dark:bg-card-bg rounded-t-3xl md:rounded-3xl flex flex-col border border-border-main dark:border-border-main overflow-hidden shadow-2xl"
+                className="w-full max-w-lg bg-white rounded-t-3xl md:rounded-3xl flex flex-col border border-border-main overflow-hidden shadow-2xl"
             >
-                <div className="p-6 border-b border-border-main dark:border-border-main flex items-center justify-between bg-white dark:bg-black shrink-0">
+                <div className="p-6 border-b border-border-main flex items-center justify-between bg-white shrink-0">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
                             <Shield size={20} />
                         </div>
                         <div>
-                            <h2 className="text-lg font-bold text-text-main dark:text-white line-clamp-1">Edit {group.name}</h2>
+                            <h2 className="text-lg font-bold text-text-main line-clamp-1">Edit {group.name}</h2>
                             <p className="text-[10px] font-bold text-text-muted">Update group properties</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="p-2 bg-hover-bg dark:bg-hover-bg/20 rounded-xl text-text-muted hover:text-text-main transition-colors">
+                    <button onClick={onClose} className="p-2 bg-hover-bg rounded-xl text-text-muted hover:text-text-main transition-colors">
                         <X size={20} />
                     </button>
                 </div>
@@ -374,25 +374,25 @@ const DAOEditModal = ({ group, onClose }: { group: DAOGroup; onClose: () => void
                 <div className="p-6 space-y-6">
                     <div className="grid grid-cols-1 gap-4">
                         <div className="space-y-1">
-                            <label className="text-[10px] font-bold text-text-muted dark:text-text-muted pl-1">Group name</label>
-                            <input value={name} onChange={e => setName(e.target.value)} className="w-full bg-hover-bg dark:bg-hover-bg/20 dark:text-white border-none dark:border dark:border-border-main/50 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20 dark:focus:bg-hover-bg/40 transition-all" />
+                            <label className="text-[10px] font-bold text-text-muted pl-1">Group name</label>
+                            <input value={name} onChange={e => setName(e.target.value)} className="w-full bg-hover-bg text-text-main border-none rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
                         </div>
                         <div className="space-y-1">
-                            <label className="text-[10px] font-bold text-text-muted dark:text-text-muted pl-1">Join deadline</label>
-                            <input type="datetime-local" value={deadline} onChange={e => setDeadline(e.target.value)} className="w-full bg-hover-bg dark:bg-hover-bg/20 dark:text-white border-none dark:border dark:border-border-main/50 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20 dark:[color-scheme:dark] dark:focus:bg-hover-bg/40 transition-all" />
+                            <label className="text-[10px] font-bold text-text-muted pl-1">Join deadline</label>
+                            <input type="datetime-local" value={deadline} onChange={e => setDeadline(e.target.value)} className="w-full bg-hover-bg text-text-main border-none rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
                         </div>
                         <div className="space-y-1">
-                            <label className="text-[10px] font-bold text-text-muted dark:text-text-muted pl-1">Topic</label>
-                            <input value={topic} onChange={e => setTopic(e.target.value)} className="w-full bg-hover-bg dark:bg-hover-bg/20 dark:text-white border-none dark:border dark:border-border-main/50 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20 dark:focus:bg-hover-bg/40 transition-all" />
+                            <label className="text-[10px] font-bold text-text-muted pl-1">Topic</label>
+                            <input value={topic} onChange={e => setTopic(e.target.value)} className="w-full bg-hover-bg text-text-main border-none rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-1">
-                                <label className="text-[10px] font-bold text-text-muted dark:text-text-muted pl-1">Member limit</label>
-                                <input type="number" value={membersLimit} onChange={e => setMembersLimit(parseInt(e.target.value))} className="w-full bg-hover-bg dark:bg-hover-bg/20 dark:text-white border-none dark:border dark:border-border-main/50 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20 dark:focus:bg-hover-bg/40 transition-all" />
+                                <label className="text-[10px] font-bold text-text-muted pl-1">Member limit</label>
+                                <input type="number" value={membersLimit} onChange={e => setMembersLimit(parseInt(e.target.value))} className="w-full bg-hover-bg text-text-main border-none rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
                             </div>
                             <div className="space-y-1">
-                                <label className="text-[10px] font-bold text-text-muted dark:text-text-muted pl-1">Stake points</label>
-                                <input type="number" value={stakedPoints} onChange={e => setStakedPoints(parseInt(e.target.value))} className="w-full bg-hover-bg dark:bg-hover-bg/20 dark:text-white border-none dark:border dark:border-border-main/50 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20 dark:focus:bg-hover-bg/40 transition-all" />
+                                <label className="text-[10px] font-bold text-text-muted pl-1">Stake points</label>
+                                <input type="number" value={stakedPoints} onChange={e => setStakedPoints(parseInt(e.target.value))} className="w-full bg-hover-bg text-text-main border-none rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
                             </div>
                         </div>
                     </div>
@@ -400,7 +400,7 @@ const DAOEditModal = ({ group, onClose }: { group: DAOGroup; onClose: () => void
                     <button 
                         onClick={handleSaveGroup} 
                         disabled={loading} 
-                        className="w-full py-4 bg-text-main dark:bg-white text-white dark:text-black rounded-2xl font-bold text-xs flex items-center justify-center gap-2 hover:bg-black dark:hover:bg-white/90 transition-all active:scale-[0.98]"
+                        className="w-full py-4 bg-text-main text-white rounded-2xl font-bold text-xs flex items-center justify-center gap-2 hover:bg-black transition-all active:scale-[0.98]"
                     >
                         {loading ? <RefreshCw className="animate-spin" size={16} /> : <Save size={16} />} 
                         Save changes
@@ -415,7 +415,7 @@ const RequestCard = ({ request, onAccept, onDecline, onMessage }: { request: Lea
     return (
         <div 
             id={`request-${request.id}`}
-            className="p-4 bg-white dark:bg-card-bg border border-accent-gold/30 dark:border-accent-gold/20 rounded-3xl relative overflow-hidden bg-accent-gold/5 dark:bg-accent-gold/5 shadow-sm scroll-mt-20 hover:border-accent-gold/50 transition-all"
+            className="p-4 bg-white border border-accent-gold/30 rounded-3xl relative overflow-hidden bg-accent-gold/5 shadow-sm scroll-mt-20 hover:border-accent-gold/50 transition-all"
         >
             <div className="flex items-start justify-between mb-3">
                 <div className="space-y-1">
@@ -432,7 +432,7 @@ const RequestCard = ({ request, onAccept, onDecline, onMessage }: { request: Lea
                 </button>
             </div>
             
-            <div className="p-3 bg-white/60 dark:bg-black/40 rounded-2xl mb-4 border border-black/5 dark:border-white/10 prose-xs dark:prose-invert">
+            <div className="p-3 bg-white/60 rounded-2xl mb-4 border border-black/5 prose-xs">
                 <Markdown>{request.message}</Markdown>
             </div>
 
@@ -1289,9 +1289,9 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen relative">
       {/* Profile Header */}
-      <div className="bg-white dark:bg-black p-4 space-y-4 border-b border-border-main dark:border-border-main/50 sticky top-0 z-10">
+      <div className="bg-white p-4 space-y-4 border-b border-border-main sticky top-0 z-10">
         <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full overflow-hidden border border-border-main/50 dark:border-border-main ring-2 ring-primary/5 bg-hover-bg flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full overflow-hidden border border-border-main/50 ring-2 ring-primary/5 bg-hover-bg flex items-center justify-center">
                 {profile.photoURL ? (
                     <img src={profile.photoURL} alt={profile.displayName} className="w-full h-full object-cover shadow-sm" referrerPolicy="no-referrer" />
                 ) : (
@@ -1300,8 +1300,8 @@ export default function ProfilePage() {
             </div>
             <div className="flex-grow">
                 <div className="flex items-center gap-1.5">
-                    <h1 className="text-xl font-bold text-text-main dark:text-white tracking-tight">{profile.displayName}</h1>
-                    <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-hover-bg dark:bg-hover-bg/20 border border-border-main/50 dark:border-border-main text-[10px] font-bold text-text-muted">
+                    <h1 className="text-xl font-bold text-text-main tracking-tight">{profile.displayName}</h1>
+                    <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-hover-bg border border-border-main/50 text-[10px] font-bold text-text-muted">
                         {profile.role === 'tutor' ? 'GURU' : 'LEARNER'}
                     </div>
                     <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
@@ -1311,7 +1311,7 @@ export default function ProfilePage() {
                 </div>
                 <div className="flex items-center gap-2 text-xs text-text-muted font-bold mt-1">
                     <span className="flex items-center gap-1"><Zap size={10} className="text-accent-gold fill-accent-gold" /> {credits} credits</span>
-                    <span className="w-0.5 h-0.5 rounded-full bg-border-main dark:bg-border-main" />
+                    <span className="w-0.5 h-0.5 rounded-full bg-border-main" />
                     <span className="flex items-center gap-1 text-primary"><Star size={10} className="fill-primary" /> {avgRating.toFixed(1)}</span>
                 </div>
             </div>
@@ -1323,13 +1323,13 @@ export default function ProfilePage() {
         <div className="flex gap-2">
             <button 
                 onClick={() => setIsEditing(!isEditing)}
-                className="flex-1 py-2 bg-text-main dark:bg-white text-white dark:text-black rounded-xl text-xs font-bold active:scale-[0.98] transition-all"
+                className="flex-1 py-2 bg-text-main text-white rounded-xl text-xs font-bold active:scale-[0.98] transition-all"
             >
                 Edit Profile
             </button>
             <button 
                 onClick={() => { setLoadingMatches(true); setTimeout(() => setLoadingMatches(false), 800); }}
-                className="px-4 py-2 bg-hover-bg dark:bg-hover-bg/20 text-text-main dark:text-white rounded-xl text-xs font-bold border border-border-main/50 dark:border-border-main"
+                className="px-4 py-2 bg-hover-bg text-text-main rounded-xl text-xs font-bold border border-border-main/50"
             >
                 <RefreshCw size={14} className={loadingMatches ? 'animate-spin' : ''} />
             </button>
@@ -1343,7 +1343,7 @@ export default function ProfilePage() {
                     initial={{ opacity: 0, y: -10 }} 
                     animate={{ opacity: 1, y: 0 }} 
                     exit={{ opacity: 0, y: -10 }}
-                    className="space-y-4 bg-white dark:bg-black p-4 rounded-2xl border border-border-main dark:border-border-main/50"
+                    className="space-y-4 bg-white p-4 rounded-2xl border border-border-main"
                 >
                     <div className="flex items-center gap-4 pb-2">
                         <div className="relative group">
@@ -1372,7 +1372,7 @@ export default function ProfilePage() {
 
                     <div className="space-y-1">
                          <label className="text-xs font-bold text-text-muted ml-1">Primary Role</label>
-                         <div className="flex gap-2 p-1 bg-hover-bg dark:bg-hover-bg/10 rounded-xl border border-border-main/50 dark:border-border-main/30">
+                         <div className="flex gap-2 p-1 bg-hover-bg rounded-xl border border-border-main/50">
                             {[
                                 { id: 'student', label: 'Learner Seeker', icon: BookOpen },
                                 { id: 'tutor', label: 'Knowledge Guru', icon: Sparkles }
@@ -1385,7 +1385,7 @@ export default function ProfilePage() {
                                             await updateDoc(doc(db, 'users', profile.uid), { role: r.id });
                                         }}
                                         className={`flex-1 flex items-center justify-center gap-2 py-2 px-1 rounded-lg text-[10px] font-bold transition-all ${
-                                            isSelected ? 'bg-white dark:bg-white text-primary dark:text-black shadow-sm ring-1 ring-primary/10' : 'text-text-muted hover:text-text-main'
+                                            isSelected ? 'bg-white text-primary shadow-sm ring-1 ring-primary/10' : 'text-text-muted hover:text-text-main'
                                         }`}
                                     >
                                         <r.icon size={12} />
@@ -1402,7 +1402,7 @@ export default function ProfilePage() {
                             <input 
                               value={teachSkill} 
                               onChange={e => setTeachSkill(e.target.value)} 
-                              className="w-full bg-hover-bg dark:bg-hover-bg/20 dark:text-white border border-border-main/50 dark:border-border-main/50 rounded-xl text-sm px-4 py-3 outline-none focus:ring-1 focus:ring-accent-gold transition-all" 
+                              className="w-full bg-hover-bg border border-border-main/50 rounded-xl text-sm px-4 py-3 outline-none focus:ring-1 focus:ring-accent-gold transition-all text-text-main" 
                               placeholder="e.g. Figma, Swift" 
                             />
                         </div>
@@ -1412,7 +1412,7 @@ export default function ProfilePage() {
                         <input 
                           value={learnSkill} 
                           onChange={e => setLearnSkill(e.target.value)} 
-                          className="w-full bg-hover-bg dark:bg-hover-bg/20 dark:text-white border border-border-main/50 dark:border-border-main/50 rounded-xl text-sm px-4 py-3 outline-none focus:ring-1 focus:ring-primary transition-all" 
+                          className="w-full bg-hover-bg border border-border-main/50 rounded-xl text-sm px-4 py-3 outline-none focus:ring-1 focus:ring-primary transition-all text-text-main" 
                           placeholder="e.g. Cooking, piano" 
                         />
                     </div>
@@ -1423,14 +1423,14 @@ export default function ProfilePage() {
 
         {/* Skills Quick Grid */}
         <div className="grid grid-cols-2 gap-4">
-            <div className="bg-white dark:bg-black p-4 rounded-2xl border border-border-main dark:border-border-main/50 space-y-3 shadow-sm">
+            <div className="bg-white p-4 rounded-2xl border border-border-main space-y-3 shadow-sm">
                 <div className="flex items-center gap-2">
                     <GraduationCap size={14} className="text-accent-gold" />
                     <h3 className="text-[10px] font-bold text-text-muted">Mastery</h3>
                 </div>
                 <div className="flex flex-wrap gap-1.5 min-h-[40px]">
                     {(profile.teachSkills || []).map((s, idx) => (
-                        <div key={`teach-${s}-${idx}`} className="bg-accent-gold/5 dark:bg-accent-gold/10 px-2 py-1 rounded-lg text-[10px] font-bold text-accent-gold border border-accent-gold/10 dark:border-accent-gold/20 flex items-center gap-1 transition-colors">
+                        <div key={`teach-${s}-${idx}`} className="bg-accent-gold/5 px-2 py-1 rounded-lg text-[10px] font-bold text-accent-gold border border-accent-gold/10 flex items-center gap-1 transition-colors">
                             {s}
                             <button onClick={() => removeSkill(s, 'teach')} className="hover:text-red-500"><X size={10} /></button>
                         </div>
@@ -1438,7 +1438,7 @@ export default function ProfilePage() {
                     {(profile.teachSkills || []).length === 0 && <p className="text-[10px] text-text-muted italic">No skills listed</p>}
                 </div>
             </div>
-            <div className="bg-white dark:bg-black p-4 rounded-2xl border border-border-main dark:border-border-main/50 space-y-3 shadow-sm">
+            <div className="bg-white p-4 rounded-2xl border border-border-main space-y-3 shadow-sm">
                 <div className="flex items-center gap-2">
                     <BookOpen size={14} className="text-primary" />
                     <h3 className="text-[10px] font-bold text-text-muted">Goals</h3>
@@ -1457,18 +1457,18 @@ export default function ProfilePage() {
 
         {/* My Courses */}
         <div className="space-y-4">
-            <h3 className="text-sm font-bold text-text-main dark:text-white flex items-center gap-2">
-                <Layers size={18} className="text-text-main dark:text-white" />
+            <h3 className="text-sm font-bold text-text-main flex items-center gap-2">
+                <Layers size={18} className="text-text-main" />
                 My Published Courses
             </h3>
             {myCourses.length === 0 ? (
-                <div className="py-10 bg-hover-bg/30 dark:bg-hover-bg/5 border-2 border-dashed border-border-main dark:border-border-main/30 rounded-2xl text-center">
+                <div className="py-10 bg-hover-bg/30 border-2 border-dashed border-border-main rounded-2xl text-center">
                     <p className="text-[11px] text-text-muted font-bold px-12">You haven't published any courses yet.</p>
                 </div>
             ) : (
                 <div className="grid grid-cols-2 gap-3">
                     {myCourses.map((course, idx) => (
-                        <div key={`my-course-${course.id}-${idx}`} className="bg-white dark:bg-card-bg rounded-2xl border border-border-main dark:border-border-main/50 overflow-hidden group/card relative shadow-sm hover:border-primary/20 transition-all">
+                        <div key={`my-course-${course.id}-${idx}`} className="bg-white rounded-2xl border border-border-main overflow-hidden group/card relative shadow-sm hover:border-primary/20 transition-all">
                             <div className="aspect-video relative overflow-hidden">
                                 <img src={course.thumbnail} className="w-full h-full object-cover transition-transform group-hover/card:scale-105" referrerPolicy="no-referrer" />
                                 <div className="absolute top-2 right-2 bg-black px-1.5 py-0.5 rounded text-[9px] font-bold text-white flex items-center gap-1">
@@ -1497,7 +1497,7 @@ export default function ProfilePage() {
                                             initial={{ opacity: 0, scale: 0.9, y: 5 }}
                                             animate={{ opacity: 1, scale: 1, y: 0 }}
                                             exit={{ opacity: 0, scale: 0.9, y: 5 }}
-                                            className="absolute right-2 bottom-10 w-32 bg-white border-2 border-black rounded-xl shadow-2xl z-20 overflow-hidden"
+                                            className="absolute right-2 bottom-10 w-32 bg-white border-2 border-border-main rounded-xl shadow-2xl z-20 overflow-hidden transition-colors"
                                         >
                                             <button 
                                                 onClick={() => { setSelectedCourse(course); setShowCourseEdit(true); setActiveCourseMenu(null); }}
@@ -1529,12 +1529,12 @@ export default function ProfilePage() {
 
         {/* My DAOs */}
         <div className="space-y-4">
-            <h3 className="text-sm font-bold text-text-main dark:text-white flex items-center gap-2">
+            <h3 className="text-sm font-bold text-text-main flex items-center gap-2">
                 <Shield size={18} className="text-primary" />
                 My Created DAOs
             </h3>
             {myDAOGroups.length === 0 ? (
-                <div className="py-10 bg-hover-bg/30 dark:bg-hover-bg/5 border-2 border-dashed border-border-main dark:border-border-main/30 rounded-2xl text-center">
+                <div className="py-10 bg-hover-bg/30 border-2 border-dashed border-border-main rounded-2xl text-center">
                     <p className="text-[11px] text-text-muted font-bold px-12">You haven't initiated any DAO groups yet.</p>
                 </div>
             ) : (
@@ -1543,7 +1543,7 @@ export default function ProfilePage() {
                         <div key={`my-dao-${group.id}-${idx}`} className="relative">
                             <div 
                                 onClick={() => navigate(`/group?id=${group.id}`)}
-                                className="p-4 bg-white dark:bg-card-bg rounded-2xl border border-border-main dark:border-border-main/50 flex items-center justify-between group cursor-pointer hover:border-primary/30 transition-all active:scale-[0.99] shadow-sm"
+                                className="p-4 bg-white rounded-2xl border border-border-main flex items-center justify-between group cursor-pointer hover:border-primary/30 transition-all active:scale-[0.99] shadow-sm"
                             >
                                 <div className="flex items-center gap-4">
                                     <div className="w-12 h-12 bg-hover-bg rounded-xl flex items-center justify-center relative overflow-hidden shrink-0 border border-border-main/50">
@@ -1581,7 +1581,7 @@ export default function ProfilePage() {
                                             initial={{ opacity: 0, scale: 0.95, y: -10 }}
                                             animate={{ opacity: 1, scale: 1, y: 0 }}
                                             exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                                            className="absolute right-0 top-14 w-44 bg-white dark:bg-card-bg border border-border-main dark:border-border-main rounded-2xl shadow-2xl z-20 overflow-hidden"
+                                            className="absolute right-0 top-14 w-44 bg-white border border-border-main rounded-2xl shadow-2xl z-20 overflow-hidden transition-all"
                                         >
                                             <button 
                                                 onClick={() => { setSelectedDAOGroup(group); setShowDAOEdit(true); setActiveDAOMenu(null); }}
@@ -1614,18 +1614,18 @@ export default function ProfilePage() {
         {/* Sessions Section */}
         <div className="space-y-4">
             <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold text-text-main dark:text-white flex items-center gap-2">
+                <h3 className="text-sm font-bold text-text-main flex items-center gap-2">
                     <Calendar size={18} className="text-accent-gold" />
                     Protocol Sessions
                 </h3>
-                <div className="flex bg-hover-bg/50 dark:bg-hover-bg/10 p-1 rounded-xl border border-border-main/30 dark:border-border-main/20">
+                <div className="flex bg-hover-bg/50 p-1 rounded-xl border border-border-main/30">
                     {(['ongoing', 'upcoming', 'past'] as const).map((tab) => (
                         <button
                             key={tab}
                             onClick={() => setSessionTab(tab)}
                             className={`px-3 py-1.5 rounded-lg text-[10px] font-black transition-all ${
                                 sessionTab === tab 
-                                ? 'bg-white dark:bg-white text-primary dark:text-black shadow-sm ring-1 ring-primary/5' 
+                                ? 'bg-white text-primary shadow-sm ring-1 ring-primary/5' 
                                 : 'text-text-muted hover:text-text-main'
                             }`}
                         >
@@ -1660,9 +1660,9 @@ export default function ProfilePage() {
                             <motion.div 
                                 initial={{ opacity: 0 }} 
                                 animate={{ opacity: 1 }}
-                                className="py-12 bg-hover-bg/20 dark:bg-hover-bg/5 border-2 border-dashed border-border-main/50 dark:border-border-main/30 rounded-3xl text-center space-y-3"
+                                className="py-12 bg-hover-bg/20 border-2 border-dashed border-border-main/50 rounded-3xl text-center space-y-3"
                             >
-                                <div className="w-12 h-12 bg-white dark:bg-card-bg rounded-2xl mx-auto flex items-center justify-center text-text-muted border border-border-main/30 dark:border-border-main/20 shadow-sm">
+                                <div className="w-12 h-12 bg-white rounded-2xl mx-auto flex items-center justify-center text-text-muted border border-border-main/30 shadow-sm">
                                     <Clock size={20} className="opacity-40" />
                                 </div>
                                 <div className="space-y-1">
@@ -1724,34 +1724,34 @@ export default function ProfilePage() {
 
         {/* Matches (The "Suggestion" system) */}
         <div className="space-y-4">
-            <h3 className="text-sm font-bold text-text-main dark:text-white flex items-center gap-2">
+            <h3 className="text-sm font-bold text-text-main flex items-center gap-2">
                 <Sparkles size={18} className="text-accent-gold" />
                 Algorithm's Matches
             </h3>
             {matchingUsers.length === 0 ? (
-                <div className="py-12 bg-hover-bg dark:bg-hover-bg/5 border-2 border-dashed border-border-main dark:border-border-main/30 rounded-2xl text-center space-y-3">
-                    <div className="w-12 h-12 bg-white dark:bg-card-bg rounded-full mx-auto flex items-center justify-center text-accent-gold border border-border-main/20 shadow-sm">
+                <div className="py-12 bg-hover-bg border-2 border-dashed border-border-main rounded-2xl text-center space-y-3">
+                    <div className="w-12 h-12 bg-white rounded-full mx-auto flex items-center justify-center text-accent-gold border border-border-main/20 shadow-sm">
                         <MapPin size={24} />
                     </div>
                     <p className="text-xs text-text-muted font-bold px-12 leading-relaxed">The algorithm is looking for partners with overlapping skills. Try adding more skills to find them.</p>
                 </div>
             ) : (
                 <div className="flex gap-3 overflow-x-auto pb-4 -mx-4 px-4 no-scrollbar">
-                    {matchingUsers.map(u => (
-                        <div key={u.uid} className="flex-shrink-0 w-48 p-4 bg-white dark:bg-card-bg border border-border-main dark:border-border-main/50 rounded-2xl space-y-3 hover:bg-hover-bg dark:hover:bg-hover-bg/20 transition-all shadow-sm">
+                    {matchingUsers.map((u, idx) => (
+                        <div key={`${u.uid}-${idx}`} className="flex-shrink-0 w-48 p-4 bg-white border border-border-main rounded-2xl space-y-3 hover:bg-hover-bg transition-all shadow-sm">
                             <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate(`/user/${u.uid}`)}>
                                 <div className="relative">
-                                    <img src={u.photoURL} alt={u.displayName} className="w-11 h-11 rounded-full bg-hover-bg dark:bg-black border border-border-main/50 dark:border-border-main/30" referrerPolicy="no-referrer" />
-                                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-white dark:bg-black rounded-full flex items-center justify-center border border-border-main dark:border-border-main/50">
+                                    <img src={u.photoURL} alt={u.displayName} className="w-11 h-11 rounded-full bg-hover-bg border border-border-main/50" referrerPolicy="no-referrer" />
+                                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-white rounded-full flex items-center justify-center border border-border-main">
                                         <Zap size={10} className="text-accent-gold" />
                                     </div>
                                 </div>
                                 <div className="min-w-0">
-                                    <p className="text-xs font-bold text-text-main dark:text-white truncate">{u.displayName}</p>
+                                    <p className="text-xs font-bold text-text-main truncate">{u.displayName}</p>
                                     <p className="text-xs text-text-muted font-bold">Expert</p>
                                 </div>
                             </div>
-                            <div className="grid grid-cols-2 gap-2 bg-hover-bg dark:bg-hover-bg/20 p-2 rounded-lg border border-border-main/30 dark:border-border-main/20">
+                            <div className="grid grid-cols-2 gap-2 bg-hover-bg p-2 rounded-lg border border-border-main/30">
                                 <div className="text-center">
                                     <p className="text-[10px] font-bold text-text-muted">Teach</p>
                                     <p className="text-[10px] font-bold text-text-main truncate">{u.teachSkills[0]}</p>
@@ -1777,28 +1777,28 @@ export default function ProfilePage() {
         {joinedGroupStats.length > 0 && (
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-bold text-text-main dark:text-white flex items-center gap-2">
-                        <BookOpenCheck size={18} className="text-primary" />
+                    <h3 className="text-sm font-bold text-text-main flex items-center gap-2">
+                        < BookOpenCheck size={18} className="text-primary" />
                         Quiz Performance
                     </h3>
-                    <span className="text-[10px] font-bold text-text-muted bg-hover-bg dark:bg-hover-bg/20 px-2 py-0.5 rounded-full">{joinedGroupStats.length} DAOs</span>
+                    <span className="text-[10px] font-bold text-text-muted bg-hover-bg px-2 py-0.5 rounded-full">{joinedGroupStats.length} DAOs</span>
                 </div>
                 <div className="grid grid-cols-1 gap-3">
-                    {joinedGroupStats.map((stat) => (
-                        <div key={stat.id} className="p-4 bg-white dark:bg-card-bg border border-border-main dark:border-border-main/50 rounded-2xl flex items-center gap-4 hover:border-primary/20 transition-all group shadow-sm">
-                            <div className="w-12 h-12 rounded-xl bg-hover-bg dark:bg-black flex flex-col items-center justify-center border border-border-main/50 dark:border-border-main/30 shrink-0">
+                    {joinedGroupStats.map((stat, idx) => (
+                        <div key={`${stat.id}-${idx}`} className="p-4 bg-white border border-border-main rounded-2xl flex items-center gap-4 hover:border-primary/20 transition-all group shadow-sm">
+                            <div className="w-12 h-12 rounded-xl bg-hover-bg flex flex-col items-center justify-center border border-border-main/50 shrink-0">
                                 <p className="text-[10px] font-bold text-primary leading-none">{stat.quizzesPassed}</p>
                                 <p className="text-[7px] font-bold text-text-muted mt-0.5">Passed</p>
                             </div>
                             <div className="flex-grow min-w-0">
-                                <h4 className="text-sm font-bold text-text-main dark:text-white truncate">{stat.name}</h4>
+                                <h4 className="text-sm font-bold text-text-main truncate">{stat.name}</h4>
                                 <p className="text-[10px] text-text-muted font-medium truncate">{stat.topic}</p>
                             </div>
-                            <div className="text-right shrink-0 px-3 border-l border-border-main/50 dark:border-border-main/30">
+                            <div className="text-right shrink-0 px-3 border-l border-border-main/50">
                                 <p className="text-[8px] font-bold text-text-muted mb-0.5">Latest score</p>
                                 <div className="flex items-center justify-end gap-1">
                                     <div className="h-1 w-1 rounded-full bg-accent-gold" />
-                                    <p className="text-sm font-bold text-text-main dark:text-white">{stat.latestScore}<span className="text-[10px] text-text-muted font-bold ml-0.5">/100</span></p>
+                                    <p className="text-sm font-bold text-text-main">{stat.latestScore}<span className="text-[10px] text-text-muted font-bold ml-0.5">/100</span></p>
                                 </div>
                             </div>
                             <button 
@@ -1895,49 +1895,49 @@ export default function ProfilePage() {
                     initial={{ scale: 0.9, opacity: 0 }} 
                     animate={{ scale: 1, opacity: 1 }} 
                     exit={{ scale: 0.9, opacity: 0 }}
-                    className="w-full max-w-sm bg-white dark:bg-card-bg rounded-[2.5rem] p-8 space-y-6 border border-border-main dark:border-border-main relative overflow-hidden shadow-2xl"
+                    className="w-full max-w-sm bg-white rounded-[2.5rem] p-8 space-y-6 border border-border-main relative overflow-hidden shadow-2xl"
                 >
                     <div className="flex items-center justify-between">
-                        <h2 className="text-lg font-bold text-text-main dark:text-white tracking-tight">Edit course</h2>
-                        <button onClick={() => setShowCourseEdit(false)} className="p-2 bg-hover-bg dark:bg-hover-bg/20 rounded-xl text-text-muted hover:text-text-main">
+                        <h2 className="text-lg font-bold text-text-main tracking-tight">Edit course</h2>
+                        <button onClick={() => setShowCourseEdit(false)} className="p-2 bg-hover-bg rounded-xl text-text-muted hover:text-text-main">
                             <X size={20} />
                         </button>
                     </div>
 
                     <div className="space-y-4">
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-text-muted dark:text-text-muted ml-1">Course title</label>
+                            <label className="text-[10px] font-bold text-text-muted ml-1">Course title</label>
                             <input 
                                 value={selectedCourse.title} 
                                 onChange={e => setSelectedCourse({...selectedCourse, title: e.target.value})}
-                                className="w-full bg-hover-bg dark:bg-hover-bg/20 dark:text-white border-2 border-transparent dark:border dark:border-border-main/50 focus:border-primary/20 rounded-2xl px-5 py-4 text-sm font-bold outline-none focus:bg-hover-bg/40 transition-all"
+                                className="w-full bg-hover-bg border-2 border-transparent focus:border-primary/20 rounded-2xl px-5 py-4 text-sm font-bold outline-none focus:bg-hover-bg/40 transition-all text-text-main"
                                 placeholder="Enter title"
                             />
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-text-muted dark:text-text-muted ml-1">Video/Resource URL</label>
+                            <label className="text-[10px] font-bold text-text-muted ml-1">Video/Resource URL</label>
                             <input 
                                 value={selectedCourse.link} 
                                 onChange={e => setSelectedCourse({...selectedCourse, link: e.target.value})}
-                                className="w-full bg-hover-bg dark:bg-hover-bg/20 dark:text-white border-2 border-transparent dark:border dark:border-border-main/50 focus:border-primary/20 rounded-2xl px-5 py-4 text-sm font-bold outline-none focus:bg-hover-bg/40 transition-all"
+                                className="w-full bg-hover-bg border-2 border-transparent focus:border-primary/20 rounded-2xl px-5 py-4 text-sm font-bold outline-none focus:bg-hover-bg/40 transition-all text-text-main"
                                 placeholder="e.g. YouTube link"
                             />
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-text-muted dark:text-text-muted ml-1">Thumbnail URL</label>
+                            <label className="text-[10px] font-bold text-text-muted ml-1">Thumbnail URL</label>
                             <input 
                                 value={selectedCourse.thumbnail} 
                                 onChange={e => setSelectedCourse({...selectedCourse, thumbnail: e.target.value})}
-                                className="w-full bg-hover-bg dark:bg-hover-bg/20 dark:text-white border-2 border-transparent dark:border dark:border-border-main/50 focus:border-primary/20 rounded-2xl px-5 py-4 text-sm font-bold outline-none focus:bg-hover-bg/40 transition-all"
+                                className="w-full bg-hover-bg border-2 border-transparent focus:border-primary/20 rounded-2xl px-5 py-4 text-sm font-bold outline-none focus:bg-hover-bg/40 transition-all text-text-main"
                                 placeholder="Image URL"
                             />
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-text-muted dark:text-text-muted ml-1">DAO Group Link (Optional)</label>
+                            <label className="text-[10px] font-bold text-text-muted ml-1">DAO Group Link (Optional)</label>
                             <input 
                                 value={selectedCourse.daoGroupLink || ''} 
                                 onChange={e => setSelectedCourse({...selectedCourse, daoGroupLink: e.target.value})}
-                                className="w-full bg-hover-bg dark:bg-hover-bg/20 dark:text-white border-2 border-transparent dark:border dark:border-border-main/50 focus:border-primary/20 rounded-2xl px-5 py-4 text-sm font-bold outline-none focus:bg-hover-bg/40 transition-all"
+                                className="w-full bg-hover-bg border-2 border-transparent focus:border-primary/20 rounded-2xl px-5 py-4 text-sm font-bold outline-none focus:bg-hover-bg/40 transition-all text-text-main"
                                 placeholder="DAO Link"
                             />
                         </div>

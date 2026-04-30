@@ -20,6 +20,7 @@ import UserViewPage from './pages/UserViewPage';
 import AuthPage from './pages/AuthPage';
 import SkillSetupPage from './pages/SkillSetupPage';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { ThemeProvider } from './contexts/ThemeContext';
 
 // --- Auth Context ---
 interface AuthContextType {
@@ -179,7 +180,7 @@ const Navigation = () => {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-border-main/50 pb-[env(safe-area-inset-bottom)] z-50 transition-colors duration-200">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-border-main z-50">
       <div className="flex justify-around items-center h-14 max-w-lg mx-auto px-2">
         {navItems.map((item) => {
           const isActive = location.pathname === item.path;
@@ -218,11 +219,6 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, profile, loading, credits, unreadNotifications, unreadMessages } = useAuth();
   const location = useLocation();
 
-  useEffect(() => {
-    document.documentElement.classList.add('dark');
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#0f0f0f');
-  }, []);
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-bg-main p-10">
@@ -250,7 +246,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   return (
     <div className="min-h-screen bg-bg-main pb-16">
-      <header className="sticky top-0 pt-[env(safe-area-inset-top)] bg-white border-b border-border-main/50 z-50 transition-colors duration-200">
+      <header className="sticky top-0 pt-[env(safe-area-inset-top)] bg-white border-b border-border-main z-50 transition-colors duration-200">
         <div className="h-14 flex items-center justify-between px-4">
           <div className="flex items-center gap-1 group cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
               <div className="text-xl font-black tracking-tighter text-text-main">Skillora</div>
@@ -304,27 +300,29 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 export default function App() {
   return (
     <ErrorBoundary>
-      <AuthProvider>
-        <BrowserRouter>
-          <Layout>
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/group" element={<GroupPage />} />
-              <Route path="/create" element={<CreatePage />} />
-              <Route path="/notification" element={<NotificationPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/messages" element={<MessagesPage />} />
-              <Route path="/chat/:conversationId" element={<ChatPage />} />
-              <Route path="/settings" element={<SettingsPage />} />
-              <Route path="/terms" element={<TermsPage />} />
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="/policy" element={<PolicyPage />} />
-              <Route path="/user/:userId" element={<UserViewPage />} />
-              <Route path="/skill-setup" element={<SkillSetupPage />} />
-            </Routes>
-          </Layout>
-        </BrowserRouter>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <BrowserRouter>
+            <Layout>
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/group" element={<GroupPage />} />
+                <Route path="/create" element={<CreatePage />} />
+                <Route path="/notification" element={<NotificationPage />} />
+                <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/messages" element={<MessagesPage />} />
+                <Route path="/chat/:conversationId" element={<ChatPage />} />
+                <Route path="/settings" element={<SettingsPage />} />
+                <Route path="/terms" element={<TermsPage />} />
+                <Route path="/about" element={<AboutPage />} />
+                <Route path="/policy" element={<PolicyPage />} />
+                <Route path="/user/:userId" element={<UserViewPage />} />
+                <Route path="/skill-setup" element={<SkillSetupPage />} />
+              </Routes>
+            </Layout>
+          </BrowserRouter>
+        </AuthProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }

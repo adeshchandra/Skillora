@@ -131,10 +131,10 @@ const DAOGroupCard = ({ group, onJoin, onView, isJoining }: DAOGroupCardProps) =
   const displayRating = typeof group.rating === 'number' && !isNaN(group.rating) ? group.rating : 0;
 
   return (
-    <div className="bg-white dark:bg-card-bg border border-border-main dark:border-border-main/50 rounded-[24px] flex flex-col p-4 mb-4 shadow-sm shadow-black/5 dark:shadow-none relative transition-colors">
+    <div className="bg-white border border-border-main rounded-[24px] flex flex-col p-4 mb-4 shadow-sm shadow-black/5 relative transition-colors">
       {/* Cover Image */}
       <div className="relative aspect-[21/9] w-full mb-4">
-        <div className="w-full h-full rounded-[18px] overflow-hidden bg-hover-bg dark:bg-black ring-1 ring-border-main/50 dark:ring-border-main/30">
+        <div className="w-full h-full rounded-[18px] overflow-hidden bg-hover-bg ring-1 ring-border-main/50">
             {group.image ? (
                 <img src={group.image} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
             ) : (
@@ -144,11 +144,11 @@ const DAOGroupCard = ({ group, onJoin, onView, isJoining }: DAOGroupCardProps) =
             )}
             
             <div className="absolute top-2 left-2 flex items-center gap-1.5">
-                <div className="bg-text-main/80 dark:bg-black/80 backdrop-blur-none px-2.5 py-1 rounded-md font-bold border border-white/10 shadow-sm">
+                <div className="bg-text-main/80 px-2.5 py-1 rounded-md font-bold border border-white/10 shadow-sm">
                     <span className="text-[9px] font-bold text-white tracking-wide">{group.stakedPoints} pts stake</span>
                 </div>
                 {group.isPrivate && (
-                    <div className="bg-text-main/60 dark:bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-md font-bold border border-white/10 dark:border-white/5 flex items-center gap-1.5 shadow-sm">
+                    <div className="bg-text-main/60 px-2.5 py-1 rounded-md font-bold border border-white/10 flex items-center gap-1.5 shadow-sm">
                         <Lock size={10} className="text-white" />
                         <span className="text-[9px] font-bold text-white tracking-wide uppercase">Private</span>
                     </div>
@@ -165,12 +165,12 @@ const DAOGroupCard = ({ group, onJoin, onView, isJoining }: DAOGroupCardProps) =
 
       <div className="px-1 space-y-1 mb-4 flex items-start justify-between">
         <div className="min-w-0 flex-grow">
-            <h3 className="text-sm font-bold text-text-main dark:text-white leading-snug line-clamp-1 tracking-tight">{group.name}</h3>
+            <h3 className="text-sm font-bold text-text-main leading-snug line-clamp-1 tracking-tight">{group.name}</h3>
             <p className="text-[11px] font-medium text-text-muted">{group.quizTopic}</p>
         </div>
         <div className="flex items-center gap-1 shrink-0 ml-4 py-1">
             <Star size={12} fill="currentColor" className={displayRating > 0 ? "text-accent-gold" : "text-text-muted opacity-30"} />
-            <span className="text-[11px] font-bold text-text-main dark:text-white">{displayRating.toFixed(1)}</span>
+            <span className="text-[11px] font-bold text-text-main">{displayRating.toFixed(1)}</span>
             <span className="text-[10px] font-medium text-text-muted">({group.ratingCount || 0})</span>
         </div>
       </div>
@@ -180,25 +180,25 @@ const DAOGroupCard = ({ group, onJoin, onView, isJoining }: DAOGroupCardProps) =
             {members.slice(0, 4).map((m, idx) => (
                 <div 
                   key={`card-member-${m.userId || m.id || idx}`} 
-                  className="w-8 h-8 rounded-full border-2 border-white dark:border-black bg-hover-bg dark:bg-black overflow-hidden ring-1 ring-border-main/10 dark:ring-border-main/30 shadow-sm cursor-pointer transition-colors"
+                  className="w-8 h-8 rounded-full border-2 border-white bg-hover-bg overflow-hidden ring-1 ring-border-main/10 shadow-sm cursor-pointer transition-colors"
                   onClick={() => navigate(`/user/${m.userId}`)}
                 >
                     <img src={m.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${m.displayName}`} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                 </div>
             ))}
             {members.length > 4 && (
-                <div className="w-8 h-8 rounded-full border-2 border-white dark:border-black bg-hover-bg dark:bg-black flex items-center justify-center text-[9px] font-bold text-text-muted ring-1 ring-border-main/10 dark:ring-border-main/30 shadow-sm transition-colors">
+                <div className="w-8 h-8 rounded-full border-2 border-white bg-hover-bg flex items-center justify-center text-[9px] font-bold text-text-muted ring-1 ring-border-main/10 shadow-sm transition-colors">
                     +{members.length - 4}
                 </div>
             )}
             {members.length === 0 && (
-                <div className="w-8 h-8 rounded-full border-2 border-white dark:border-black bg-hover-bg dark:bg-black flex items-center justify-center ring-1 ring-border-main/10 dark:ring-border-main/30 transition-colors">
+                <div className="w-8 h-8 rounded-full border-2 border-white bg-hover-bg flex items-center justify-center ring-1 ring-border-main/10 transition-colors">
                     <Users size={14} className="text-text-muted opacity-40" />
                 </div>
             )}
         </div>
         <div className="text-right flex flex-col items-end">
-            <span className="text-sm font-bold text-text-main dark:text-white leading-none">{members.length} / {group.memberLimit}</span>
+            <span className="text-sm font-bold text-text-main leading-none">{members.length} / {group.memberLimit}</span>
             <span className="text-[9px] font-medium text-text-muted tracking-wide mt-0.5">Members</span>
         </div>
       </div>
@@ -218,9 +218,9 @@ const DAOGroupCard = ({ group, onJoin, onView, isJoining }: DAOGroupCardProps) =
             disabled={isJoining || isStartingChat}
             className={`flex-grow py-3 rounded-xl font-bold text-xs tracking-wide transition-all active:scale-[0.97] shadow-sm ${
                 (isMember || user?.uid === group.adminId) 
-                    ? 'bg-hover-bg dark:bg-hover-bg/10 text-text-main dark:text-white hover:bg-border-main dark:hover:bg-hover-bg/20 border border-border-main dark:border-border-main/50' 
+                    ? 'bg-hover-bg text-text-main hover:bg-border-main border border-border-main' 
                     : (group.isPrivate && group.adminId !== user?.uid)
-                        ? 'bg-text-main dark:bg-white text-white dark:text-black hover:bg-text-main/90 dark:hover:bg-white/90'
+                        ? 'bg-text-main text-white hover:bg-text-main/90'
                         : 'bg-primary text-white hover:bg-primary-dark shadow-primary/20 disabled:opacity-50'
             }`}
         >
@@ -233,8 +233,8 @@ const DAOGroupCard = ({ group, onJoin, onView, isJoining }: DAOGroupCardProps) =
                 hasRated 
                     ? 'bg-accent-gold/10 text-accent-gold border-accent-gold/20' 
                     : (!isMember || user?.uid === group.adminId)
-                        ? 'bg-hover-bg dark:bg-hover-bg/10 text-text-muted opacity-30 grayscale cursor-not-allowed border-border-main/30'
-                        : 'bg-hover-bg dark:bg-hover-bg/10 text-text-muted hover:text-text-main dark:hover:text-white border-border-main dark:border-border-main/50 hover:bg-border-main dark:hover:bg-hover-bg/20'
+                        ? 'bg-hover-bg text-text-muted opacity-30 grayscale cursor-not-allowed border-border-main/30'
+                        : 'bg-hover-bg text-text-muted hover:text-text-main border-border-main hover:bg-border-main'
             }`}
         >
             <Star size={18} fill={hasRated ? "currentColor" : "none"} />
@@ -243,15 +243,15 @@ const DAOGroupCard = ({ group, onJoin, onView, isJoining }: DAOGroupCardProps) =
 
       <AnimatePresence>
         {isRating && (
-            <div className="fixed inset-0 bg-text-main/20 dark:bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+            <div className="fixed inset-0 bg-text-main/20 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
                 <motion.div 
                     initial={{ scale: 0.95, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0.95, opacity: 0 }}
-                    className="bg-white dark:bg-card-bg w-full max-w-sm rounded-[32px] p-6 border border-border-main dark:border-border-main space-y-6 shadow-2xl transition-colors"
+                    className="bg-white w-full max-w-sm rounded-[32px] p-6 border border-border-main space-y-6 shadow-2xl transition-colors"
                 >
                     <div className="text-center space-y-1">
-                        <h4 className="text-lg font-bold text-text-main dark:text-white tracking-tighter">Rate this DAO</h4>
+                        <h4 className="text-lg font-bold text-text-main tracking-tighter">Rate this DAO</h4>
                         <p className="text-xs text-text-muted font-bold leading-relaxed">How is your experience with this group so far?</p>
                     </div>
 
@@ -265,7 +265,7 @@ const DAOGroupCard = ({ group, onJoin, onView, isJoining }: DAOGroupCardProps) =
                                 <Star 
                                     size={36} 
                                     fill={v <= ratingValue ? "currentColor" : "none"} 
-                                    className={v <= ratingValue ? "text-accent-gold" : "text-hover-bg dark:text-hover-bg/20"}
+                                    className={v <= ratingValue ? "text-accent-gold" : "text-hover-bg"}
                                 />
                             </button>
                         ))}
@@ -280,7 +280,7 @@ const DAOGroupCard = ({ group, onJoin, onView, isJoining }: DAOGroupCardProps) =
                         </button>
                         <button 
                             onClick={() => setIsRating(false)}
-                            className="px-6 py-4 bg-hover-bg dark:bg-hover-bg/20 text-text-main dark:text-white rounded-2xl font-bold text-xs tracking-wide active:scale-[0.98] transition-all border border-border-main/50 dark:border-border-main/30"
+                            className="px-6 py-4 bg-hover-bg text-text-main rounded-2xl font-bold text-xs tracking-wide active:scale-[0.98] transition-all border border-border-main/50"
                         >
                             Back
                         </button>

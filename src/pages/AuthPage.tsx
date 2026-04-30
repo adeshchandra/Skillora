@@ -18,7 +18,7 @@ const validateEmail = (email: string) => {
 const FloatingInput = ({ label, value, onChange, type = 'text', showPasswordToggle, isPasswordVisible, onTogglePassword, icon: Icon }: any) => {
   return (
     <div className="space-y-1.5 w-full mb-4">
-      <label className="text-[10px] font-black text-text-muted/60 dark:text-text-muted/80 uppercase tracking-widest ml-1">{label}</label>
+      <label className="text-[10px] font-black text-text-muted/60 uppercase tracking-widest ml-1">{label}</label>
       <div className="relative">
         <div className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted/40">
           {Icon && <Icon size={16} />}
@@ -27,7 +27,7 @@ const FloatingInput = ({ label, value, onChange, type = 'text', showPasswordTogg
           type={showPasswordToggle ? (isPasswordVisible ? 'text' : 'password') : type}
           value={value}
           onChange={onChange}
-          className={`w-full ${Icon ? 'pl-11' : 'px-4'} pr-4 py-4 bg-hover-bg/40 dark:bg-hover-bg/10 border-2 border-transparent dark:border dark:border-border-main/50 rounded-2xl outline-none focus:bg-white dark:focus:bg-hover-bg/20 focus:ring-4 focus:ring-primary/5 dark:focus:ring-primary/10 focus:border-primary dark:focus:border-primary transition-all text-[13px] font-bold text-text-main dark:text-white placeholder:text-text-muted/20 shadow-sm`}
+          className={`w-full ${Icon ? 'pl-11' : 'px-4'} pr-4 py-4 bg-hover-bg/40 border-2 border-transparent rounded-2xl outline-none focus:bg-white focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-[13px] font-bold text-text-main placeholder:text-text-muted/20 shadow-sm`}
           placeholder={`Enter your ${label.toLowerCase()}...`}
         />
         {showPasswordToggle && (
@@ -149,12 +149,12 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black flex flex-col items-center pt-24 px-6 md:px-0">
+    <div className="min-h-screen bg-white flex flex-col items-center pt-24 px-6 md:px-0">
       <div className="w-full max-w-[340px] flex flex-col items-center space-y-8">
         
         <div className="text-center space-y-3 w-full">
             <div className="flex items-center justify-center gap-1">
-                <div className="text-2xl font-black tracking-tighter text-text-main dark:text-white">Skillora</div>
+                <div className="text-2xl font-black tracking-tighter text-text-main">Skillora</div>
                 <div className="w-2 h-2 rounded-full bg-primary" />
             </div>
             <p className="text-[11px] font-bold text-text-muted leading-none">
@@ -174,7 +174,7 @@ export default function AuthPage() {
                     >
                         {showResetForm ? (
                             <form onSubmit={handlePasswordReset} className="w-full space-y-6">
-                    <div className="p-4 bg-hover-bg dark:bg-black rounded-2xl text-center space-y-2 border border-border-main/30 dark:border-border-main">
+                    <div className="p-4 bg-hover-bg rounded-2xl text-center space-y-2 border border-border-main/30">
                         <Lock className="w-5 h-5 text-text-muted mx-auto" />
                         <p className="text-[10px] text-text-muted font-bold leading-relaxed px-2">Enter your email to receive an automated recovery link.</p>
                     </div>
@@ -247,18 +247,18 @@ export default function AuthPage() {
                                     </div>
 
                     {!isLogin && (
-                        <div className="flex items-start gap-3 p-4 bg-hover-bg/30 dark:bg-black/50 border border-border-main/20 dark:border-border-main rounded-2xl group transition-all">
+                        <div className="flex items-start gap-3 p-4 bg-hover-bg/30 border border-border-main/20 rounded-2xl group transition-all">
                             <div className="pt-0.5">
                                 <input 
                                     type="checkbox" 
                                     id="terms-checkbox"
                                     checked={acceptedTerms}
                                     onChange={() => setAcceptedTerms(!acceptedTerms)}
-                                    className="w-4 h-4 rounded-lg border-border-main dark:border-border-main/50 text-text-main focus:ring-0 cursor-pointer transition-all grayscale dark:invert"
+                                    className="w-4 h-4 rounded-lg border-border-main text-text-main focus:ring-0 cursor-pointer transition-all grayscale"
                                 />
                             </div>
-                            <label htmlFor="terms-checkbox" className="text-[10px] font-bold text-text-muted leading-relaxed cursor-pointer group-hover:text-text-main dark:group-hover:text-white">
-                                Confirm <Link to="/terms" className="text-text-main dark:text-white underline decoration-primary/30" onClick={(e) => e.stopPropagation()}>Terms and Conditions</Link>
+                            <label htmlFor="terms-checkbox" className="text-[10px] font-bold text-text-muted leading-relaxed cursor-pointer group-hover:text-text-main">
+                                Confirm <Link to="/terms" className="text-text-main underline decoration-primary/30" onClick={(e) => e.stopPropagation()}>Terms and Conditions</Link>
                             </label>
                         </div>
                     )}
@@ -266,7 +266,7 @@ export default function AuthPage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full py-4 bg-text-main dark:bg-white dark:text-black font-bold text-sm rounded-2xl hover:bg-black dark:hover:bg-white/90 transition-all active:scale-[0.98] disabled:opacity-50 mt-4 shadow-sm"
+                        className="w-full py-4 bg-text-main text-white font-bold text-sm rounded-2xl hover:bg-black transition-all active:scale-[0.98] disabled:opacity-50 mt-4 shadow-sm"
                     >
                         {loading ? 'Processing...' : (isLogin ? 'Sign In' : 'Create Account')}
                     </button>
@@ -276,22 +276,22 @@ export default function AuthPage() {
                     <div className="flex flex-col items-center">
                         <button 
                             onClick={() => { setIsLogin(!isLogin); setError(''); setSuccessMsg(''); }}
-                            className="text-text-muted text-[11px] font-bold hover:text-primary transition-colors dark:hover:text-white"
+                            className="text-text-muted text-[11px] font-bold hover:text-primary transition-colors"
                         >
                             {isLogin ? "Don't have an account? Sign Up" : "Already have an account? Sign In"}
                         </button>
                     </div>
 
                     <div className="relative flex items-center opacity-30">
-                        <div className="flex-grow border-t border-border-main dark:border-border-main/50"></div>
+                        <div className="flex-grow border-t border-border-main"></div>
                         <span className="flex-shrink mx-4 text-[9px] font-bold text-text-muted uppercase tracking-[0.2em]">Social</span>
-                        <div className="flex-grow border-t border-border-main dark:border-border-main/50"></div>
+                        <div className="flex-grow border-t border-border-main"></div>
                     </div>
 
                     <button
                         onClick={handleGoogleSignIn}
                         disabled={loading}
-                        className="w-full flex items-center justify-center gap-4 px-6 py-4 bg-white dark:bg-black border border-border-main dark:border-border-main text-text-main dark:text-white rounded-2xl font-bold text-sm hover:bg-hover-bg dark:hover:bg-white/10 transition-all active:scale-[0.98] disabled:opacity-50"
+                        className="w-full flex items-center justify-center gap-4 px-6 py-4 bg-white border border-border-main text-text-main rounded-2xl font-bold text-sm hover:bg-hover-bg transition-all active:scale-[0.98] disabled:opacity-50"
                     >
                         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4 grayscale opacity-70" alt="G" />
                         {loading ? 'Processing...' : 'Continue with Google'}

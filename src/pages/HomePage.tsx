@@ -28,7 +28,7 @@ const FilterSystem = ({ selectedTags, setSelectedTags, searchQuery, setSearchQue
   };
 
   return (
-    <div className="bg-white dark:bg-black border-b border-border-main dark:border-border-main">
+    <div className="bg-white border-b border-border-main">
       <div className="px-4 py-3 space-y-3">
         {/* Search Bar */}
         <div className="relative flex items-center">
@@ -38,10 +38,10 @@ const FilterSystem = ({ selectedTags, setSelectedTags, searchQuery, setSearchQue
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search skills, teachers, topics..."
-                className="w-full bg-hover-bg dark:bg-hover-bg/10 border-none dark:border-2 dark:border-border-main/50 rounded-xl py-2.5 pl-10 pr-4 text-xs font-semibold focus:ring-2 focus:ring-primary/20 dark:focus:bg-hover-bg/20 dark:text-white outline-none transition-all"
+                className="w-full bg-hover-bg border-none rounded-xl py-2.5 pl-10 pr-4 text-xs font-semibold focus:ring-2 focus:ring-primary/20 outline-none transition-all"
             />
             {searchQuery && (
-                <button onClick={() => setSearchQuery('')} className="absolute right-3 p-1 text-text-muted hover:text-text-main dark:hover:text-white transition-colors">
+                <button onClick={() => setSearchQuery('')} className="absolute right-3 p-1 text-text-muted hover:text-text-main transition-colors">
                     <X size={14} />
                 </button>
             )}
@@ -207,7 +207,7 @@ export default function HomePage() {
           <motion.div 
             animate={refreshing ? { rotate: 360 } : { rotate: pullDistance * 2 }}
             transition={refreshing ? { repeat: Infinity, duration: 1, ease: "linear" } : { duration: 0 }}
-            className={`w-8 h-8 rounded-full bg-white dark:bg-black shadow-lg border border-border-main flex items-center justify-center ${refreshing ? 'text-primary' : 'text-text-muted'}`}
+            className={`w-8 h-8 rounded-full bg-white shadow-lg border border-border-main flex items-center justify-center ${refreshing ? 'text-primary' : 'text-text-muted'}`}
           >
             <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
           </motion.div>

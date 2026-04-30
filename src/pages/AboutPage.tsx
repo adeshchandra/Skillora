@@ -42,7 +42,7 @@ export default function AboutPage() {
         <div className="text-center space-y-4">
             <div className="w-20 h-20 bg-primary rounded-[2.5rem] flex items-center justify-center mx-auto text-white shadow-2xl shadow-primary/20 relative group">
                 <Sparkles size={40} className="group-hover:rotate-12 transition-transform" />
-                <div className="absolute -top-1 -right-1 w-6 h-6 bg-accent-gold rounded-full border-4 border-white dark:border-card-bg" />
+                <div className="absolute -top-1 -right-1 w-6 h-6 bg-accent-gold rounded-full border-4 border-white" />
             </div>
             <div className="space-y-1">
                 <h2 className="text-3xl font-black text-text-main tracking-tight uppercase">Skillora</h2>
@@ -116,11 +116,11 @@ export default function AboutPage() {
         <div className="text-center space-y-4 py-6">
             <div className="flex justify-center -space-x-2">
                 {[1, 2, 3, 4].map(i => (
-                    <div key={i} className="w-8 h-8 rounded-full border-2 border-white dark:border-card-bg bg-hover-bg overflow-hidden flex items-center justify-center">
+                    <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-hover-bg overflow-hidden flex items-center justify-center">
                         <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i * 123}`} alt="User" />
                     </div>
                 ))}
-                <div className="w-8 h-8 rounded-full border-2 border-white dark:border-card-bg bg-primary flex items-center justify-center text-[10px] font-bold text-white">
+                <div className="w-8 h-8 rounded-full border-2 border-white bg-primary flex items-center justify-center text-[10px] font-bold text-white">
                     +1k
                 </div>
             </div>

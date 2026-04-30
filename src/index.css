@@ -30,19 +30,19 @@
   --card-bg: #ffffff;
   --text-main: #1c1e21;
   --text-muted: #65676b;
-  --border-main: #dddfe2;
+  --border-main: #e4e6eb;
   --accent-gold: #ff9800;
   --accent-green: #42b72a;
   --hover-bg: #f2f2f2;
 }
 
 .dark {
-  --bg-main: #0f0f0f;
-  --card-bg: #0f0f0f;
+  --bg-main: #000000;
+  --card-bg: #121212;
   --text-main: #f1f1f1;
-  --text-muted: #aaaaaa;
+  --text-muted: #9ba3af;
   --border-main: #2a2a2a;
-  --hover-bg: #272727;
+  --hover-bg: #1e1e1e;
   --primary: #3ea6ff;
   --primary-dark: #1a73e8;
 }
@@ -52,16 +52,40 @@
     @apply bg-bg-main;
   }
   body {
-    @apply font-sans bg-bg-main text-text-main transition-colors duration-200;
+    @apply font-sans bg-bg-main text-text-main transition-colors duration-300;
   }
   
-  header, nav, .bg-white {
-    @apply transition-colors duration-200;
+  header, nav, footer, [role="tablist"], .transition-theme, div, section, main {
+    @apply transition-colors duration-300;
   }
 }
 
+/* Base Semantic Classes */
+.bg-theme-card { @apply bg-card-bg; }
+.bg-theme-main { @apply bg-bg-main; }
+.text-theme-main { @apply text-text-main; }
+.text-theme-muted { @apply text-text-muted; }
+.border-theme-main { @apply border-border-main; }
+
+/* Force Overrides for No Mixing */
 .dark .bg-white {
-  @apply bg-card-bg;
+  @apply bg-card-bg!;
+}
+
+.dark .bg-black {
+  @apply bg-bg-main!;
+}
+
+.dark .bg-bg-main {
+  @apply bg-bg-main!;
+}
+
+.dark .text-black, .dark .text-text-main {
+  @apply text-text-main!;
+}
+
+.dark .border-border-main {
+  @apply border-border-main!;
 }
 
 .dark .border-black {

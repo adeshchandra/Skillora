@@ -85,24 +85,24 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                 initial={{ y: "100%" }} 
                 animate={{ y: 0 }} 
                 exit={{ y: "100%" }}
-                className="w-full max-w-lg bg-white dark:bg-card-bg rounded-t-3xl md:rounded-3xl p-6 space-y-6 border border-border-main dark:border-border-main relative overflow-hidden shadow-2xl"
+                className="w-full max-w-lg bg-white rounded-t-3xl md:rounded-3xl p-6 space-y-6 border border-border-main relative overflow-hidden shadow-2xl"
             >
                 <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-primary via-accent-gold to-primary opacity-20" />
                 
                 <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-bold text-text-main dark:text-white flex items-center gap-2">
+                    <h2 className="text-lg font-bold text-text-main flex items-center gap-2">
                         <Handshake className="text-primary" />
                         Negotiate Contract
                     </h2>
-                    <button onClick={onClose} className="p-2 bg-hover-bg dark:bg-hover-bg/20 rounded-full text-text-muted hover:text-text-main">
+                    <button onClick={onClose} className="p-2 bg-hover-bg rounded-full text-text-muted hover:text-text-main">
                         <X size={20} />
                     </button>
                 </div>
 
-                <div className="bg-primary/5 dark:bg-primary/10 border border-primary/20 dark:border-primary/30 p-4 rounded-2xl flex items-start gap-3">
+                <div className="bg-primary/5 border border-primary/20 p-4 rounded-2xl flex items-start gap-3">
                     <AlertCircle className="text-primary" size={16} />
                     <div className="space-y-0.5">
-                        <p className="text-xs font-bold text-text-main dark:text-white">Finalizing agreement with {selectedReq.senderName}</p>
+                        <p className="text-xs font-bold text-text-main">Finalizing agreement with {selectedReq.senderName}</p>
                         <p className="text-[11px] text-text-muted font-medium">Agreement for learning {selectedReq.learnSkill}.</p>
                     </div>
                 </div>
@@ -114,7 +114,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                             <input 
                                 type="number" min="1" max="30" value={contractDays || ''}
                                 onChange={e => setContractDays(parseInt(e.target.value) || 0)}
-                                className="w-full bg-hover-bg dark:bg-hover-bg/20 dark:text-white border-none dark:border dark:border-border-main/50 rounded-xl px-4 py-3 text-sm font-bold outline-none ring-primary/20 focus:ring-2 transition-all"
+                                className="w-full bg-hover-bg border-none rounded-xl px-4 py-3 text-sm font-bold outline-none ring-primary/20 focus:ring-2 transition-all"
                             />
                         </div>
                         <div className="space-y-1">
@@ -122,7 +122,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                             <select 
                                 value={contractDuration}
                                 onChange={e => setContractDuration(e.target.value)}
-                                className="w-full bg-hover-bg dark:bg-hover-bg/20 dark:text-white border-none dark:border dark:border-border-main/50 rounded-xl px-4 py-3 text-sm font-bold outline-none ring-primary/20 focus:ring-2 appearance-none transition-all"
+                                className="w-full bg-hover-bg border-none rounded-xl px-4 py-3 text-sm font-bold outline-none ring-primary/20 focus:ring-2 appearance-none transition-all"
                             >
                                 <option>30 mins</option>
                                 <option>45 mins</option>
@@ -139,7 +139,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                             <input 
                                 type="number" step="10" min="0" value={contractCredits || ''}
                                 onChange={e => setContractCredits(parseInt(e.target.value) || 0)}
-                                className="w-full bg-hover-bg dark:bg-hover-bg/20 dark:text-white border-none dark:border dark:border-border-main/50 rounded-xl px-4 py-3 text-sm font-bold outline-none ring-primary/20 focus:ring-2 transition-all"
+                                className="w-full bg-hover-bg border-none rounded-xl px-4 py-3 text-sm font-bold outline-none ring-primary/20 focus:ring-2 transition-all"
                             />
                         </div>
                         <div className="space-y-1">
@@ -147,7 +147,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                             <input 
                                 type="time" value={contractTime}
                                 onChange={e => setContractTime(e.target.value)}
-                                className="w-full bg-hover-bg dark:bg-hover-bg/20 dark:text-white border-none dark:border dark:border-border-main/50 rounded-xl px-4 py-3 text-sm font-bold outline-none ring-primary/20 focus:ring-2 dark:[color-scheme:dark] transition-all"
+                                className="w-full bg-hover-bg border-none rounded-xl px-4 py-3 text-sm font-bold outline-none ring-primary/20 focus:ring-2 [color-scheme:light] transition-all"
                             />
                         </div>
                     </div>
@@ -157,7 +157,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                         <input 
                             type="date" value={contractDate}
                             onChange={e => setContractDate(e.target.value)}
-                            className="w-full bg-hover-bg dark:bg-hover-bg/20 dark:text-white border-none dark:border dark:border-border-main/50 rounded-xl px-4 py-3 text-sm font-bold outline-none ring-primary/20 focus:ring-2 dark:[color-scheme:dark] transition-all"
+                            className="w-full bg-hover-bg border-none rounded-xl px-4 py-3 text-sm font-bold outline-none ring-primary/20 focus:ring-2 [color-scheme:light] transition-all"
                         />
                     </div>
                 </div>

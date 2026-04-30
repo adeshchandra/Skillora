@@ -13,7 +13,7 @@ const SuggestionBox = ({ title, icon: Icon, description, steps, onDismiss, type 
         <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="p-4 bg-primary/5 dark:bg-card-bg rounded-2xl border border-primary/10 dark:border-border-main space-y-3 relative overflow-hidden shadow-sm"
+            className="p-4 bg-primary/5 rounded-2xl border border-primary/10 space-y-3 relative overflow-hidden shadow-sm"
         >
             <div className="absolute -top-4 -right-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl" />
             <div className="flex items-center gap-2">
@@ -202,14 +202,14 @@ export default function CreatePage() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-black transition-colors">
-      <div className="p-4 border-b border-border-main dark:border-border-main/50 flex items-center gap-4 bg-white dark:bg-black sticky top-0 z-10 transition-colors">
-         <h1 className="text-xl font-bold text-text-main dark:text-white">Create</h1>
+    <div className="flex flex-col h-full transition-colors">
+      <div className="p-4 border-b border-border-main flex items-center gap-4 sticky top-0 z-10 transition-colors">
+         <h1 className="text-xl font-bold text-text-main">Create</h1>
          <div className="flex items-center gap-1.5 ml-auto">
             <button 
                 onClick={() => setActiveTab('course')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm ${
-                    activeTab === 'course' ? 'bg-text-main dark:bg-white text-white dark:text-black' : 'bg-hover-bg dark:bg-hover-bg/10 text-text-main dark:text-text-muted group hover:bg-border-main dark:hover:bg-hover-bg/20'
+                    activeTab === 'course' ? 'bg-text-main text-white' : 'bg-hover-bg text-text-main group hover:bg-border-main'
                 }`}
             >
                 Course
@@ -217,7 +217,7 @@ export default function CreatePage() {
             <button 
                 onClick={() => setActiveTab('dao')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm ${
-                    activeTab === 'dao' ? 'bg-text-main dark:bg-white text-white dark:text-black' : 'bg-hover-bg dark:bg-hover-bg/10 text-text-main dark:text-text-muted group hover:bg-border-main dark:hover:bg-hover-bg/20'
+                    activeTab === 'dao' ? 'bg-text-main text-white' : 'bg-hover-bg text-text-main group hover:bg-border-main'
                 }`}
             >
                 DAO Group
@@ -266,7 +266,7 @@ export default function CreatePage() {
               >
                 <div className="space-y-4">
                     <div className="space-y-1">
-                        <label className="text-xs font-bold text-text-main dark:text-white pl-1 uppercase tracking-wider">Course Thumbnail</label>
+                        <label className="text-xs font-bold text-text-main pl-1 uppercase tracking-wider">Course Thumbnail</label>
                         <div className="relative group">
                             <label className="cursor-pointer block">
                                 <input 
@@ -275,12 +275,12 @@ export default function CreatePage() {
                                     className="hidden" 
                                     onChange={(e) => handleImageSelect(e, 'course')}
                                 />
-                                <div className="aspect-video w-full bg-hover-bg dark:bg-hover-bg/10 rounded-2xl border-2 border-dashed border-border-main/50 dark:border-border-main/30 flex flex-col items-center justify-center gap-2 overflow-hidden hover:border-primary/50 dark:hover:border-primary transition-all">
+                                <div className="aspect-video w-full bg-hover-bg rounded-2xl border-2 border-dashed border-border-main/50 flex flex-col items-center justify-center gap-2 overflow-hidden hover:border-primary/50 transition-all">
                                     {courseThumb ? (
                                         <img src={courseThumb} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                                     ) : (
                                         <>
-                                            <div className="w-10 h-10 bg-white dark:bg-hover-bg/20 rounded-xl flex items-center justify-center text-text-muted shadow-sm transition-colors">
+                                            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-text-muted shadow-sm transition-colors">
                                                 <ImageIcon size={20} />
                                             </div>
                                             <p className="text-[11px] font-bold text-text-muted">{uploading ? 'Compressing...' : 'Tap to upload cover (16:9)'}</p>
@@ -297,44 +297,44 @@ export default function CreatePage() {
                     </div>
 
                     <div className="space-y-1">
-                        <label className="text-xs font-bold text-text-main dark:text-white pl-1 uppercase tracking-wider">Course Title</label>
+                        <label className="text-xs font-bold text-text-main pl-1 uppercase tracking-wider">Course Title</label>
                         <input
                           required type="text" value={courseTitle}
                           onChange={(e) => setCourseTitle(e.target.value)}
                           placeholder="e.g. Master React in 10 mins"
-                          className="w-full px-4 py-3 bg-hover-bg dark:bg-hover-bg/20 dark:text-white border-2 border-transparent dark:border dark:border-border-main/50 rounded-xl focus:bg-white dark:focus:bg-hover-bg/40 focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold"
+                          className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold"
                         />
                     </div>
                     <div className="space-y-1">
-                        <label className="text-xs font-bold text-text-main dark:text-white pl-1 uppercase tracking-wider">Link URL</label>
+                        <label className="text-xs font-bold text-text-main pl-1 uppercase tracking-wider">Link URL</label>
                         <div className="relative">
                             <input
                               required type="url" value={courseLink}
                               onChange={(e) => setCourseLink(e.target.value)}
                               placeholder="YouTube, Facebook, etc."
-                              className="w-full px-4 py-3 bg-hover-bg dark:bg-hover-bg/20 dark:text-white border-2 border-transparent dark:border dark:border-border-main/50 rounded-xl focus:bg-white dark:focus:bg-hover-bg/40 focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold pr-10"
+                              className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold pr-10"
                             />
                             {courseLink && (
-                                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-[10px] bg-white dark:bg-black px-2 py-0.5 rounded border border-border-main/20 shadow-sm transition-colors">
+                                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-[10px] bg-white px-2 py-0.5 rounded border border-border-main/20 shadow-sm transition-colors">
                                     <LinkIcon size={10} className="text-primary" />
-                                    <span className="font-bold text-text-muted dark:text-text-muted">{reduceURL(courseLink)}</span>
+                                    <span className="font-bold text-text-muted">{reduceURL(courseLink)}</span>
                                 </div>
                             )}
                         </div>
                     </div>
                     <div className="space-y-1">
-                        <label className="text-xs font-bold text-text-main dark:text-white pl-1 tracking-wide">DAO Group Link (Optional)</label>
+                        <label className="text-xs font-bold text-text-main pl-1 tracking-wide">DAO Group Link (Optional)</label>
                         <input
                           type="url" value={daoGroupLink}
                           onChange={(e) => setDaoGroupLink(e.target.value)}
                           placeholder="Link to your DAO group"
-                          className="w-full px-4 py-3 bg-hover-bg dark:bg-hover-bg/20 dark:text-white border-2 border-transparent dark:border dark:border-border-main/50 rounded-xl focus:bg-white dark:focus:bg-hover-bg/40 focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold"
+                          className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold"
                         />
                     </div>
                 </div>
 
                 <div className="space-y-3">
-                    <label className="text-xs font-bold text-text-main dark:text-white pl-1 uppercase tracking-wider">Target Skills</label>
+                    <label className="text-xs font-bold text-text-main pl-1 uppercase tracking-wider">Target Skills</label>
                     <div className="flex gap-2">
                         <input 
                             type="text"
@@ -342,12 +342,12 @@ export default function CreatePage() {
                             onChange={(e) => setCustomTag(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addCustomTag())}
                             placeholder="Add custom skill..."
-                            className="flex-grow px-4 py-2 bg-hover-bg dark:bg-hover-bg/20 dark:text-white border-2 border-transparent dark:border dark:border-border-main/50 rounded-xl focus:bg-white dark:focus:bg-hover-bg/40 focus:ring-2 focus:ring-primary/20 outline-none text-xs font-bold transition-all"
+                            className="flex-grow px-4 py-2 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-primary/20 outline-none text-xs font-bold transition-all"
                         />
                         <button 
                             type="button" 
                             onClick={addCustomTag}
-                            className="px-4 py-2 bg-text-main dark:bg-white text-white dark:text-black rounded-xl text-xs font-bold hover:bg-black dark:hover:bg-white/90 transition-colors shadow-sm"
+                            className="px-4 py-2 bg-text-main text-white rounded-xl text-xs font-bold hover:bg-black transition-colors shadow-sm"
                         >
                             Add
                         </button>
@@ -376,7 +376,7 @@ export default function CreatePage() {
                                     className={`px-3 py-1.5 rounded-full text-[11px] font-bold transition-all flex items-center gap-1.5 border active:scale-95 ${
                                         isSelected 
                                             ? 'bg-primary text-white border-primary shadow-sm' 
-                                            : 'bg-hover-bg dark:bg-hover-bg/10 text-text-main dark:text-white border-border-main/50 dark:border-border-main/30'
+                                            : 'bg-hover-bg text-text-main border-border-main/50'
                                     }`}
                                 >
                                     {isSelected ? <CheckCircle2 size={12} /> : <Plus size={12} />}
@@ -387,14 +387,14 @@ export default function CreatePage() {
                     </div>
                 </div>
 
-                <div className="p-4 bg-primary/5 dark:bg-hover-bg/10 rounded-2xl border border-primary/10 dark:border-border-main/50 flex items-center gap-3">
+                <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10 flex items-center gap-3">
                     <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-xs">+10</div>
-                    <p className="text-[13px] font-bold text-text-main dark:text-white tracking-tight">Post & earn 10 skill credits.</p>
+                    <p className="text-[13px] font-bold text-text-main tracking-tight">Post & earn 10 skill credits.</p>
                 </div>
 
                 <button
                   disabled={loading || uploading}
-                  className="w-full py-4 bg-primary text-white rounded-2xl font-black text-sm hover:bg-primary-dark transition-all disabled:opacity-50 border-2 border-primary-dark active:scale-[0.98]"
+                  className="w-full py-4 bg-primary text-white rounded-2xl font-black text-sm hover:bg-primary-dark transition-all disabled:opacity-50 border-2 border-primary-dark active:scale-[0.98] shadow-lg"
                 >
                   {loading ? 'Publishing...' : 'Publish Course'}
                 </button>
@@ -408,7 +408,7 @@ export default function CreatePage() {
               >
                 <div className="space-y-4">
                     <div className="space-y-1">
-                        <label className="text-xs font-bold text-text-main dark:text-white pl-1 uppercase tracking-wider">DAO Cover Image</label>
+                        <label className="text-xs font-bold text-text-main pl-1 uppercase tracking-wider">DAO Cover Image</label>
                         <div className="relative group">
                             <label className="cursor-pointer block">
                                 <input 
@@ -417,12 +417,12 @@ export default function CreatePage() {
                                     className="hidden" 
                                     onChange={(e) => handleImageSelect(e, 'dao')}
                                 />
-                                <div className="aspect-[21/9] w-full bg-hover-bg dark:bg-hover-bg/10 rounded-2xl border-2 border-dashed border-border-main/50 dark:border-border-main/30 flex flex-col items-center justify-center gap-2 overflow-hidden hover:border-primary/50 dark:hover:border-primary transition-all">
+                                <div className="aspect-[21/9] w-full bg-hover-bg rounded-2xl border-2 border-dashed border-border-main/50 flex flex-col items-center justify-center gap-2 overflow-hidden hover:border-primary/50 transition-all">
                                     {daoImage ? (
                                         <img src={daoImage} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                                     ) : (
                                         <>
-                                            <div className="w-10 h-10 bg-white dark:bg-hover-bg/20 rounded-xl flex items-center justify-center text-text-muted shadow-sm transition-colors">
+                                            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-text-muted shadow-sm transition-colors">
                                                 <Sparkles size={20} className="text-primary" />
                                             </div>
                                             <p className="text-[11px] font-bold text-text-muted">{uploading ? 'Compressing...' : 'Tap to upload DAO cover (21:9)'}</p>
@@ -439,55 +439,55 @@ export default function CreatePage() {
                     </div>
 
                     <div className="space-y-1">
-                        <label className="text-xs font-bold text-text-main dark:text-white pl-1 uppercase tracking-wider">DAO Group Name</label>
+                        <label className="text-xs font-bold text-text-main pl-1 uppercase tracking-wider">DAO Group Name</label>
                         <input
                           required type="text" value={daoName}
                           onChange={(e) => setDaoName(e.target.value)}
                           placeholder="e.g. Python Warriors"
-                          className="w-full px-4 py-3 bg-hover-bg dark:bg-hover-bg/20 dark:text-white border-2 border-transparent dark:border dark:border-border-main/50 rounded-xl focus:bg-white dark:focus:bg-hover-bg/40 focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold"
+                          className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold"
                         />
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                         <div className="space-y-1">
-                            <label className="text-xs font-bold text-text-main dark:text-white pl-1 uppercase tracking-wider">Member Limit</label>
+                            <label className="text-xs font-bold text-text-main pl-1 uppercase tracking-wider">Member Limit</label>
                             <input
                               required type="number" min="3" value={daoLimit || ''}
                               onChange={(e) => setDaoLimit(parseInt(e.target.value) || 0)}
-                              className="w-full px-4 py-3 bg-hover-bg dark:bg-hover-bg/20 dark:text-white border-2 border-transparent dark:border dark:border-border-main/50 rounded-xl focus:bg-white dark:focus:bg-hover-bg/40 focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold"
+                              className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold"
                             />
                         </div>
                         <div className="space-y-1">
-                            <label className="text-xs font-bold text-text-main dark:text-white pl-1 uppercase tracking-wider">Stake (Pts)</label>
+                            <label className="text-xs font-bold text-text-main pl-1 uppercase tracking-wider">Stake (Pts)</label>
                             <input
                               required type="number" min="1" value={daoStake || ''}
                               onChange={(e) => setDaoStake(parseInt(e.target.value) || 0)}
-                              className="w-full px-4 py-3 bg-hover-bg dark:bg-hover-bg/20 dark:text-white border-2 border-transparent dark:border dark:border-border-main/50 rounded-xl focus:bg-white dark:focus:bg-hover-bg/40 focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold"
+                              className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold"
                             />
                         </div>
                     </div>
                     <div className="space-y-1">
-                        <label className="text-xs font-bold text-text-main dark:text-white pl-1 uppercase tracking-wider">Join Deadline</label>
+                        <label className="text-xs font-bold text-text-main pl-1 uppercase tracking-wider">Join Deadline</label>
                         <input
                           required type="datetime-local" value={daoDeadline}
                           onChange={(e) => setDaoDeadline(e.target.value)}
-                          className="w-full px-4 py-3 bg-hover-bg dark:bg-hover-bg/20 dark:text-white border-2 border-transparent dark:border dark:border-border-main/50 rounded-xl focus:bg-white dark:focus:bg-hover-bg/40 focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold dark:[color-scheme:dark]"
+                          className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold [color-scheme:light]"
                         />
                     </div>
                     
-                    <div className="p-4 bg-hover-bg dark:bg-hover-bg/10 rounded-2xl flex items-center justify-between border border-border-main/20 dark:border-border-main/50 transition-all">
+                    <div className="p-4 bg-hover-bg rounded-2xl flex items-center justify-between border border-border-main/20 transition-all">
                         <div className="flex items-center gap-3">
-                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${daoIsPrivate ? 'bg-primary/20 text-primary' : 'bg-white dark:bg-hover-bg/20 text-text-muted border border-border-main/50 dark:border-border-main/30 shadow-sm'}`}>
+                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${daoIsPrivate ? 'bg-primary/20 text-primary' : 'bg-white text-text-muted border border-border-main/50 shadow-sm'}`}>
                                 <Lock size={20} />
                             </div>
                             <div className="space-y-0.5">
-                                <h4 className="text-sm font-bold text-text-main dark:text-white">Private Group</h4>
+                                <h4 className="text-sm font-bold text-text-main">Private Group</h4>
                                 <p className="text-[10px] font-medium text-text-muted tracking-tight">Only you can add members to this group.</p>
                             </div>
                         </div>
                         <button 
                             type="button"
                             onClick={() => setDaoIsPrivate(!daoIsPrivate)}
-                            className={`w-12 h-6 rounded-full relative transition-all shadow-inner ${daoIsPrivate ? 'bg-primary' : 'bg-border-main dark:bg-hover-bg/40'}`}
+                            className={`w-12 h-6 rounded-full relative transition-all shadow-inner ${daoIsPrivate ? 'bg-primary' : 'bg-border-main'}`}
                         >
                             <motion.div 
                                 animate={{ x: daoIsPrivate ? 26 : 2 }}
@@ -497,12 +497,12 @@ export default function CreatePage() {
                     </div>
 
                     <div className="space-y-1">
-                        <label className="text-xs font-bold text-text-main dark:text-white pl-1 uppercase tracking-wider">Learning Topic</label>
+                        <label className="text-xs font-bold text-text-main pl-1 uppercase tracking-wider">Learning Topic</label>
                         <input
                           required type="text" value={daoTopic}
                           onChange={(e) => setDaoTopic(e.target.value)}
                           placeholder="e.g. Design Systems"
-                          className="w-full px-4 py-3 bg-hover-bg dark:bg-hover-bg/20 dark:text-white border-2 border-transparent dark:border dark:border-border-main/50 rounded-xl focus:bg-white dark:focus:bg-hover-bg/40 focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold"
+                          className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold"
                         />
                     </div>
                 </div>
@@ -516,12 +516,12 @@ export default function CreatePage() {
                             onChange={(e) => setCustomTag(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addCustomTag())}
                             placeholder="Add custom skill..."
-                            className="flex-grow px-4 py-2 bg-hover-bg dark:bg-hover-bg/20 dark:text-white border-none rounded-xl focus:bg-white dark:focus:bg-hover-bg/40 focus:ring-1 focus:ring-primary outline-none text-xs font-bold transition-all"
+                            className="flex-grow px-4 py-2 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-primary/20 outline-none text-xs font-bold transition-all"
                         />
                         <button 
                             type="button" 
                             onClick={addCustomTag}
-                            className="px-4 py-2 bg-text-main text-white rounded-xl text-xs font-bold hover:bg-black transition-colors"
+                            className="px-4 py-2 bg-text-main text-white rounded-xl text-xs font-bold hover:bg-black transition-colors shadow-sm"
                         >
                             Add
                         </button>
@@ -547,7 +547,7 @@ export default function CreatePage() {
                                     key={skill}
                                     type="button"
                                     onClick={() => toggleTag(skill)}
-                                    className={`px-3 py-1.5 rounded-full text-[11px] font-bold transition-all flex items-center gap-1.5 border ${
+                                    className={`px-3 py-1.5 rounded-full text-[11px] font-bold transition-all flex items-center gap-1.5 border active:scale-95 ${
                                         isSelected 
                                             ? 'bg-primary text-white border-primary shadow-sm' 
                                             : 'bg-hover-bg text-text-main border-border-main/50'
@@ -563,7 +563,7 @@ export default function CreatePage() {
 
                 <button
                   disabled={loading || uploading}
-                  className="w-full py-4 bg-primary text-white rounded-2xl font-black text-sm hover:bg-primary-dark transition-all disabled:opacity-50 border-2 border-primary-dark active:scale-[0.98]"
+                  className="w-full py-4 bg-primary text-white rounded-2xl font-black text-sm hover:bg-primary-dark transition-all disabled:opacity-50 border-2 border-primary-dark active:scale-[0.98] shadow-lg"
                 >
                   <div className="flex items-center justify-center gap-2">
                     <span>{loading ? 'Creating...' : 'Initiate DAO Group'}</span>
@@ -581,23 +581,23 @@ export default function CreatePage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-white/90 dark:bg-black/90 backdrop-blur-md transition-colors"
+                className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-white/90 backdrop-blur-md transition-colors"
             >
                 <motion.div 
                     initial={{ scale: 0.9, opacity: 0, y: 20 }}
                     animate={{ scale: 1, opacity: 1, y: 0 }}
-                    className="w-full max-w-sm bg-white dark:bg-card-bg border border-border-main dark:border-border-main rounded-[32px] p-8 shadow-2xl flex flex-col items-center text-center gap-6 transition-all"
+                    className="w-full max-w-sm bg-white border border-border-main rounded-[32px] p-8 shadow-2xl flex flex-col items-center text-center gap-6 transition-all"
                 >
                     <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center text-primary border border-primary/20">
                         <CheckCircle2 size={40} className="animate-in zoom-in duration-500" />
                     </div>
                     <div className="space-y-2">
-                        <h2 className="text-xl font-black text-text-main dark:text-white tracking-tight">Success!</h2>
+                        <h2 className="text-xl font-black text-text-main tracking-tight">Success!</h2>
                         <p className="text-sm font-medium text-text-muted leading-relaxed">
                             {successMsg}
                         </p>
                     </div>
-                    <div className="w-full h-1.5 bg-hover-bg dark:bg-hover-bg/20 rounded-full overflow-hidden">
+                    <div className="w-full h-1.5 bg-hover-bg rounded-full overflow-hidden">
                         <motion.div 
                             initial={{ width: 0 }}
                             animate={{ width: '100%' }}

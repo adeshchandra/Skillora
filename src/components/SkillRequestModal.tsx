@@ -153,20 +153,20 @@ export const SkillRequestModal: React.FC<SkillRequestModalProps> = ({
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
-            className="bg-white dark:bg-card-bg w-full max-w-lg rounded-[32px] overflow-hidden border border-border-main dark:border-border-main flex flex-col max-h-[90vh] shadow-2xl shadow-text-main/10"
+            className="bg-white w-full max-w-lg rounded-[32px] overflow-hidden border border-border-main flex flex-col max-h-[90vh] shadow-2xl shadow-text-main/10"
           >
             {/* Header */}
-            <div className="p-6 border-b border-border-main dark:border-border-main/50 flex items-center justify-between shrink-0 bg-white dark:bg-black transition-colors">
+            <div className="p-6 border-b border-border-main flex items-center justify-between shrink-0 bg-white transition-colors">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
                   <Handshake size={20} />
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-text-main dark:text-white tracking-tight">Skill Request</h2>
+                  <h2 className="text-lg font-bold text-text-main tracking-tight">Skill Request</h2>
                   <p className="text-[10px] font-bold text-text-muted tracking-wide">To: {targetUser.displayName}</p>
                 </div>
               </div>
-              <button onClick={onClose} className="p-2 bg-hover-bg dark:bg-hover-bg/20 rounded-xl text-text-muted hover:text-text-main transition-colors">
+              <button onClick={onClose} className="p-2 bg-hover-bg rounded-xl text-text-muted hover:text-text-main transition-colors">
                 <X size={20} />
               </button>
             </div>
@@ -174,17 +174,17 @@ export const SkillRequestModal: React.FC<SkillRequestModalProps> = ({
             {/* Scrollable Content */}
             <div className="p-6 overflow-y-auto space-y-6">
               {/* Type Selection */}
-              <div className="flex gap-2 p-1 bg-hover-bg dark:bg-hover-bg/10 rounded-2xl transition-colors">
+              <div className="flex gap-2 p-1 bg-hover-bg rounded-2xl transition-colors">
                 <button 
                   onClick={() => setRequestType('Exchange')}
-                  className={`flex-1 py-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${requestType === 'Exchange' ? 'bg-white dark:bg-white text-text-main dark:text-black shadow-sm' : 'text-text-muted hover:text-text-main'}`}
+                  className={`flex-1 py-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${requestType === 'Exchange' ? 'bg-white text-text-main shadow-sm' : 'text-text-muted hover:text-text-main'}`}
                 >
                   <Handshake size={14} />
                   Skill Exchange
                 </button>
                 <button 
                   onClick={() => setRequestType('Learning')}
-                  className={`flex-1 py-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${requestType === 'Learning' ? 'bg-white dark:bg-white text-text-main dark:text-black shadow-sm' : 'text-text-muted hover:text-text-main'}`}
+                  className={`flex-1 py-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${requestType === 'Learning' ? 'bg-white text-text-main shadow-sm' : 'text-text-muted hover:text-text-main'}`}
                 >
                   <BookOpen size={14} />
                   Learning Only
@@ -199,12 +199,12 @@ export const SkillRequestModal: React.FC<SkillRequestModalProps> = ({
                     value={learnSkill}
                     onChange={e => setLearnSkill(e.target.value)}
                     placeholder="e.g. Advanced Figma"
-                    className="w-full bg-hover-bg dark:bg-hover-bg/20 dark:text-white border-2 border-transparent dark:border dark:border-border-main/50 rounded-2xl px-4 py-4 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20 focus:bg-hover-bg/30 transition-all"
+                    className="w-full bg-hover-bg border-2 border-transparent rounded-2xl px-4 py-4 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20 focus:bg-hover-bg/30 transition-all"
                   />
                   {initialTeacherSkills.length > 0 && (
                     <div className="flex flex-wrap gap-2 mt-2">
                        {Array.from(new Set(initialTeacherSkills)).map((s, idx) => (
-                         <button key={`${s}-${idx}`} onClick={() => setLearnSkill(s)} className="text-[9px] font-bold px-2 py-1 bg-primary/5 dark:bg-primary/20 text-primary rounded-md border border-primary/10 dark:border-primary/30 transition-colors">+{s}</button>
+                         <button key={`${s}-${idx}`} onClick={() => setLearnSkill(s)} className="text-[9px] font-bold px-2 py-1 bg-primary/5 text-primary rounded-md border border-primary/10 transition-colors">+{s}</button>
                        ))}
                     </div>
                   )}
@@ -217,12 +217,12 @@ export const SkillRequestModal: React.FC<SkillRequestModalProps> = ({
                       value={teachSkill}
                       onChange={e => setTeachSkill(e.target.value)}
                       placeholder="e.g. Next.js Basics"
-                      className="w-full bg-hover-bg dark:bg-hover-bg/20 dark:text-white border-2 border-transparent dark:border dark:border-border-main/50 rounded-2xl px-4 py-4 text-sm font-semibold outline-none focus:ring-2 focus:ring-accent-gold/20 focus:bg-hover-bg/30 transition-all"
+                      className="w-full bg-hover-bg border-2 border-transparent rounded-2xl px-4 py-4 text-sm font-semibold outline-none focus:ring-2 focus:ring-accent-gold/20 focus:bg-hover-bg/30 transition-all"
                     />
                     {initialLearnerSkills.length > 0 && (
                       <div className="flex flex-wrap gap-2 mt-2">
                          {Array.from(new Set(initialLearnerSkills)).map((s, idx) => (
-                           <button key={`${s}-${idx}`} onClick={() => setTeachSkill(s)} className="text-[9px] font-bold px-2 py-1 bg-accent-gold/5 dark:bg-accent-gold/20 text-accent-gold rounded-md border border-accent-gold/10 dark:border-accent-gold/30 transition-colors">+{s}</button>
+                           <button key={`${s}-${idx}`} onClick={() => setTeachSkill(s)} className="text-[9px] font-bold px-2 py-1 bg-accent-gold/5 text-accent-gold rounded-md border border-accent-gold/10 transition-colors">+{s}</button>
                          ))}
                       </div>
                     )}
@@ -239,12 +239,12 @@ export const SkillRequestModal: React.FC<SkillRequestModalProps> = ({
                     <select 
                       value={duration}
                       onChange={e => setDuration(e.target.value)}
-                      className="w-full bg-hover-bg dark:bg-hover-bg/20 dark:text-white border-none dark:border dark:border-border-main/50 rounded-2xl pl-10 pr-4 py-4 text-sm font-semibold outline-none appearance-none focus:ring-2 focus:ring-primary/20 transition-all"
+                      className="w-full bg-hover-bg border-none rounded-2xl pl-10 pr-4 py-4 text-sm font-semibold outline-none appearance-none focus:ring-2 focus:ring-primary/20 transition-all [color-scheme:light]"
                     >
-                      <option className="dark:bg-black">3 days</option>
-                      <option className="dark:bg-black">1 week</option>
-                      <option className="dark:bg-black">2 weeks</option>
-                      <option className="dark:bg-black">1 month</option>
+                      <option className="bg-white">3 days</option>
+                      <option className="bg-white">1 week</option>
+                      <option className="bg-white">2 weeks</option>
+                      <option className="bg-white">1 month</option>
                     </select>
                   </div>
                 </div>
@@ -256,7 +256,7 @@ export const SkillRequestModal: React.FC<SkillRequestModalProps> = ({
                       type="number"
                       value={credits}
                       onChange={e => setCredits(parseInt(e.target.value))}
-                      className="w-full bg-hover-bg dark:bg-hover-bg/20 dark:text-white border-2 border-transparent dark:border dark:border-border-main/50 rounded-2xl pl-10 pr-4 py-4 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                      className="w-full bg-hover-bg border-2 border-transparent rounded-2xl pl-10 pr-4 py-4 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                     />
                   </div>
                 </div>
@@ -271,7 +271,7 @@ export const SkillRequestModal: React.FC<SkillRequestModalProps> = ({
                       <button 
                         key={media}
                         onClick={() => setContactMedia(media)}
-                        className={`flex-1 py-3 rounded-xl text-[10px] font-bold border transition-all ${contactMedia === media ? 'bg-text-main dark:bg-white text-white dark:text-black border-text-main dark:border-white shadow-sm' : 'bg-white dark:bg-card-bg text-text-muted border-border-main dark:border-border-main/50 hover:bg-hover-bg dark:hover:bg-hover-bg/20'}`}
+                        className={`flex-1 py-3 rounded-xl text-[10px] font-bold border transition-all ${contactMedia === media ? 'bg-text-main text-white border-text-main shadow-sm' : 'bg-white text-text-muted border-border-main hover:bg-hover-bg'}`}
                       >
                         {media}
                       </button>
@@ -286,7 +286,7 @@ export const SkillRequestModal: React.FC<SkillRequestModalProps> = ({
                       value={contactInfo}
                       onChange={e => setContactInfo(e.target.value)}
                       placeholder={contactMedia === 'Email' ? 'your@email.com' : 'Your ID / Number'}
-                      className="w-full bg-hover-bg dark:bg-hover-bg/20 dark:text-white border-2 border-transparent dark:border dark:border-border-main/50 rounded-2xl pl-10 pr-4 py-4 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                      className="w-full bg-hover-bg border-2 border-transparent rounded-2xl pl-10 pr-4 py-4 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                     />
                   </div>
                 </div>
@@ -300,12 +300,12 @@ export const SkillRequestModal: React.FC<SkillRequestModalProps> = ({
                   onChange={e => setMessage(e.target.value)}
                   placeholder="Fill in the template or tell the guru about your goals..."
                   rows={10}
-                  className="w-full bg-hover-bg dark:bg-hover-bg/20 dark:text-white border-2 border-transparent dark:border dark:border-border-main/50 rounded-2xl px-4 py-4 text-[11px] font-semibold outline-none focus:ring-2 focus:ring-primary/20 resize-none transition-all leading-relaxed"
+                  className="w-full bg-hover-bg border-2 border-transparent rounded-2xl px-4 py-4 text-[11px] font-semibold outline-none focus:ring-2 focus:ring-primary/20 resize-none transition-all leading-relaxed"
                 />
               </div>
             </div>
 
-            <div className="p-6 border-t border-border-main dark:border-border-main/50 shrink-0 bg-white dark:bg-black transition-colors">
+            <div className="p-6 border-t border-border-main shrink-0 bg-white transition-colors">
               <button 
                 onClick={handleSubmit}
                 disabled={loading}
