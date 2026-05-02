@@ -11,6 +11,8 @@ import { getUserInterests, rankItems } from '../lib/tracking';
 
 import CourseCard from '../components/CourseCard';
 
+import { useScrollDirection } from '../lib/hooks';
+
 interface FilterSystemProps {
   selectedTags: string[];
   setSelectedTags: (tags: string[]) => void;
@@ -94,35 +96,13 @@ export default function HomePage() {
   const [startY, setStartY] = useState(0);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isScrolling, setIsScrolling] = useState(false);
+  const { scrollDir, isAtTop } = useScrollDirection();
 
   useEffect(() => {
     if (user) {
       getUserInterests(user.uid).then(setUserInterests);
     }
   }, [user]);
-
-  useEffect(() => {
-    let scrollTimeout: any;
-    const handleScroll = () => {
-      // Set scrolling true as soon as we move
-      setIsScrolling(true);
-      
-      // Clear the timeout - this prevents it from setting false while moving
-      clearTimeout(scrollTimeout);
-      
-      // Set scrolling false after 300ms of no scroll events
-      scrollTimeout = setTimeout(() => {
-        setIsScrolling(false);
-      }, 300);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      clearTimeout(scrollTimeout);
-    };
-  }, []);
 
   const fetchCourses = async (isRefreshing = false) => {
     if (isRefreshing) setRefreshing(true);
@@ -193,6 +173,8 @@ export default function HomePage() {
     userInterests
   );
 
+  const isVisible = scrollDir === 'up' || isAtTop;
+
   return (
     <div 
       className="min-h-screen relative"
@@ -217,10 +199,11 @@ export default function HomePage() {
       )}
 
       <motion.div 
+        initial={false}
         animate={{ 
-          y: isScrolling ? -200 : 0, // Push it up when scrolling
-          opacity: isScrolling ? 0 : 1,
-          pointerEvents: isScrolling ? 'none' : 'auto'
+          y: isVisible ? 0 : -200,
+          opacity: isVisible ? 1 : 0,
+          pointerEvents: isVisible ? 'auto' : 'none'
         }}
         transition={{ 
           duration: 0.3,

@@ -24,11 +24,14 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 
+import { useScrollDirection } from './lib/hooks';
+
 // --- Components ---
 
 const Navigation = () => {
   const { user, unreadMessages } = useAuth();
   const location = useLocation();
+  const { scrollDir, isAtTop } = useScrollDirection();
 
   const isChatPage = location.pathname.startsWith('/chat/');
   if (isChatPage) return null;
@@ -41,8 +44,15 @@ const Navigation = () => {
     { name: 'Profile', path: '/profile', icon: UserIcon },
   ];
 
+  const isVisible = scrollDir === 'up' || isAtTop;
+
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-bg-main border-t border-border-main z-50 transition-colors">
+    <motion.nav 
+      initial={false}
+      animate={{ y: isVisible ? 0 : 80 }}
+      transition={{ duration: 0.3, ease: 'easeInOut' }}
+      className="fixed bottom-0 left-0 right-0 bg-bg-main border-t border-border-main z-50 transition-colors"
+    >
       <div className="flex justify-around items-center h-14 max-w-lg mx-auto px-2">
         {navItems.map((item) => {
           const isActive = location.pathname === item.path;
@@ -73,13 +83,14 @@ const Navigation = () => {
           );
         })}
       </div>
-    </nav>
+    </motion.nav>
   );
 };
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, profile, loading, credits, unreadNotifications, unreadMessages } = useAuth();
   const location = useLocation();
+  const { scrollDir, isAtTop } = useScrollDirection();
 
   if (loading) {
     return (
@@ -106,10 +117,17 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return <SkillSetupPage />;
   }
 
+  const isHeaderVisible = scrollDir === 'up' || isAtTop;
+
   return (
     <div className="min-h-screen bg-bg-main pb-16 transition-colors">
-      <header className="sticky top-0 pt-[env(safe-area-inset-top)] bg-bg-main border-b border-border-main z-50 transition-colors duration-200">
-        <div className="h-14 flex items-center justify-between px-4">
+      <motion.header 
+        initial={false}
+        animate={{ y: isHeaderVisible ? 0 : -80 }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
+        className="fixed top-0 left-0 right-0 pt-[env(safe-area-inset-top)] bg-bg-main border-b border-border-main z-50 transition-colors duration-200"
+      >
+        <div className="h-14 flex items-center justify-between px-4 max-w-lg mx-auto">
           <div className="flex items-center gap-1 group cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
               <div className="text-xl font-black tracking-tighter text-text-main">Skillora</div>
               <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1" />
@@ -140,8 +158,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             </Link>
           </div>
         </div>
-      </header>
-      <main className="max-w-lg mx-auto min-h-screen bg-bg-main transition-colors duration-200">
+      </motion.header>
+      <main className="max-w-lg mx-auto min-h-screen bg-bg-main transition-colors duration-200 pt-14">
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}

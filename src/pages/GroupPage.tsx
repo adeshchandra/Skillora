@@ -11,6 +11,7 @@ import { format } from 'date-fns';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { getUserInterests, rankItems } from '../lib/tracking';
+import { useScrollDirection } from '../lib/hooks';
 import DAOGroupCard from '../components/DAOGroupCard';
 
 const FilterSystem = ({ selectedTags, setSelectedTags, searchQuery, setSearchQuery }: any) => {
@@ -1176,30 +1177,13 @@ export default function GroupPage() {
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(searchParams.get('id'));
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isScrolling, setIsScrolling] = useState(false);
+  const { scrollDir, isAtTop } = useScrollDirection();
 
   useEffect(() => {
     if (user) {
       getUserInterests(user.uid).then(setUserInterests);
     }
   }, [user]);
-
-  useEffect(() => {
-    let scrollTimeout: any;
-    const handleScroll = () => {
-      setIsScrolling(true);
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(() => {
-        setIsScrolling(false);
-      }, 300);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      clearTimeout(scrollTimeout);
-    };
-  }, []);
 
   const fetchGroups = (isRefreshing = false) => {
     if (isRefreshing) setRefreshing(true);
@@ -1314,6 +1298,8 @@ export default function GroupPage() {
     return <DAODetail groupId={selectedGroupId} onBack={() => setSelectedGroupId(null)} />;
   }
 
+  const isVisible = scrollDir === 'up' || isAtTop;
+
   return (
     <div 
       className="min-h-screen pb-20 relative bg-bg-main transition-colors"
@@ -1337,23 +1323,20 @@ export default function GroupPage() {
         </div>
       )}
 
-      <div className="p-5 bg-bg-main border-b border-border-main transition-colors">
-        <h1 className="text-xl font-bold text-text-main tracking-tight mb-0.5">DeadlineDAO</h1>
-        <p className="text-text-muted text-[10px] font-bold tracking-wide">Commit together. Earn together.</p>
-      </div>
-
-      <motion.div 
+      <motion.div
+        initial={false}
         animate={{ 
-          y: isScrolling ? -200 : 0,
-          opacity: isScrolling ? 0 : 1,
-          pointerEvents: isScrolling ? 'none' : 'auto'
+          y: isVisible ? 0 : -200,
+          opacity: isVisible ? 1 : 0
         }}
-        transition={{ 
-          duration: 0.3,
-          ease: "easeInOut"
-        }}
-        className="sticky top-14 z-40"
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
+        className="sticky top-14 z-40 bg-bg-main"
       >
+        <div className="p-5 border-b border-border-main transition-colors">
+          <h1 className="text-xl font-bold text-text-main tracking-tight mb-0.5">DeadlineDAO</h1>
+          <p className="text-text-muted text-[10px] font-bold tracking-wide">Commit together. Earn together.</p>
+        </div>
+
         <FilterSystem 
           selectedTags={selectedTags} 
           setSelectedTags={setSelectedTags} 
