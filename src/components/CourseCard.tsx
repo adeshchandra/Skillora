@@ -3,11 +3,13 @@ import { doc, getDoc, setDoc, updateDoc, increment, onSnapshot, collection, quer
 import { db } from '../lib/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import { Course } from '../types';
-import { Star, Play, User as UserIcon, MessageCircle, Handshake, Check, ExternalLink } from 'lucide-react';
+import { Star, Play, User as UserIcon, MessageCircle, Handshake, Check, ExternalLink, X, MoreVertical } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import { SkillRequestModal } from './SkillRequestModal';
 import { trackInteraction } from '../lib/tracking';
+import { parseVideoUrl } from '../lib/video-utils';
+import { useVideoPlayer } from '../contexts/VideoPlayerContext';
 
 interface CourseCardProps {
   course: Course;
@@ -17,12 +19,16 @@ interface CourseCardProps {
 const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { activeVideoId, toggleVideo } = useVideoPlayer();
   const [hasVisited, setHasVisited] = useState(false);
   const [hasRated, setHasRated] = useState(false);
   const [isRating, setIsRating] = useState(false);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [hasSentRequest, setHasSentRequest] = useState(false);
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
+
+  const isPlaying = activeVideoId === course.id;
+  const videoInfo = parseVideoUrl(course.link);
 
   useEffect(() => {
     if (!user || !course?.id) return;
@@ -32,6 +38,7 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
         const data = docSnap.data();
         setHasVisited(true);
         if (data.rating !== undefined) setHasRated(true);
+        // REMOVED: Auto-play on mount to prevent multiple videos
       }
     });
 
@@ -76,7 +83,12 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
       visitedAt: new Date().toISOString(),
     });
     setHasVisited(true);
-    window.open(overrideLink || course.link, '_blank');
+    // Only open external link if it's a DAO link or not a video we can preview
+    if (overrideLink || !videoInfo) {
+      window.open(overrideLink || course.link, '_blank');
+    } else {
+      toggleVideo(course.id);
+    }
   };
 
   const handleRate = async (score: number) => {
@@ -109,17 +121,77 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
     <div className="flex flex-col bg-bg-main mb-2 border-b border-border-main last:border-0 transition-colors">
       <div 
         className="relative aspect-video w-full cursor-pointer group overflow-hidden" 
-        onClick={() => handleVisit()}
+        onClick={() => {
+          if (!hasVisited) {
+            handleVisit();
+          } else if (videoInfo) {
+            toggleVideo(course.id);
+          } else {
+            handleVisit();
+          }
+        }}
       >
-        <img 
-          src={course.thumbnail || `https://picsum.photos/seed/course-${course.id}/800/450`} 
-          alt={course.title}
-          className="w-full h-full object-cover bg-hover-bg transition-transform group-hover:scale-105"
-          referrerPolicy="no-referrer"
-        />
-        <div className="absolute bottom-3 right-3 bg-text-main/80 text-bg-main text-[10px] px-2 py-1 rounded-lg font-bold backdrop-blur-sm border border-white/10 shadow-lg">
-          {hasVisited ? 'Respin' : 'Unlock'}
-        </div>
+        <AnimatePresence mode="wait">
+          {isPlaying && videoInfo ? (
+            <motion.div 
+              key="player"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black z-10"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <iframe
+                src={videoInfo.embedUrl + (videoInfo.type === 'youtube' ? '?autoplay=1' : '')}
+                title={course.title}
+                className="w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleVideo(course.id);
+                }}
+                className="absolute top-2 right-2 p-1.5 bg-black/50 text-white rounded-full hover:bg-black transition-colors backdrop-blur-sm border border-white/20 z-20"
+              >
+                <X size={16} />
+              </button>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="thumbnail"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="w-full h-full"
+            >
+              <img 
+                src={course.thumbnail || `https://picsum.photos/seed/course-${course.id}/800/450`} 
+                alt={course.title}
+                className="w-full h-full object-cover bg-hover-bg transition-transform group-hover:scale-105"
+                referrerPolicy="no-referrer"
+              />
+              {!isPlaying && videoInfo && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-14 h-14 rounded-full bg-primary/80 text-bg-main flex items-center justify-center shadow-2xl backdrop-blur-sm transition-transform group-hover:scale-110 active:scale-95">
+                    <Play size={28} className="ml-1" fill="currentColor" />
+                  </div>
+                </div>
+              )}
+              <div className="absolute bottom-3 right-3 bg-text-main/80 text-bg-main text-[10px] px-2.5 py-1.5 rounded-lg font-bold backdrop-blur-sm border border-white/10 shadow-lg flex items-center gap-1.5 uppercase tracking-wider">
+                {videoInfo ? (
+                  <>
+                    <Play size={10} fill="currentColor" className={!hasVisited ? 'text-primary' : ''} />
+                    <span>{hasVisited ? 'Watch Now' : 'Unlock & Play'}</span>
+                  </>
+                ) : (
+                  <span>{hasVisited ? 'Respin' : 'Unlock Now'}</span>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <div className="flex gap-3 pt-3 pb-3 px-3">
@@ -143,16 +215,19 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
           <div className="flex items-start justify-between gap-2 mb-1">
             <h3 
               className="text-[14px] font-bold text-text-main leading-snug line-clamp-2 cursor-pointer hover:text-primary transition-colors"
-              onClick={() => handleVisit()}
+              onClick={() => {
+                if (hasVisited && videoInfo) toggleVideo(course.id);
+                else handleVisit();
+              }}
             >
               {course.title}
             </h3>
             <button 
-              onClick={(e) => { e.stopPropagation(); handleVisit(); }}
+              onClick={(e) => { e.stopPropagation(); window.open(course.link, '_blank'); }}
               className="mt-0.5 p-1 text-text-muted hover:text-primary transition-colors shrink-0"
-              title="Open external link"
+              title="More options"
             >
-              <ExternalLink size={14} />
+              <MoreVertical size={16} />
             </button>
           </div>
           <div className="text-[12px] text-text-muted font-medium flex flex-wrap items-center gap-x-1 gap-y-0.5 transition-colors">
@@ -175,9 +250,16 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
             </span>
           </div>
 
-          <div className="mt-3 flex items-center gap-2">
+          <div className="mt-4 flex items-center gap-2">
             {!hasVisited ? (
               <>
+                <button 
+                  onClick={() => handleVisit()}
+                  className="px-5 py-2 bg-primary text-bg-main rounded-xl text-[10.5px] font-bold tracking-wide hover:bg-primary-dark transition-all active:scale-95 flex items-center gap-2 shadow-sm"
+                >
+                  <ExternalLink size={12} />
+                  Visit
+                </button>
                 <button 
                   onClick={() => {
                     if (course.daoGroupLink) {
@@ -192,7 +274,7 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
                       ? 'bg-text-main text-bg-main hover:bg-black' 
                       : (hasSentRequest 
                           ? 'bg-green-500/10 text-green-500 border border-green-500/20' 
-                          : 'bg-primary text-bg-main hover:bg-primary-dark')
+                          : 'bg-hover-bg text-text-main hover:bg-border-main border border-border-main/50')
                   }`}
                 >
                   {!course.daoGroupLink && (hasSentRequest ? <Check size={12} /> : <MessageCircle size={12} />)}
@@ -207,7 +289,7 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
                 />
               </>
             ) : (
-              <>
+              <div className="flex items-center gap-2">
                 {course.daoGroupLink ? (
                   <button 
                     onClick={() => window.open(course.daoGroupLink, '_blank')}
@@ -217,10 +299,10 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
                   </button>
                 ) : (
                   <button 
-                    onClick={() => handleVisit()}
+                    onClick={() => window.open(course.link, '_blank')}
                     className="px-5 py-2 bg-hover-bg hover:bg-border-main text-text-main rounded-xl text-[10.5px] font-bold tracking-wide transition-all shadow-sm border border-border-main/50"
                   >
-                    Watch again
+                    Visit
                   </button>
                 )}
                 {!isRating && !hasRated && user?.uid !== course.teacherId && (
@@ -236,7 +318,7 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
                     Already rated
                   </span>
                 )}
-              </>
+              </div>
             )}
           </div>
         </div>

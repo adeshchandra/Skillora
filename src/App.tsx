@@ -23,6 +23,7 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { VideoPlayerProvider } from './contexts/VideoPlayerContext';
 
 import { useScrollDirection } from './lib/hooks';
 
@@ -182,25 +183,27 @@ export default function App() {
     <ErrorBoundary>
         <AuthProvider>
           <ThemeProvider>
-            <BrowserRouter>
-              <Layout>
-                <Routes>
-                  <Route path="/" element={<HomePage />} />
-                  <Route path="/group" element={<GroupPage />} />
-                  <Route path="/create" element={<CreatePage />} />
-                  <Route path="/notification" element={<NotificationPage />} />
-                  <Route path="/profile" element={<ProfilePage />} />
-                  <Route path="/messages" element={<MessagesPage />} />
-                  <Route path="/chat/:conversationId" element={<ChatPage />} />
-                  <Route path="/settings" element={<SettingsPage />} />
-                  <Route path="/terms" element={<TermsPage />} />
-                  <Route path="/about" element={<AboutPage />} />
-                  <Route path="/policy" element={<PolicyPage />} />
-                  <Route path="/user/:userId" element={<UserViewPage />} />
-                  <Route path="/skill-setup" element={<SkillSetupPage />} />
-                </Routes>
-              </Layout>
-            </BrowserRouter>
+            <VideoPlayerProvider>
+              <BrowserRouter>
+                <Layout>
+                  <Routes>
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/group" element={<GroupPage />} />
+                    <Route path="/create" element={<CreatePage />} />
+                    <Route path="/notification" element={<NotificationPage />} />
+                    <Route path="/profile" element={<ProfilePage />} />
+                    <Route path="/messages" element={<MessagesPage />} />
+                    <Route path="/chat/:conversationId" element={<ChatPage />} />
+                    <Route path="/settings" element={<SettingsPage />} />
+                    <Route path="/terms" element={<TermsPage />} />
+                    <Route path="/about" element={<AboutPage />} />
+                    <Route path="/policy" element={<PolicyPage />} />
+                    <Route path="/user/:userId" element={<UserViewPage />} />
+                    <Route path="/skill-setup" element={<SkillSetupPage />} />
+                  </Routes>
+                </Layout>
+              </BrowserRouter>
+            </VideoPlayerProvider>
           </ThemeProvider>
         </AuthProvider>
     </ErrorBoundary>
