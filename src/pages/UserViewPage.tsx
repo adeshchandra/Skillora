@@ -257,9 +257,11 @@ export default function UserViewPage() {
                                 </div>
                             </div>
                             <div className="flex flex-col items-center gap-2">
-                                <div className={`px-2.5 py-0.5 rounded-lg border text-[10px] font-bold transition-colors ${reputation.color}`}>
-                                    {reputation.label}
-                                </div>
+                                {reputation.label !== "Skill Seeker" && (
+                                    <div className={`px-2.5 py-0.5 rounded-lg border text-[10px] font-bold transition-colors ${reputation.color}`}>
+                                        {reputation.label}
+                                    </div>
+                                )}
                                 <div className="flex items-center justify-center gap-1.5 text-[10px] font-medium text-text-muted">
                                     <MapPin size={10} className="text-primary" />
                                     {profile.location || 'Distributed Node'}

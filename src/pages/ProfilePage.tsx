@@ -1275,9 +1275,11 @@ export default function ProfilePage() {
                     </div>
                     <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
                 </div>
-                <div className={`mt-1 inline-flex px-2 py-0.5 rounded-lg border text-[8px] font-bold ${reputation.color}`}>
-                    {reputation.label}
-                </div>
+                {reputation.label !== "Skill Seeker" && (
+                    <div className={`mt-1 inline-flex px-2 py-0.5 rounded-lg border text-[8px] font-bold ${reputation.color}`}>
+                        {reputation.label}
+                    </div>
+                )}
                 <div className="flex items-center gap-2 text-xs text-text-muted font-bold mt-1">
                     <span className="flex items-center gap-1"><Zap size={10} className="text-accent-gold fill-accent-gold" /> {credits} credits</span>
                     <span className="w-0.5 h-0.5 rounded-full bg-border-main" />
@@ -1737,7 +1739,7 @@ export default function ProfilePage() {
                 </div>
             </div>
 
-            <div className="grid gap-3">
+            <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4 snap-x snap-mandatory">
                 {(() => {
                     const filteredSessions = allSessions.filter(s => {
                         const sessDate = new Date(s.date);
@@ -1762,7 +1764,7 @@ export default function ProfilePage() {
                             <motion.div 
                                 initial={{ opacity: 0 }} 
                                 animate={{ opacity: 1 }}
-                                className="py-12 bg-hover-bg/20 border-2 border-dashed border-border-main/50 rounded-3xl text-center space-y-3"
+                                className="w-full flex-shrink-0 py-12 bg-hover-bg/20 border-2 border-dashed border-border-main/50 rounded-3xl text-center space-y-3"
                             >
                                 <div className="w-12 h-12 bg-theme-card rounded-2xl mx-auto flex items-center justify-center text-text-muted border border-border-main/30 shadow-sm">
                                     <Clock size={20} className="opacity-40" />
@@ -1783,6 +1785,7 @@ export default function ProfilePage() {
                                     initial={{ opacity: 0, x: -10 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     transition={{ delay: idx * 0.05 }}
+                                    className="w-[300px] flex-shrink-0 snap-start"
                                 >
                                     <RequestCard 
                                         request={req} 
@@ -1804,6 +1807,7 @@ export default function ProfilePage() {
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: (sessionTab === 'upcoming' ? pendingRequests.length : 0 + idx) * 0.05 }}
+                                    className="w-[300px] flex-shrink-0 snap-start"
                                 >
                                     <SessionCard 
                                         session={sess} 

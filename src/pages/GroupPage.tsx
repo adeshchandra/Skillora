@@ -77,6 +77,72 @@ const FilterSystem = ({ selectedTags, setSelectedTags, searchQuery, setSearchQue
   );
 };
 
+const TopUsersSection = ({ isDark = false }: { isDark?: boolean }) => {
+    const [topUsers, setTopUsers] = useState<UserProfile[]>([]);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchTopUsers = async () => {
+            try {
+                // Simplified query to avoid index issues if they occur
+                const q = query(
+                    collection(db, 'users'),
+                    orderBy('rating', 'desc'),
+                    limit(12)
+                );
+                const unsubscribe = onSnapshot(q, (snap) => {
+                    setTopUsers(snap.docs.map(d => ({ uid: d.id, ...d.data() } as UserProfile)));
+                });
+                return unsubscribe;
+            } catch (err) {
+                console.error("Top users fetch error:", err);
+            }
+        };
+        fetchTopUsers();
+    }, []);
+
+    if (topUsers.length === 0) return null;
+
+    return (
+        <div className={`pb-2 ${isDark ? '-mx-1' : 'px-5 pb-4 -mt-2'}`}>
+            <div className="flex gap-4 overflow-x-auto no-scrollbar py-2 snap-x">
+                {topUsers.map((u) => (
+                    <div 
+                        key={u.uid} 
+                        onClick={() => navigate(`/user/${u.uid}`)}
+                        className="flex flex-col items-center gap-2 shrink-0 cursor-pointer group snap-start"
+                    >
+                        <div className="relative">
+                            <div className={`w-[54px] h-[54px] rounded-full overflow-hidden border-2 group-active:scale-95 transition-transform bg-hover-bg shadow-sm ${isDark ? 'border-white/10' : 'border-border-main'}`}>
+                                <img 
+                                    src={u.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${u.displayName}`} 
+                                    className="w-full h-full object-cover"
+                                    referrerPolicy="no-referrer"
+                                    alt={u.displayName}
+                                />
+                            </div>
+                            {/* Activeness dot - matched to the blue in screenshot */}
+                            <div className={`absolute bottom-0 right-0 w-3.5 h-3.5 bg-[#4AA9FF] rounded-full border-2 shadow-sm ${isDark ? 'border-[#0D0D0D]' : 'border-bg-main'}`} title="Active" />
+                        </div>
+                        <span className={`text-[10px] font-bold line-clamp-1 w-[54px] text-center tracking-tight opacity-90 ${isDark ? 'text-white' : 'text-text-main'}`}>
+                            {u.displayName.split(' ')[0]}
+                        </span>
+                    </div>
+                ))}
+                <div 
+                    onClick={() => navigate('/members')}
+                    className="flex flex-col items-center gap-2 shrink-0 cursor-pointer group snap-start"
+                >
+                    <div className={`w-[54px] h-[54px] rounded-full border-2 flex items-center justify-center text-[#4AA9FF] font-black text-xs group-active:scale-95 transition-transform shadow-sm ${isDark ? 'bg-white/5 border-white/10' : 'bg-hover-bg border-border-main'}`}>
+                        All
+                    </div>
+                    <span className={`text-[10px] font-bold tracking-tight opacity-90 ${isDark ? 'text-white/60' : 'text-text-muted'}`}>View</span>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 const QuizComponent = ({ group, onComplete }: { group: DAOGroup, onComplete: () => void }) => {
   const { user } = useAuth();
   const [quiz, setQuiz] = useState<Quiz | null>(null);
@@ -1332,9 +1398,8 @@ export default function GroupPage() {
         transition={{ duration: 0.3, ease: 'easeInOut' }}
         className="sticky top-14 z-40 bg-bg-main"
       >
-        <div className="p-5 border-b border-border-main transition-colors">
-          <h1 className="text-xl font-bold text-text-main tracking-tight mb-0.5">DeadlineDAO</h1>
-          <p className="text-text-muted text-[10px] font-bold tracking-wide">Commit together. Earn together.</p>
+        <div className="pt-2">
+          <TopUsersSection />
         </div>
 
         <FilterSystem 
