@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { getUserInterests, rankItems } from '../lib/tracking';
 
 import CourseCard from '../components/CourseCard';
+import { BookCard } from '../components/BookCard';
 
 import { useScrollDirection } from '../lib/hooks';
 
@@ -61,7 +62,7 @@ const FilterSystem = ({ selectedTags, setSelectedTags, searchQuery, setSearchQue
             </button>
             {POPULAR_SKILLS.map(skill => (
                 <button 
-                    key={skill}
+                    key={`pop-filter-${skill}`}
                     onClick={() => toggleTag(skill)}
                     className={`flex-shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold transition-all ${
                         selectedTags.includes(skill) ? 'bg-primary text-bg-main border-primary' : 'bg-hover-bg text-text-main group hover:bg-border-main border border-transparent'
@@ -161,6 +162,9 @@ export default function HomePage() {
 
   const filteredCourses = rankItems(
     courses.filter(course => {
+      // Don't show books in the main course feed to keep it clean
+      if (course.itemType === 'book') return false;
+
       const matchesSearch = course.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
                            course.teacherName.toLowerCase().includes(searchQuery.toLowerCase()) ||
                            (course.tags && course.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())));
@@ -172,6 +176,8 @@ export default function HomePage() {
     }),
     userInterests
   );
+
+  const books = courses.filter(c => c.itemType === 'book');
 
   const isVisible = scrollDir === 'up' || isAtTop;
 
@@ -236,6 +242,21 @@ export default function HomePage() {
         </div>
       ) : (
         <div className="flex flex-col">
+          {/* Books Row */}
+          {books.length > 0 && (
+            <div className="py-4 space-y-3 bg-hover-bg/30">
+              <div className="px-4 flex items-center justify-between">
+                <h3 className="text-sm font-black text-text-main uppercase tracking-wider">New Books</h3>
+                <span className="text-[10px] font-bold text-primary">View All</span>
+              </div>
+              <div className="flex gap-3 overflow-x-auto no-scrollbar px-4 pb-2">
+                {books.map(book => (
+                  <BookCard key={book.id} book={book} />
+                ))}
+              </div>
+            </div>
+          )}
+
           {filteredCourses.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-32 px-12 text-center space-y-6">
               <div className="w-24 h-24 bg-bg-main rounded-[40px] flex items-center justify-center">

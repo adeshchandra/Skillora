@@ -279,7 +279,7 @@ export const SkillRequestModal: React.FC<SkillRequestModalProps> = ({
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[10px) font-bold text-text-muted pl-1">Contact Information</label>
+                  <label className="text-[10px] font-bold text-text-muted pl-1">Contact Information</label>
                   <div className="relative">
                     <MessageCircle size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" />
                     <input 

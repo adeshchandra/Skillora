@@ -33,6 +33,11 @@ export interface Course {
   daoGroupLink?: string;
   createdAt: any;
   tags?: string[];
+  itemType?: 'course' | 'book';
+  bookOrigin?: 'affiliate' | 'own';
+  price?: number;
+  originalPrice?: number;
+  description?: string;
 }
 
 export interface DAOGroup {

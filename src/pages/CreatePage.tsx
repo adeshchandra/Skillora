@@ -43,8 +43,12 @@ const SuggestionBox = ({ title, icon: Icon, description, steps, onDismiss, type 
 export default function CreatePage() {
   const { user, credits } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'course' | 'dao'>('course');
+  const [activeTab, setActiveTab] = useState<'course' | 'dao' | 'book'>('course');
+  const [bookOrigin, setBookOrigin] = useState<'affiliate' | 'own'>('affiliate');
+  const [bookType, setBookType] = useState<'free' | 'paid'>('paid');
   const [loading, setLoading] = useState(false);
+  const [previewing, setPreviewing] = useState(false);
+  const [previewData, setPreviewData] = useState<{ title: string; image: string; description?: string } | null>(null);
 
   // Suggestions state
   const [showImgSuggestion, setShowImgSuggestion] = useState(() => !localStorage.getItem('hideImgSuggestion'));
@@ -52,6 +56,8 @@ export default function CreatePage() {
 
   // Forms...
   const [courseTitle, setCourseTitle] = useState('');
+  const [courseDescription, setCourseDescription] = useState('');
+  const [coursePrice, setCoursePrice] = useState<number | undefined>();
   const [courseLink, setCourseLink] = useState('');
   const [courseThumb, setCourseThumb] = useState('');
   const [daoGroupLink, setDaoGroupLink] = useState('');
@@ -133,6 +139,7 @@ export default function CreatePage() {
     try {
       await addDoc(collection(db, 'courses'), {
         title: courseTitle,
+        description: courseDescription,
         link: courseLink,
         daoGroupLink: daoGroupLink,
         thumbnail: courseThumb || `https://picsum.photos/seed/${Math.random()}/800/450`,
@@ -142,6 +149,7 @@ export default function CreatePage() {
         rating: 0,
         reviewCount: 0,
         tags: selectedTags,
+        price: coursePrice || 0,
         createdAt: serverTimestamp(),
       });
       const userRef = doc(db, 'users', user.uid);
@@ -154,6 +162,90 @@ export default function CreatePage() {
     } catch (err) { 
       console.error(err); 
       setLoading(false);
+    }
+  };
+
+  const handleCreateBook = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user || loading) return;
+    setLoading(true);
+    try {
+      const finalPrice = bookOrigin === 'own' && bookType === 'free' ? 0 : coursePrice;
+      
+      await addDoc(collection(db, 'courses'), {
+        title: courseTitle || previewData?.title || 'Untitled Book',
+        description: courseDescription || previewData?.description || '',
+        link: courseLink,
+        thumbnail: courseThumb || previewData?.image || `https://picsum.photos/seed/book-${Math.random()}/400/600`,
+        teacherId: user.uid,
+        teacherName: user.displayName,
+        teacherPhoto: user.photoURL,
+        rating: 0,
+        reviewCount: 0,
+        tags: selectedTags,
+        itemType: 'book',
+        bookOrigin,
+        price: finalPrice || (bookOrigin === 'affiliate' ? Math.floor(Math.random() * 500) + 100 : 0), 
+        originalPrice: (finalPrice ? Math.floor(finalPrice * 1.5) : (bookOrigin === 'affiliate' ? Math.floor(Math.random() * 1000) + 500 : 0)),
+        createdAt: serverTimestamp(),
+      });
+      const userRef = doc(db, 'users', user.uid);
+      await updateDoc(userRef, { credits: increment(5) });
+      
+      setSuccessMsg('Book listed successfully!');
+      setTargetPath('/');
+      setShowSuccess(true);
+      setTimeout(() => navigate('/'), 2000);
+    } catch (err) { 
+      console.error(err); 
+      setLoading(false);
+    }
+  };
+
+  const fetchLinkPreview = async (url: string) => {
+    if (!url || !url.startsWith('http')) return;
+    setPreviewing(true);
+    setPreviewData(null);
+    try {
+      // Try Microlink API for real rich preview data
+      const response = await fetch(`https://api.microlink.io?url=${encodeURIComponent(url)}`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.status === 'success' && data.data) {
+          const info = data.data;
+          const refinedData = {
+            title: info.title || 'Untitled Resource',
+            image: info.image?.url || info.logo?.url || `https://picsum.photos/seed/${Math.random()}/800/450`,
+            description: info.description || 'No description available for this link.',
+          };
+
+          setPreviewData(refinedData);
+          setCourseTitle(refinedData.title);
+          setCourseDescription(refinedData.description);
+          setCourseThumb(refinedData.image);
+          setPreviewing(false);
+          return;
+        }
+      }
+
+      // Fallback if API fails
+      let domain = 'Website';
+      try { domain = new URL(url).hostname; } catch(e){}
+      
+      const genericData = { 
+          title: 'Instant Preview', 
+          image: `https://picsum.photos/seed/${domain}/800/450`,
+          description: `Fetched content from ${domain}. You can edit the details below.`
+      };
+      setPreviewData(genericData);
+      setCourseTitle(genericData.title);
+      setCourseDescription(genericData.description);
+      setCourseThumb(genericData.image);
+    } catch (err) {
+      console.error("Preview error:", err);
+    } finally {
+      setPreviewing(false);
     }
   };
 
@@ -182,7 +274,7 @@ export default function CreatePage() {
       // Update user profile
       const userRef = doc(db, 'users', user.uid);
       await updateDoc(userRef, { 
-        credits: increment(0) // No longer adding to joinedGroups
+        credits: increment(0)
       });
 
       setSuccessMsg(`DAO Group "${daoName}" created successfully!`);
@@ -215,6 +307,14 @@ export default function CreatePage() {
                 Course
             </button>
             <button 
+                onClick={() => setActiveTab('book')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm ${
+                    activeTab === 'book' ? 'bg-text-main text-bg-main' : 'bg-hover-bg text-text-main group hover:bg-border-main'
+                }`}
+            >
+                Book
+            </button>
+            <button 
                 onClick={() => setActiveTab('dao')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm ${
                     activeTab === 'dao' ? 'bg-text-main text-bg-main' : 'bg-hover-bg text-text-main group hover:bg-border-main'
@@ -228,8 +328,29 @@ export default function CreatePage() {
       <div className="p-4 overflow-y-auto pb-20 space-y-6">
         {/* Onboarding Suggestions */}
         <AnimatePresence>
-            {showImgSuggestion && (
+            {activeTab === 'book' ? (
                 <SuggestionBox 
+                    key="suggest-book"
+                    title={bookOrigin === 'affiliate' ? "Affiliate Link Guide" : "Own Book Listing Guide"}
+                    icon={bookOrigin === 'affiliate' ? LinkIcon : Wand2}
+                    description={bookOrigin === 'affiliate' 
+                        ? "Listing a book from a marketplace. We'll try to fetch details automatically."
+                        : "Listing your own published book. Higher quality assets convert better."
+                    }
+                    steps={bookOrigin === 'affiliate' ? [
+                        "Paste link from Amazon, Rokomari, etc.",
+                        "We'll fetch title, image & description.",
+                        "You can still manually upload a better cover if needed."
+                    ] : [
+                        "Upload high-res front cover (3:4 aspect).",
+                        "Provide direct drive or shop link.",
+                        "Add detailed summary to attract learners."
+                    ]}
+                    onDismiss={() => dismissSuggestion('hideImgSuggestion')}
+                />
+            ) : showImgSuggestion && (
+                <SuggestionBox 
+                    key="suggest-course"
                     title="Optimized Uploads"
                     icon={Wand2}
                     description="Upload high-quality covers. We'll automatically compress them to keep Skillora fast."
@@ -243,6 +364,7 @@ export default function CreatePage() {
             )}
             {activeTab === 'dao' && showDaoSuggestion && (
                 <SuggestionBox 
+                    key="suggest-dao"
                     title="How to run a DAO Goal"
                     icon={Users}
                     description="Commit to a group goal. Members stake points to ensure participation."
@@ -258,7 +380,7 @@ export default function CreatePage() {
 
         <AnimatePresence mode="wait">
             {activeTab === 'course' ? (
-              <motion.form 
+                  <motion.form 
                 key="course"
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                 onSubmit={handleCreateCourse} 
@@ -266,7 +388,7 @@ export default function CreatePage() {
               >
                 <div className="space-y-4">
                     <div className="space-y-1">
-                        <label className="text-xs font-bold text-text-main pl-1 uppercase tracking-wider">Course Thumbnail</label>
+                        <label className="text-xs font-bold text-text-main pl-1 uppercase tracking-wider">Thumbnail</label>
                         <div className="relative group">
                             <label className="cursor-pointer block">
                                 <input 
@@ -297,7 +419,27 @@ export default function CreatePage() {
                     </div>
 
                     <div className="space-y-1">
-                        <label className="text-xs font-bold text-text-main pl-1 uppercase tracking-wider">Course Title</label>
+                        <label className="text-xs font-bold text-text-main pl-1 uppercase tracking-wider">Link URL</label>
+                        <div className="relative">
+                            <input
+                              required type="url" value={courseLink}
+                              onChange={(e) => {
+                                setCourseLink(e.target.value);
+                                fetchLinkPreview(e.target.value);
+                              }}
+                              placeholder="YouTube, Facebook, etc."
+                              className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-theme-card focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold pr-10"
+                            />
+                            {courseLink && (
+                                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-primary">
+                                    <LinkIcon size={18} />
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="space-y-1">
+                        <label className="text-xs font-bold text-text-main pl-1 uppercase tracking-wider">Title</label>
                         <input
                           required type="text" value={courseTitle}
                           onChange={(e) => setCourseTitle(e.target.value)}
@@ -305,23 +447,28 @@ export default function CreatePage() {
                           className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-theme-card focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold"
                         />
                     </div>
+
                     <div className="space-y-1">
-                        <label className="text-xs font-bold text-text-main pl-1 uppercase tracking-wider">Link URL</label>
-                        <div className="relative">
-                            <input
-                              required type="url" value={courseLink}
-                              onChange={(e) => setCourseLink(e.target.value)}
-                              placeholder="YouTube, Facebook, etc."
-                              className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-theme-card focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold pr-10"
-                            />
-                            {courseLink && (
-                                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-[10px] bg-theme-card px-2 py-0.5 rounded border border-border-main/20 shadow-sm transition-colors">
-                                    <LinkIcon size={10} className="text-primary" />
-                                    <span className="font-bold text-text-muted">{reduceURL(courseLink)}</span>
-                                </div>
-                            )}
-                        </div>
+                        <label className="text-xs font-bold text-text-main pl-1 uppercase tracking-wider">Description</label>
+                        <textarea
+                          value={courseDescription}
+                          onChange={(e) => setCourseDescription(e.target.value)}
+                          placeholder="What will students learn?"
+                          rows={3}
+                          className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-theme-card focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold resize-none"
+                        />
                     </div>
+
+                    <div className="space-y-1">
+                        <label className="text-xs font-bold text-text-main pl-1 uppercase tracking-wider">Price (TK) - Optional</label>
+                        <input
+                          type="number" value={coursePrice || ''}
+                          onChange={(e) => setCoursePrice(parseFloat(e.target.value) || undefined)}
+                          placeholder="e.g. 500 (Leave empty for free)"
+                          className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-theme-card focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold"
+                        />
+                    </div>
+
                     <div className="space-y-1">
                         <label className="text-xs font-bold text-text-main pl-1 tracking-wide">DAO Group Link (Optional)</label>
                         <input
@@ -353,7 +500,6 @@ export default function CreatePage() {
                         </button>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                        {/* Selected Custom Tags first */}
                         {Array.from(new Set(selectedTags.filter(t => !POPULAR_SKILLS.includes(t)))).map(tag => (
                             <button
                                 key={`course-tag-${tag}`}
@@ -370,7 +516,7 @@ export default function CreatePage() {
                             const isSelected = selectedTags.includes(skill);
                             return (
                                 <button
-                                    key={skill}
+                                    key={`course-pop-${skill}`}
                                     type="button"
                                     onClick={() => toggleTag(skill)}
                                     className={`px-3 py-1.5 rounded-full text-[11px] font-bold transition-all flex items-center gap-1.5 border active:scale-95 ${
@@ -397,6 +543,190 @@ export default function CreatePage() {
                   className="w-full py-4 bg-primary text-bg-main rounded-2xl font-black text-sm hover:bg-primary-dark transition-all disabled:opacity-50 border-2 border-primary-dark active:scale-[0.98] shadow-lg"
                 >
                   {loading ? 'Publishing...' : 'Publish Course'}
+                </button>
+              </motion.form>
+            ) : activeTab === 'book' ? (
+              <motion.form 
+                key="book"
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                onSubmit={handleCreateBook} 
+                className="space-y-6"
+              >
+                <div className="space-y-4">
+        {/* Origin Selection */}
+                    <div className="flex flex-col gap-3">
+                        <div className="p-1 bg-hover-bg rounded-xl flex gap-1">
+                            <button 
+                                type="button"
+                                onClick={() => setBookOrigin('affiliate')}
+                                className={`flex-1 py-3 text-[11px] font-black uppercase tracking-wider rounded-lg transition-all flex items-center justify-center gap-2 ${
+                                    bookOrigin === 'affiliate' ? 'bg-bg-main text-primary shadow-sm' : 'text-text-muted hover:text-text-main'
+                                }`}
+                            >
+                                <LinkIcon size={12} />
+                                Affiliate Link
+                            </button>
+                            <button 
+                                type="button"
+                                onClick={() => setBookOrigin('own')}
+                                className={`flex-1 py-3 text-[11px] font-black uppercase tracking-wider rounded-lg transition-all flex items-center justify-center gap-2 ${
+                                    bookOrigin === 'own' ? 'bg-bg-main text-primary shadow-sm' : 'text-text-muted hover:text-text-main'
+                                }`}
+                            >
+                                <Sparkles size={12} />
+                                My Own Book
+                            </button>
+                        </div>
+
+                        {bookOrigin === 'own' && (
+                            <div className="flex gap-2 p-1 bg-hover-bg/50 rounded-xl">
+                                <button 
+                                    type="button"
+                                    onClick={() => setBookType('free')}
+                                    className={`flex-1 py-2 text-[10px] font-bold rounded-lg transition-all ${
+                                        bookType === 'free' ? 'bg-white text-text-main shadow-sm' : 'text-text-muted'
+                                    }`}
+                                >
+                                    Free Book
+                                </button>
+                                <button 
+                                    type="button"
+                                    onClick={() => setBookType('paid')}
+                                    className={`flex-1 py-2 text-[10px] font-bold rounded-lg transition-all ${
+                                        bookType === 'paid' ? 'bg-white text-text-main shadow-sm' : 'text-text-muted'
+                                    }`}
+                                >
+                                    Paid (In-Inbox)
+                                </button>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="space-y-1">
+                        <label className="text-xs font-bold text-text-main pl-1 uppercase tracking-wider">Book Preview</label>
+                        <div className="relative group/book">
+                            <label className="cursor-pointer block">
+                                <input 
+                                    type="file" 
+                                    accept="image/*" 
+                                    className="hidden" 
+                                    onChange={(e) => handleImageSelect(e, 'course')}
+                                />
+                                <div className="aspect-[3/4] max-w-[200px] mx-auto bg-hover-bg rounded-2xl border-2 border-dashed border-border-main/50 flex flex-col items-center justify-center gap-2 overflow-hidden hover:border-primary/50 transition-all shadow-sm">
+                                    {courseThumb ? (
+                                        <img src={courseThumb} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                                    ) : (
+                                        <>
+                                            <div className="w-10 h-10 bg-theme-card rounded-xl flex items-center justify-center text-text-muted">
+                                                <ImageIcon size={20} />
+                                            </div>
+                                            <p className="text-[11px] font-bold text-text-muted px-4 text-center">
+                                                {bookOrigin === 'affiliate' 
+                                                    ? 'Thumbnail will fetch from link or tap to upload' 
+                                                    : 'Tap to upload high-res front cover (3:4)'}
+                                            </p>
+                                        </>
+                                    )}
+                                    {previewing && (
+                                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-sm">
+                                            <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                        </div>
+                                    )}
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div className="space-y-1">
+                        <label className="text-xs font-bold text-text-main pl-1 uppercase tracking-wider">Shop Link</label>
+                        <div className="relative">
+                            <input
+                              required type="url" value={courseLink}
+                              onChange={(e) => {
+                                setCourseLink(e.target.value);
+                                fetchLinkPreview(e.target.value);
+                              }}
+                              placeholder="Paste Amazon, Rokomari or PDF link..."
+                              className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-theme-card focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold pr-12"
+                            />
+                            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-primary">
+                                <LinkIcon size={18} />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="space-y-1">
+                        <label className="text-xs font-bold text-text-main pl-1 uppercase tracking-wider">Book Title</label>
+                        <input
+                          required type="text" value={courseTitle}
+                          onChange={(e) => setCourseTitle(e.target.value)}
+                          placeholder="e.g. Clean Code"
+                          className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-theme-card focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold"
+                        />
+                    </div>
+
+                    <div className="space-y-1">
+                        <label className="text-xs font-bold text-text-main pl-1 uppercase tracking-wider">Description</label>
+                        <textarea
+                          value={courseDescription}
+                          onChange={(e) => setCourseDescription(e.target.value)}
+                          placeholder="Short summary of the book..."
+                          rows={3}
+                          className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-theme-card focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold resize-none"
+                        />
+                    </div>
+
+                    <div className="space-y-1">
+                        <label className="text-xs font-bold text-text-main pl-1 uppercase tracking-wider">Price (TK)</label>
+                        <input
+                          type="number" value={coursePrice || ''}
+                          onChange={(e) => setCoursePrice(parseFloat(e.target.value))}
+                          placeholder="0.00"
+                          className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-theme-card focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold"
+                        />
+                    </div>
+
+                    <div className="space-y-3 pt-2">
+                        <label className="text-xs font-bold text-text-main pl-1 uppercase tracking-wider">Target Skills</label>
+                        <div className="flex flex-wrap gap-2">
+                            {POPULAR_SKILLS.slice(0, 8).map(skill => {
+                                const isSelected = selectedTags.includes(skill);
+                                return (
+                                    <button
+                                        key={`book-${skill}`}
+                                        type="button"
+                                        onClick={() => toggleTag(skill)}
+                                        className={`px-3 py-1.5 rounded-full text-[11px] font-bold transition-all border active:scale-95 ${
+                                            isSelected 
+                                                ? 'bg-primary text-bg-main border-primary shadow-sm' 
+                                                : 'bg-hover-bg text-text-main border-border-main/50'
+                                        }`}
+                                    >
+                                        {skill}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10 flex items-center gap-3">
+                    <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
+                        <Sparkles size={18} />
+                    </div>
+                    <p className="text-[13px] font-bold text-text-main tracking-tight">Listing a book helps others learn shared skills.</p>
+                </div>
+
+                <button
+                  disabled={loading || previewing}
+                  className="w-full py-4 bg-primary text-bg-main rounded-2xl font-black text-sm hover:bg-primary-dark transition-all disabled:opacity-50 border-2 border-primary-dark active:scale-[0.98] shadow-lg flex items-center justify-center gap-2"
+                >
+                  {loading ? 'Publishing...' : (
+                    <>
+                        <Send size={18} />
+                        <span>List Book Now</span>
+                    </>
+                  )}
                 </button>
               </motion.form>
             ) : (
@@ -544,7 +874,7 @@ export default function CreatePage() {
                             const isSelected = selectedTags.includes(skill);
                             return (
                                 <button
-                                    key={skill}
+                                    key={`dao-pop-${skill}`}
                                     type="button"
                                     onClick={() => toggleTag(skill)}
                                     className={`px-3 py-1.5 rounded-full text-[11px] font-bold transition-all flex items-center gap-1.5 border active:scale-95 ${

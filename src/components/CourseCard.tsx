@@ -76,13 +76,15 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
     if (!hasVisited) {
       const userRef = doc(db, 'users', user.uid);
       await updateDoc(userRef, { credits: increment(-10) });
+      
+      await setDoc(visitRef, {
+        userId: user.uid,
+        courseId: course.id,
+        visitedAt: new Date().toISOString(),
+      });
+      setHasVisited(true);
     }
-    await setDoc(visitRef, {
-      userId: user.uid,
-      courseId: course.id,
-      visitedAt: new Date().toISOString(),
-    });
-    setHasVisited(true);
+    
     // Only open external link if it's a DAO link or not a video we can preview
     if (overrideLink || !videoInfo) {
       window.open(overrideLink || course.link, '_blank');
@@ -222,13 +224,38 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
             >
               {course.title}
             </h3>
-            <button 
-              onClick={(e) => { e.stopPropagation(); window.open(course.link, '_blank'); }}
-              className="mt-0.5 p-1 text-text-muted hover:text-primary transition-colors shrink-0"
-              title="More options"
-            >
-              <MoreVertical size={16} />
-            </button>
+            <div className="relative group/menu">
+              <button 
+                onClick={(e) => { 
+                  e.stopPropagation(); 
+                  // Simple copy to clipboard fallack instead of menu for now, or just open link
+                  navigator.clipboard.writeText(course.link);
+                }}
+                className="mt-0.5 p-1 text-text-muted hover:text-primary transition-colors shrink-0"
+                title="Copy Link"
+              >
+                <MoreVertical size={16} />
+              </button>
+              <div className="absolute right-0 top-full mt-1 bg-bg-main border border-border-main rounded-lg shadow-xl py-1 z-[60] opacity-0 group-hover/menu:opacity-100 pointer-events-none group-hover/menu:pointer-events-auto transition-opacity min-w-[120px]">
+                <button 
+                  onClick={(e) => { e.stopPropagation(); window.open(course.link, '_blank'); }}
+                  className="w-full text-left px-3 py-1.5 text-[10px] font-bold text-text-main hover:bg-hover-bg flex items-center gap-2"
+                >
+                  <ExternalLink size={10} />
+                  Open Link
+                </button>
+                <button 
+                  onClick={(e) => { 
+                    e.stopPropagation(); 
+                    navigator.clipboard.writeText(window.location.origin + `/user/${course.teacherId}`);
+                  }}
+                  className="w-full text-left px-3 py-1.5 text-[10px] font-bold text-text-main hover:bg-hover-bg flex items-center gap-2"
+                >
+                  <UserIcon size={10} />
+                  View Teacher
+                </button>
+              </div>
+            </div>
           </div>
           <div className="text-[12px] text-text-muted font-medium flex flex-wrap items-center gap-x-1 gap-y-0.5 transition-colors">
             {!hideTeacher && (
@@ -249,9 +276,15 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
               <span>{displayRating.toFixed(1)}</span>
             </span>
           </div>
-
-          <div className="mt-4 flex items-center gap-2">
-            {!hasVisited ? (
+          {course.description && (
+            <p className="mt-2 text-[12px] text-text-muted leading-snug line-clamp-2 italic pr-4">
+              {course.description}
+            </p>
+          )}
+          
+          <div className="mt-4 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+                {!hasVisited ? (
               <>
                 <button 
                   onClick={() => handleVisit()}
@@ -320,6 +353,13 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
                 )}
               </div>
             )}
+            </div>
+
+            {course.price ? (
+                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500/10 rounded-xl border border-green-500/20">
+                    <span className="text-[11px] font-black text-green-600">TK {course.price}</span>
+                </div>
+            ) : null}
           </div>
         </div>
       </div>

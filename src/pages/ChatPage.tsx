@@ -278,6 +278,14 @@ export default function ChatPage() {
     }, [location.search]);
 
     useEffect(() => {
+        if (location.state?.initialMessage) {
+            setNewMessage(location.state.initialMessage);
+            // Clear state so it doesn't reappear
+            window.history.replaceState({}, document.title);
+        }
+    }, [location.state]);
+
+    useEffect(() => {
         if (!conversationId || !user) return;
 
         // Fetch conversation info
