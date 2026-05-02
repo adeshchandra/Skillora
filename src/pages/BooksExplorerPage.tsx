@@ -12,8 +12,9 @@ export const BooksExplorerPage = () => {
     const [books, setBooks] = useState<Course[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
-    const [originFilter, setOriginFilter] = useState<'all' | 'affiliate' | 'own'>('all');
-    const [typeFilter, setTypeFilter] = useState<'all' | 'free' | 'paid'>('all');
+    const [selectedOrigins, setSelectedOrigins] = useState<string[]>([]);
+    const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+    const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
     useEffect(() => {
         const q = query(
@@ -30,19 +31,48 @@ export const BooksExplorerPage = () => {
         return () => unsubscribe();
     }, []);
 
+    const toggleOrigin = (origin: string) => {
+        setSelectedOrigins(prev => 
+            prev.includes(origin) ? prev.filter(o => o !== origin) : [...prev, origin]
+        );
+    };
+
+    const toggleType = (type: string) => {
+        setSelectedTypes(prev => 
+            prev.includes(type) ? prev.filter(t => t !== type) : [...prev, type]
+        );
+    };
+
+    const toggleTag = (tag: string) => {
+        setSelectedTags(prev => 
+            prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+        );
+    };
+
+    const resetFilters = () => {
+        setSelectedOrigins([]);
+        setSelectedTypes([]);
+        setSelectedTags([]);
+        setSearchQuery('');
+    };
+
     const filteredBooks = books.filter(book => {
         const matchesSearch = book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                             book.teacherName.toLowerCase().includes(searchQuery.toLowerCase());
+                             book.teacherName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                             (book.tags && book.tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase())));
         
-        const matchesOrigin = originFilter === 'all' || book.bookOrigin === originFilter;
+        const matchesOrigin = selectedOrigins.length === 0 || selectedOrigins.includes(book.bookOrigin || '');
         
         const isPaid = (book.price || 0) > 0;
-        const matchesType = typeFilter === 'all' || 
-                           (typeFilter === 'free' && !isPaid) ||
-                           (typeFilter === 'paid' && isPaid);
+        const bookType = isPaid ? 'paid' : 'free';
+        const matchesType = selectedTypes.length === 0 || selectedTypes.includes(bookType);
 
-        return matchesSearch && matchesOrigin && matchesType;
+        const matchesTags = selectedTags.length === 0 || (book.tags && selectedTags.every(t => book.tags?.includes(t)));
+
+        return matchesSearch && matchesOrigin && matchesType && matchesTags;
     });
+
+    const allTags = Array.from(new Set(books.flatMap(b => b.tags || []))).sort();
 
     return (
         <div className="min-h-screen bg-bg-main pb-24">
@@ -71,33 +101,47 @@ export const BooksExplorerPage = () => {
                 {/* Filters */}
                 <div className="px-4 pb-3 flex gap-2 overflow-x-auto no-scrollbar">
                     <FilterButton 
-                        active={originFilter === 'all'} 
-                        onClick={() => setOriginFilter('all')} 
+                        active={selectedOrigins.length === 0 && selectedTypes.length === 0 && selectedTags.length === 0} 
+                        onClick={resetFilters} 
                         label="All Books" 
                     />
                     <FilterButton 
-                        active={originFilter === 'affiliate'} 
-                        onClick={() => setOriginFilter('affiliate')} 
+                        active={selectedOrigins.includes('affiliate')} 
+                        onClick={() => toggleOrigin('affiliate')} 
                         label="Marketplace" 
                         icon={<Link2 size={12} />}
                     />
                     <FilterButton 
-                        active={originFilter === 'own'} 
-                        onClick={() => setOriginFilter('own')} 
+                        active={selectedOrigins.includes('own')} 
+                        onClick={() => toggleOrigin('own')} 
                         label="Own Works" 
                         icon={<Sparkles size={12} />}
                     />
                     <div className="w-[1px] h-6 bg-border-main self-center mx-1" />
                     <FilterButton 
-                        active={typeFilter === 'free'} 
-                        onClick={() => setTypeFilter('free')} 
+                        active={selectedTypes.includes('free')} 
+                        onClick={() => toggleType('free')} 
                         label="Free" 
                     />
                     <FilterButton 
-                        active={typeFilter === 'paid'} 
-                        onClick={() => setTypeFilter('paid')} 
+                        active={selectedTypes.includes('paid')} 
+                        onClick={() => toggleType('paid')} 
                         label="Paid" 
                     />
+                    
+                    {allTags.length > 0 && (
+                        <>
+                            <div className="w-[1px] h-6 bg-border-main self-center mx-1" />
+                            {allTags.map(tag => (
+                                <FilterButton 
+                                    key={tag}
+                                    active={selectedTags.includes(tag)} 
+                                    onClick={() => toggleTag(tag)} 
+                                    label={tag} 
+                                />
+                            ))}
+                        </>
+                    )}
                 </div>
             </div>
 
@@ -132,9 +176,15 @@ export const BooksExplorerPage = () => {
                             <BookOpen size={32} />
                         </div>
                         <h3 className="font-bold text-text-main mb-1 tracking-tight">No books matching filters</h3>
-                        <p className="text-xs font-medium text-text-muted leading-relaxed">
+                        <p className="text-xs font-medium text-text-muted leading-relaxed mb-6">
                             Try adjusting your search or filters to find what you're looking for.
                         </p>
+                        <button 
+                            onClick={resetFilters}
+                            className="px-6 py-2 bg-primary text-bg-main rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-primary/20 active:scale-95 transition-transform"
+                        >
+                            Clear All Filters
+                        </button>
                     </div>
                 )}
             </div>

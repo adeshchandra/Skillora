@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { handleFirestoreError, OperationType } from '../lib/firestore-utils';
 import { UserProfile, Session, LearningRequest, Course, DAOGroup, Quiz } from '../types';
 import { useNavigate } from 'react-router-dom';
-import { Settings, CreditCard, BookOpen, GraduationCap, MapPin, Layers, Check, X, RefreshCw, LogOut, ExternalLink, Calendar, Shield, Star, Plus, Users, User as UserIcon, Zap, MessageCircle, Clock, Video, Handshake, ChevronRight, AlertCircle, Sparkles, Save, Trash2, BookOpenCheck, Camera, Image as ImageIcon, Crop, MoreVertical, Share2, Edit, Menu, Copy } from 'lucide-react';
+import { Settings, CreditCard, BookOpen, GraduationCap, MapPin, Layers, Check, X, RefreshCw, LogOut, ExternalLink, Calendar, Shield, Star, Plus, Users, User as UserIcon, Zap, MessageCircle, Clock, Video, Handshake, ChevronRight, AlertCircle, Sparkles, Save, Trash2, BookOpenCheck, Camera, Image as ImageIcon, Crop, MoreVertical, Share2, Edit, Menu, Copy, Link2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import Cropper from 'react-easy-crop';
 import { Area } from 'react-easy-crop';
@@ -462,6 +462,8 @@ export default function ProfilePage() {
   const [learnerSessions, setLearnerSessions] = useState<Session[]>([]);
   const [teacherSessions, setTeacherSessions] = useState<Session[]>([]);
   const [myCourses, setMyCourses] = useState<Course[]>([]);
+  const [myOwnBooks, setMyOwnBooks] = useState<Course[]>([]);
+  const [myMarketplaceBooks, setMyMarketplaceBooks] = useState<Course[]>([]);
   const [myDAOGroups, setMyDAOGroups] = useState<DAOGroup[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [joinedGroupStats, setJoinedGroupStats] = useState<any[]>([]);
@@ -656,7 +658,12 @@ export default function ProfilePage() {
 
         setLearnerSessions(learnerSnap.docs.map(d => ({ id: d.id, ...d.data() } as Session)));
         setTeacherSessions(teacherSnap.docs.map(d => ({ id: d.id, ...d.data() } as Session)));
-        setMyCourses(coursesSnap.docs.map(d => ({ id: d.id, ...d.data() } as Course)));
+        
+        const allItems = coursesSnap.docs.map(d => ({ id: d.id, ...d.data() } as Course));
+        setMyCourses(allItems.filter(i => i.itemType !== 'book'));
+        setMyOwnBooks(allItems.filter(i => i.itemType === 'book' && (i.bookOrigin === 'own' || !i.bookOrigin)));
+        setMyMarketplaceBooks(allItems.filter(i => i.itemType === 'book' && i.bookOrigin === 'affiliate'));
+        
         setMyDAOGroups(daoSnap.docs.map(d => ({ id: d.id, ...d.data() } as DAOGroup)));
         setPendingRequests(requestsSnap.docs.map(d => ({ id: d.id, ...d.data() } as LearningRequest)));
     } catch (err) {
@@ -1231,7 +1238,12 @@ export default function ProfilePage() {
   }
 
   // Calculate dynamic reputation
-  const allRatings = [...myCourses.map(c => c.rating || 0), ...myDAOGroups.map(d => d.rating || 0)];
+  const allRatings = [
+    ...myCourses.map(c => c.rating || 0), 
+    ...myOwnBooks.map(c => c.rating || 0),
+    ...myMarketplaceBooks.map(c => c.rating || 0),
+    ...myDAOGroups.map(d => d.rating || 0)
+  ];
   const avgRating = allRatings.length > 0 ? allRatings.reduce((a, b) => a + b, 0) / allRatings.length : 0;
 
   const getReputation = (rating: number) => {
@@ -1423,24 +1435,24 @@ export default function ProfilePage() {
                     <p className="text-[11px] text-text-muted font-bold px-12">You haven't published any courses yet.</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-2 gap-3">
+                <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4 snap-x">
                     {myCourses.map((course, idx) => (
-                        <div key={`my-course-${course.id}-${idx}`} className="bg-theme-card rounded-2xl border border-border-main overflow-hidden group/card relative shadow-sm hover:border-primary/20 transition-all">
+                        <div key={`my-course-${course.id}-${idx}`} className="w-[280px] shrink-0 bg-theme-card rounded-3xl border border-border-main overflow-hidden group/card relative shadow-sm hover:border-primary/20 transition-all snap-start">
                             <div className="aspect-video relative overflow-hidden">
                                 <img src={course.thumbnail} className="w-full h-full object-cover transition-transform group-hover/card:scale-105" referrerPolicy="no-referrer" />
-                                <div className="absolute top-2 right-2 bg-black px-1.5 py-0.5 rounded text-[9px] font-bold text-bg-main flex items-center gap-1">
-                                    <Star size={8} fill="currentColor" /> {course.rating?.toFixed(1) || '0.0'}
+                                <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md px-2 py-1 rounded-xl text-[10px] font-bold text-bg-main flex items-center gap-1 border border-white/10">
+                                    <Star size={10} fill="currentColor" className="text-accent-gold" /> {course.rating?.toFixed(1) || '0.0'}
                                 </div>
                             </div>
-                            <div className="p-2.5 space-y-1 relative">
-                                <h4 className="text-[11px] font-bold text-text-main line-clamp-1 pr-4">{course.title}</h4>
+                            <div className="p-4 space-y-2 relative">
+                                <h4 className="text-sm font-bold text-text-main line-clamp-1 pr-6">{course.title}</h4>
                                 <div className="flex items-center justify-between">
-                                    <p className="text-[10px] font-bold text-text-muted">{course.reviewCount} reviews</p>
+                                    <p className="text-[10px] font-bold text-text-muted tracking-tight">{course.reviewCount} peer reviews</p>
                                     <button 
                                         onClick={(e) => { e.stopPropagation(); setActiveCourseMenu(activeCourseMenu === course.id ? null : course.id); }}
-                                        className="p-1 hover:bg-hover-bg rounded-lg text-text-muted transition-colors"
+                                        className="p-1.5 hover:bg-hover-bg rounded-xl text-text-muted transition-colors border border-transparent hover:border-border-main/50"
                                     >
-                                        <MoreVertical size={14} />
+                                        <MoreVertical size={16} />
                                     </button>
                                 </div>
                             </div>
@@ -1454,23 +1466,156 @@ export default function ProfilePage() {
                                             initial={{ opacity: 0, scale: 0.9, y: 5 }}
                                             animate={{ opacity: 1, scale: 1, y: 0 }}
                                             exit={{ opacity: 0, scale: 0.9, y: 5 }}
-                                            className="absolute right-2 bottom-10 w-32 bg-theme-card border-2 border-border-main rounded-xl shadow-2xl z-20 overflow-hidden transition-colors"
+                                            className="absolute right-4 bottom-12 w-40 bg-theme-card border-2 border-border-main rounded-2xl shadow-2xl z-20 overflow-hidden"
                                         >
                                             <button 
                                                 onClick={() => { setSelectedCourse(course); setShowCourseEdit(true); setActiveCourseMenu(null); }}
-                                                className="w-full flex items-center gap-2 px-3 py-2 text-[10px] font-bold text-text-main hover:bg-hover-bg transition-colors border-b border-border-main"
+                                                className="w-full flex items-center gap-3 px-4 py-3 text-[11px] font-bold text-text-main hover:bg-hover-bg transition-colors border-b border-border-main"
+                                            >
+                                                <Edit size={14} className="text-primary" /> Edit Course
+                                            </button>
+                                            <button 
+                                                onClick={() => handleShareCourse(course)}
+                                                className="w-full flex items-center gap-3 px-4 py-3 text-[11px] font-bold text-text-main hover:bg-hover-bg transition-colors border-b border-border-main"
+                                            >
+                                                <Share2 size={14} className="text-accent-gold" /> Share Course
+                                            </button>
+                                            <button 
+                                                onClick={() => handleDeleteCourse(course)}
+                                                className="w-full flex items-center gap-3 px-4 py-3 text-[11px] font-bold text-red-500 hover:bg-red-500/10 transition-colors"
+                                            >
+                                                <Trash2 size={14} /> Delete
+                                            </button>
+                                        </motion.div>
+                                    </>
+                                )}
+                            </AnimatePresence>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+
+        {/* My Own Books */}
+        <div className="space-y-4">
+            <h3 className="text-sm font-bold text-text-main flex items-center gap-2">
+                <Sparkles size={18} className="text-accent-gold" />
+                My Own Works (Books)
+            </h3>
+            {myOwnBooks.length === 0 ? (
+                <div className="py-10 bg-hover-bg/30 border-2 border-dashed border-border-main rounded-2xl text-center">
+                    <p className="text-[11px] text-text-muted font-bold px-12">No personal books published yet.</p>
+                </div>
+            ) : (
+                <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4 snap-x">
+                    {myOwnBooks.map((book, idx) => (
+                        <div key={`my-book-own-${book.id}-${idx}`} className="w-[180px] shrink-0 bg-theme-card rounded-2xl border border-border-main overflow-hidden group/card relative shadow-sm hover:border-primary/20 transition-all snap-start">
+                            <div className="aspect-[3/4] relative overflow-hidden">
+                                <img src={book.thumbnail} className="w-full h-full object-cover transition-transform group-hover/card:scale-105" referrerPolicy="no-referrer" />
+                                <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-md px-1.5 py-0.5 rounded-lg text-[9px] font-bold text-bg-main flex items-center gap-1 border border-white/10">
+                                    <Star size={8} fill="currentColor" className="text-accent-gold" /> {book.rating?.toFixed(1) || '0.0'}
+                                </div>
+                            </div>
+                            <div className="p-3 space-y-1 relative">
+                                <h4 className="text-[11px] font-bold text-text-main line-clamp-1 pr-4">{book.title}</h4>
+                                <div className="flex items-center justify-between">
+                                    <p className="text-[9px] font-bold text-text-muted">Own Work</p>
+                                    <button 
+                                        onClick={(e) => { e.stopPropagation(); setActiveCourseMenu(activeCourseMenu === book.id ? null : book.id); }}
+                                        className="p-1 hover:bg-hover-bg rounded-lg text-text-muted transition-colors"
+                                    >
+                                        <MoreVertical size={14} />
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <AnimatePresence>
+                                {activeCourseMenu === book.id && (
+                                    <>
+                                        <div className="fixed inset-0 z-10" onClick={() => setActiveCourseMenu(null)} />
+                                        <motion.div 
+                                            initial={{ opacity: 0, scale: 0.9, y: 5 }}
+                                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                                            exit={{ opacity: 0, scale: 0.9, y: 5 }}
+                                            className="absolute right-2 bottom-10 w-32 bg-theme-card border-2 border-border-main rounded-xl shadow-2xl z-20 overflow-hidden"
+                                        >
+                                            <button 
+                                                onClick={() => { setSelectedCourse(book); setShowCourseEdit(true); setActiveCourseMenu(null); }}
+                                                className="w-full flex items-center gap-2 px-3 py-2 text-[10px] font-bold text-text-main hover:bg-hover-bg"
                                             >
                                                 <Edit size={12} className="text-primary" /> Edit
                                             </button>
                                             <button 
-                                                onClick={() => handleShareCourse(course)}
-                                                className="w-full flex items-center gap-2 px-3 py-2 text-[10px] font-bold text-text-main hover:bg-hover-bg transition-colors border-b border-border-main"
+                                                onClick={() => handleDeleteCourse(book)}
+                                                className="w-full flex items-center gap-2 px-3 py-2 text-[10px] font-bold text-red-500 hover:bg-red-500/10"
                                             >
-                                                <Share2 size={12} className="text-accent-gold" /> Share
+                                                <Trash2 size={12} /> Delete
+                                            </button>
+                                        </motion.div>
+                                    </>
+                                )}
+                            </AnimatePresence>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+
+        {/* Marketplace Books */}
+        <div className="space-y-4">
+            <h3 className="text-sm font-bold text-text-main flex items-center gap-2">
+                <Link2 size={18} className="text-primary" />
+                Marketplace Books (Affiliate)
+            </h3>
+            {myMarketplaceBooks.length === 0 ? (
+                <div className="py-10 bg-hover-bg/30 border-2 border-dashed border-border-main rounded-2xl text-center">
+                    <p className="text-[11px] text-text-muted font-bold px-12">No affiliate books in your collection.</p>
+                </div>
+            ) : (
+                <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4 snap-x">
+                    {myMarketplaceBooks.map((book, idx) => (
+                        <div key={`my-book-aff-${book.id}-${idx}`} className="w-[180px] shrink-0 bg-theme-card rounded-2xl border border-border-main overflow-hidden group/card relative shadow-sm hover:border-primary/20 transition-all snap-start">
+                            <div className="aspect-[3/4] relative overflow-hidden">
+                                <img src={book.thumbnail} className="w-full h-full object-cover transition-transform group-hover/card:scale-105" referrerPolicy="no-referrer" />
+                                <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-md px-1.5 py-0.5 rounded-lg text-[9px] font-bold text-bg-main flex items-center gap-1 border border-white/10">
+                                    <Star size={8} fill="currentColor" className="text-accent-gold" /> {book.rating?.toFixed(1) || '0.0'}
+                                </div>
+                                <div className="absolute bottom-2 left-2 px-2 py-0.5 bg-green-500 text-bg-main text-[8px] font-black rounded-full uppercase tracking-widest shadow-lg">
+                                    Affiliate
+                                </div>
+                            </div>
+                            <div className="p-3 space-y-1 relative">
+                                <h4 className="text-[11px] font-bold text-text-main line-clamp-1 pr-4">{book.title}</h4>
+                                <div className="flex items-center justify-between">
+                                    <p className="text-[9px] font-bold text-green-600">TK {book.price}</p>
+                                    <button 
+                                        onClick={(e) => { e.stopPropagation(); setActiveCourseMenu(activeCourseMenu === book.id ? null : book.id); }}
+                                        className="p-1 hover:bg-hover-bg rounded-lg text-text-muted transition-colors"
+                                    >
+                                        <MoreVertical size={14} />
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <AnimatePresence>
+                                {activeCourseMenu === book.id && (
+                                    <>
+                                        <div className="fixed inset-0 z-10" onClick={() => setActiveCourseMenu(null)} />
+                                        <motion.div 
+                                            initial={{ opacity: 0, scale: 0.9, y: 5 }}
+                                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                                            exit={{ opacity: 0, scale: 0.9, y: 5 }}
+                                            className="absolute right-2 bottom-10 w-32 bg-theme-card border-2 border-border-main rounded-xl shadow-2xl z-20 overflow-hidden"
+                                        >
+                                            <button 
+                                                onClick={() => { setSelectedCourse(book); setShowCourseEdit(true); setActiveCourseMenu(null); }}
+                                                className="w-full flex items-center gap-2 px-3 py-2 text-[10px] font-bold text-text-main hover:bg-hover-bg"
+                                            >
+                                                <Edit size={12} className="text-primary" /> Edit
                                             </button>
                                             <button 
-                                                onClick={() => handleDeleteCourse(course)}
-                                                className="w-full flex items-center gap-2 px-3 py-2 text-[10px] font-bold text-red-500 hover:bg-red-500/10 transition-colors"
+                                                onClick={() => handleDeleteCourse(book)}
+                                                className="w-full flex items-center gap-2 px-3 py-2 text-[10px] font-bold text-red-500 hover:bg-red-500/10"
                                             >
                                                 <Trash2 size={12} /> Delete
                                             </button>
