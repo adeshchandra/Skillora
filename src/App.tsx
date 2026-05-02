@@ -13,6 +13,7 @@ import ProfilePage from './pages/ProfilePage';
 import MessagesPage from './pages/MessagesPage';
 import ChatPage from './pages/ChatPage';
 import SettingsPage from './pages/SettingsPage';
+import SubscriptionPage from './pages/SubscriptionPage';
 import TermsPage from './pages/TermsPage';
 import AboutPage from './pages/AboutPage';
 import PolicyPage from './pages/PolicyPage';
@@ -197,6 +198,7 @@ export default function App() {
                     <Route path="/profile" element={<ProfilePage />} />
                     <Route path="/messages" element={<MessagesPage />} />
                     <Route path="/chat/:conversationId" element={<ChatPage />} />
+                    <Route path="/subscription" element={<SubscriptionPage />} />
                     <Route path="/settings" element={<SettingsPage />} />
                     <Route path="/terms" element={<TermsPage />} />
                     <Route path="/about" element={<AboutPage />} />

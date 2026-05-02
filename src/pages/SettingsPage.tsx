@@ -16,9 +16,10 @@ import {
   Eye, 
   EyeOff,
   UserCircle,
-  RefreshCw
+  RefreshCw,
+  Crown
 } from 'lucide-react';
-import { doc, updateDoc, onSnapshot } from 'firebase/firestore';
+import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 
 const MenuItem = ({ icon: Icon, label, onClick, rightElement, description }: any) => (
@@ -47,14 +48,13 @@ const Section = ({ title, children }: any) => (
 );
 
 export default function SettingsPage() {
-  const { user, logout } = useAuth();
+  const { user, profile, logout } = useAuth();
   const navigate = useNavigate();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [resetSent, setResetSent] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { profile } = useAuth();
 
   const handlePrivacyToggle = async (key: string) => {
     if (!user) return;
@@ -76,17 +76,35 @@ export default function SettingsPage() {
         setResetSent(true);
     } catch (err) {
         console.error("Password reset error:", err);
-        alert("Failed to send reset email. Please try again.");
     } finally {
         setLoading(false);
     }
   };
 
-
   const { theme, toggleTheme } = useTheme();
   const isDarkMode = theme === 'dark';
 
   const menuItems = [
+    {
+      section: "Premium Features",
+      items: [
+        {
+          icon: Crown,
+          label: "Skillora Premium",
+          description: profile?.isPremium ? "Active Subscription" : "Unlock exclusive benefits",
+          onClick: () => navigate('/subscription'),
+          rightElement: (
+            <div className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
+              profile?.isPremium ? 'bg-green-500/10 text-green-500 border border-green-500/20' : 
+              profile?.subscriptionStatus === 'pending' ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20' :
+              'bg-primary/10 text-primary border border-primary/20'
+            }`}>
+              {profile?.isPremium ? 'Active' : profile?.subscriptionStatus === 'pending' ? 'Pending' : 'Upgrade'}
+            </div>
+          )
+        }
+      ]
+    },
     {
       section: "Display",
       items: [

@@ -19,7 +19,10 @@
         "onboardingCompleted": { "type": "boolean" },
         "bio": { "type": "string" },
         "location": { "type": "string" },
-        "privacy": { "type": "object" }
+        "privacy": { "type": "object" },
+        "isPremium": { "type": "boolean" },
+        "premiumExpiresAt": { "type": "string", "format": "date-time" },
+        "subscriptionStatus": { "type": "string", "enum": ["none", "pending", "active", "expired"] }
       },
       "required": ["uid", "displayName", "credits"]
     },
@@ -173,9 +176,31 @@
         "tagScores": { "type": "object" },
         "lastUpdated": { "type": "string", "format": "date-time" }
       }
+    },
+    "Subscription": {
+      "title": "Subscription Request",
+      "description": "Manual payment verification request for premium access",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "amount": { "type": "number" },
+        "packageType": { "type": "string", "enum": ["monthly", "yearly"] },
+        "paymentMethod": { "type": "string", "enum": ["bKash", "Nagad", "Rocket"] },
+        "transactionId": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "adminNotes": { "type": "string" }
+      },
+      "required": ["userId", "amount", "paymentMethod", "transactionId", "status"]
     }
   },
   "firestore": {
+    "/subscriptions/{subId}": {
+      "schema": "Subscription",
+      "description": "Manual subscription payment requests"
+    },
     "/users/{userId}": {
       "schema": "UserProfile",
       "description": "Collection of user profiles"

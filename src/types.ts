@@ -16,6 +16,25 @@ export interface UserProfile {
   };
   location?: string;
   darkMode?: boolean;
+  isPremium?: boolean;
+  premiumExpiresAt?: string;
+  subscriptionStatus?: 'none' | 'pending' | 'active' | 'expired';
+  trialStartedAt?: string;
+  currentPackage?: 'monthly' | 'yearly';
+}
+
+export interface Subscription {
+  id: string;
+  userId: string;
+  userName: string;
+  amount: number;
+  packageType: 'monthly' | 'yearly';
+  paymentMethod: 'bKash' | 'Nagad' | 'Rocket';
+  transactionId: string;
+  status: 'pending' | 'approved' | 'rejected';
+  createdAt: any;
+  updatedAt: any;
+  adminNotes?: string;
 }
 
 export interface Course {

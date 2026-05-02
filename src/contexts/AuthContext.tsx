@@ -131,7 +131,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           reviewCount: 0,
           createdAt: new Date().toISOString(),
           onboardingCompleted: false,
-          darkMode: false
+          darkMode: false,
+          isPremium: false,
+          premiumExpiresAt: null,
+          subscriptionStatus: 'none',
+          trialStartedAt: new Date().toISOString()
         });
       }
     } catch (error: any) {

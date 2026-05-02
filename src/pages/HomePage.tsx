@@ -8,6 +8,8 @@ import { Star, ExternalLink, Play, User as UserIcon, X, Search as SearchIcon, Re
 import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import { getUserInterests, rankItems } from '../lib/tracking';
+import { AlertCircle, ChevronRight as ChevronRightIcon } from 'lucide-react';
+import { LIMITS } from '../lib/firestore-utils';
 
 import CourseCard from '../components/CourseCard';
 import { BookCard } from '../components/BookCard';
@@ -191,6 +193,12 @@ export default function HomePage() {
     return matchesSearch && matchesTags;
   });
 
+  const { profile } = useAuth();
+  const trialExpiration = profile?.trialStartedAt ? new Date(new Date(profile.trialStartedAt).getTime() + LIMITS.FREE_TRIAL_DAYS * 24 * 60 * 60 * 1000) : null;
+  const isTrialActive = trialExpiration && trialExpiration > new Date();
+  const trialExpired = trialExpiration && trialExpiration <= new Date();
+  const daysRemaining = trialExpiration ? Math.ceil((trialExpiration.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : 0;
+
   const isVisible = scrollDir === 'up' || isAtTop;
 
   return (
@@ -200,6 +208,26 @@ export default function HomePage() {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
+      {/* Trial Banner */}
+      {!profile?.isPremium && (isTrialActive || trialExpired) && (
+        <motion.div 
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            className={`px-4 py-2 flex items-center justify-between gap-3 text-white transition-colors duration-500 overflow-hidden ${trialExpired ? 'bg-red-500' : daysRemaining <= 3 ? 'bg-amber-600' : 'bg-primary'}`}
+            onClick={() => navigate('/subscription')}
+        >
+            <div className="flex items-center gap-2">
+                <AlertCircle size={14} className="shrink-0" />
+                <p className="text-[10px] font-black uppercase tracking-widest leading-none">
+                    {trialExpired ? 'Trial Expired' : `${daysRemaining} days left in trial`}
+                </p>
+            </div>
+            <div className="flex items-center gap-1">
+                <span className="text-[9px] font-bold uppercase tracking-widest">{trialExpired ? 'Upgrade Now' : 'Go Premium'}</span>
+                <ChevronRightIcon size={12} />
+            </div>
+        </motion.div>
+      )}
       {/* Pull to refresh indicator */}
       {(pullDistance > 0 || refreshing) && (
         <div 

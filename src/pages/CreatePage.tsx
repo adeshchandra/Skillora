@@ -4,9 +4,10 @@ import { db } from '../lib/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { POPULAR_SKILLS } from '../constants';
-import { Video, Users, CheckCircle2, Image as ImageIcon, Link as LinkIcon, Send, X, Plus, Info, Sparkles, Wand2, ArrowRight, Lock } from 'lucide-react';
+import { Video, Users, CheckCircle2, Image as ImageIcon, Link as LinkIcon, Send, X, Plus, Info, Sparkles, Wand2, ArrowRight, Lock, Crown } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import imageCompression from 'browser-image-compression';
+import { checkSubscriptionAccess, LIMITS, getUserContentCounts } from '../lib/firestore-utils';
 
 const SuggestionBox = ({ title, icon: Icon, description, steps, onDismiss, type }: any) => {
     return (
@@ -41,9 +42,66 @@ const SuggestionBox = ({ title, icon: Icon, description, steps, onDismiss, type 
 };
 
 export default function CreatePage() {
-  const { user, credits } = useAuth();
+  const { user, profile, credits } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'course' | 'dao' | 'book'>('course');
+  const [counts, setCounts] = useState({ courses: 0, books: 0, daos: 0, requests: 0 });
+
+  useEffect(() => {
+    if (user) {
+      getUserContentCounts(user.uid).then(setCounts);
+    }
+  }, [user]);
+  
+  const subStatus = checkSubscriptionAccess(profile);
+
+  const getLimitExceeded = () => {
+    if (!profile?.isPremium) return false; // Trial users have no specific limit besides trial duration? 
+    // Actually, Trial users should probably have the base limit or none? 
+    // The prompt implies "after 15 days, the user will have to take the premium package".
+    // It also says "monthly package, the user will be able to get 100 credit points, 5 DAO group access...".
+    // If they are on a trial, they can use "all features".
+    
+    if (profile.isPremium) {
+        const pkgLimits = profile.currentPackage === 'yearly' ? LIMITS.YEARLY : LIMITS.MONTHLY;
+        if (activeTab === 'course' && counts.courses >= pkgLimits.COURSES) return true;
+        if (activeTab === 'book' && counts.books >= pkgLimits.BOOKS) return true;
+        if (activeTab === 'dao' && counts.daos >= pkgLimits.DAO_GROUPS) return true;
+    }
+    return false;
+  };
+
+  const limitExceeded = getLimitExceeded();
+
+  if (!subStatus.allowed && subStatus.reason === 'subscription_required') {
+    return (
+      <div className="flex-grow flex items-center justify-center p-6 bg-bg-main">
+        <motion.div 
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="max-w-sm w-full bg-theme-card rounded-[40px] border-2 border-black p-8 text-center space-y-6 shadow-2xl"
+        >
+          <div className="w-20 h-20 bg-primary/10 rounded-[32px] flex items-center justify-center mx-auto text-primary">
+            <Crown size={40} />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-black text-text-main tracking-tight uppercase">Premium Required</h2>
+            <p className="text-sm text-text-muted font-bold leading-relaxed px-4">
+              Your free trial has expired. To continue creating courses, books, and DAO groups, please upgrade to a Premium package.
+            </p>
+          </div>
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            onClick={() => navigate('/subscription')}
+            className="w-full py-5 bg-primary text-bg-main rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-primary/20"
+          >
+            Go Premium Now
+          </motion.button>
+        </motion.div>
+      </div>
+    );
+  }
+
   const [bookOrigin, setBookOrigin] = useState<'affiliate' | 'own'>('affiliate');
   const [bookType, setBookType] = useState<'free' | 'paid'>('paid');
   const [loading, setLoading] = useState(false);
@@ -539,10 +597,13 @@ export default function CreatePage() {
                 </div>
 
                 <button
-                  disabled={loading || uploading}
-                  className="w-full py-4 bg-primary text-bg-main rounded-2xl font-black text-sm hover:bg-primary-dark transition-all disabled:opacity-50 border-2 border-primary-dark active:scale-[0.98] shadow-lg"
+                  disabled={loading || uploading || limitExceeded}
+                  className="w-full py-4 bg-primary text-bg-main rounded-2xl font-black text-sm hover:bg-primary-dark transition-all disabled:opacity-50 border-2 border-primary-dark active:scale-[0.98] shadow-lg flex flex-col items-center justify-center p-4 px-6 gap-0.5"
                 >
-                  {loading ? 'Publishing...' : 'Publish Course'}
+                  {loading ? 'Publishing...' : limitExceeded ? 'Limit Reached' : 'Publish Course'}
+                  {limitExceeded && (
+                    <span className="text-[9px] font-bold uppercase opacity-80">Upgrade to increase limit</span>
+                  )}
                 </button>
               </motion.form>
             ) : activeTab === 'book' ? (
@@ -718,14 +779,19 @@ export default function CreatePage() {
                 </div>
 
                 <button
-                  disabled={loading || previewing}
-                  className="w-full py-4 bg-primary text-bg-main rounded-2xl font-black text-sm hover:bg-primary-dark transition-all disabled:opacity-50 border-2 border-primary-dark active:scale-[0.98] shadow-lg flex items-center justify-center gap-2"
+                  disabled={loading || previewing || limitExceeded}
+                  className="w-full py-4 bg-primary text-bg-main rounded-2xl font-black text-sm hover:bg-primary-dark transition-all disabled:opacity-50 border-2 border-primary-dark active:scale-[0.98] shadow-lg flex flex-col items-center justify-center p-4 px-6 gap-0.5"
                 >
-                  {loading ? 'Publishing...' : (
+                  {loading ? 'Publishing...' : limitExceeded ? (
+                    'Limit Reached'
+                  ) : (
                     <>
                         <Send size={18} />
                         <span>List Book Now</span>
                     </>
+                  )}
+                  {limitExceeded && (
+                    <span className="text-[9px] font-bold uppercase opacity-80">Upgrade to increase limit</span>
                   )}
                 </button>
               </motion.form>
@@ -892,13 +958,16 @@ export default function CreatePage() {
                 </div>
 
                 <button
-                  disabled={loading || uploading}
-                  className="w-full py-4 bg-primary text-bg-main rounded-2xl font-black text-sm hover:bg-primary-dark transition-all disabled:opacity-50 border-2 border-primary-dark active:scale-[0.98] shadow-lg"
+                  disabled={loading || uploading || limitExceeded}
+                  className="w-full py-4 bg-primary text-bg-main rounded-2xl font-black text-sm hover:bg-primary-dark transition-all disabled:opacity-50 border-2 border-primary-dark active:scale-[0.98] shadow-lg flex flex-col items-center justify-center p-4 px-6 gap-0.5"
                 >
                   <div className="flex items-center justify-center gap-2">
-                    <span>{loading ? 'Creating...' : 'Initiate DAO Group'}</span>
-                    {!loading && <ArrowRight size={18} />}
+                    <span>{loading ? 'Creating...' : limitExceeded ? 'Limit Reached' : 'Initiate DAO Group'}</span>
+                    {!loading && !limitExceeded && <ArrowRight size={18} />}
                   </div>
+                  {limitExceeded && (
+                    <span className="text-[9px] font-bold uppercase opacity-80">Upgrade to increase limit</span>
+                  )}
                 </button>
               </motion.form>
             )}

@@ -13,8 +13,18 @@ service cloud.firestore {
     function incoming() { return request.resource.data; }
     function existing() { return resource.data; }
     function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    function isAdmin() { return isSignedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)); }
 
     // --- Validation Blueprints ---
+
+    function isValidSubscription(data) {
+      return isValidId(data.get('userId', ''))
+        && data.get('paymentMethod', '') in ['bKash', 'Nagad', 'Rocket']
+        && data.get('transactionId', '') is string && data.get('transactionId', '').size() <= 100
+        && data.get('amount', 0) is number
+        && data.get('status', 'pending') in ['pending', 'approved', 'rejected']
+        && (data.get('createdAt', null) == null || data.createdAt is timestamp || data.createdAt is string);
+    }
 
     function isValidUser(data) {
       return data.get('uid', '') == request.auth.uid 
@@ -85,10 +95,17 @@ service cloud.firestore {
 
     // --- Collections ---
 
+    match /subscriptions/{subId} {
+      allow read: if isSignedIn() && (isAdmin() || resource.data.userId == request.auth.uid);
+      allow create: if isSignedIn() && incoming().userId == request.auth.uid && isValidSubscription(incoming());
+      allow update, delete: if isAdmin();
+    }
+
     match /users/{userId} {
       allow read: if true;
       allow create: if isSignedIn() && isValidUser(incoming());
       allow update: if isSignedIn() && (
+        isAdmin() ||
         (isOwner(userId) && (
           // Action: Profile Update
           (incoming().diff(existing()).affectedKeys().hasOnly(['photoURL', 'displayName', 'bio', 'location', 'teachSkills', 'learnSkills', 'privacy', 'onboardingCompleted', 'credits', 'role'])) ||

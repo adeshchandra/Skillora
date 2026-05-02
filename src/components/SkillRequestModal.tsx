@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Handshake, BookOpen, Clock, Zap, MessageCircle, Send, Users } from 'lucide-react';
+import { X, Handshake, BookOpen, Clock, Zap, MessageCircle, Send, Users, Layers } from 'lucide-react';
 import { UserProfile } from '../types';
 import { collection, addDoc, serverTimestamp, doc, setDoc, getDoc, updateDoc, increment } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { handleFirestoreError, OperationType } from '../lib/firestoreErrorHandler';
 import { useAuth } from '../contexts/AuthContext';
+import { checkSubscriptionAccess, getUserContentCounts, LIMITS } from '../lib/firestore-utils';
+import { useNavigate } from 'react-router-dom';
+import { Crown } from 'lucide-react';
 
 interface SkillRequestModalProps {
   isOpen: boolean;
@@ -24,8 +27,21 @@ export const SkillRequestModal: React.FC<SkillRequestModalProps> = ({
   initialTeacherSkills,
   conversationId
 }) => {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
+  const navigate = useNavigate();
   const [requestType, setRequestType] = useState<'Exchange' | 'Learning'>('Exchange');
+  const [counts, setCounts] = useState({ courses: 0, books: 0, daos: 0, requests: 0 });
+
+  React.useEffect(() => {
+    if (user && isOpen) {
+      getUserContentCounts(user.uid).then(setCounts);
+    }
+  }, [user, isOpen]);
+
+  const subStatus = checkSubscriptionAccess(profile);
+  const pkgLimits = profile?.currentPackage === 'yearly' ? LIMITS.YEARLY : LIMITS.MONTHLY;
+  const limitExceeded = profile?.isPremium && counts.requests >= pkgLimits.SKILL_REQUESTS;
+
   const [learnSkill, setLearnSkill] = useState(initialTeacherSkills[0] || '');
   const [teachSkill, setTeachSkill] = useState(initialLearnerSkills[0] || '');
   const [duration, setDuration] = useState('1 week');
@@ -173,6 +189,52 @@ export const SkillRequestModal: React.FC<SkillRequestModalProps> = ({
 
             {/* Scrollable Content */}
             <div className="p-6 overflow-y-auto space-y-6">
+              {!subStatus.allowed && subStatus.reason === 'subscription_required' ? (
+                <div className="py-12 flex flex-col items-center text-center space-y-6">
+                   <div className="w-20 h-20 bg-primary/10 rounded-[32px] flex items-center justify-center text-primary">
+                    <Crown size={40} />
+                  </div>
+                  <div className="space-y-2">
+                    <h2 className="text-xl font-black text-text-main tracking-tight uppercase">Premium Required</h2>
+                    <p className="text-[11px] text-text-muted font-bold leading-relaxed px-8">
+                      Your free trial has expired. Upgrade to Premium to continue sending skill requests to other gurus and learners.
+                    </p>
+                  </div>
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                        onClose();
+                        navigate('/subscription');
+                    }}
+                    className="w-full py-4 bg-primary text-bg-main rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] shadow-lg"
+                  >
+                    Go Premium
+                  </motion.button>
+                </div>
+              ) : limitExceeded ? (
+                <div className="py-12 flex flex-col items-center text-center space-y-6">
+                   <div className="w-20 h-20 bg-amber-500/10 rounded-[32px] flex items-center justify-center text-amber-500">
+                    <Layers size={40} />
+                  </div>
+                  <div className="space-y-2">
+                    <h2 className="text-xl font-black text-text-main tracking-tight uppercase">Limit Reached</h2>
+                    <p className="text-[11px] text-text-muted font-bold leading-relaxed px-8">
+                      You've reached your monthly skill request limit. Upgrade to a larger package or wait for next month.
+                    </p>
+                  </div>
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                        onClose();
+                        navigate('/subscription');
+                    }}
+                    className="w-full py-4 bg-primary text-bg-main rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] shadow-lg"
+                  >
+                    View Packages
+                  </motion.button>
+                </div>
+              ) : (
+                <>
               {/* Type Selection */}
               <div className="flex gap-2 p-1 bg-hover-bg rounded-2xl transition-colors">
                 <button 
@@ -303,9 +365,12 @@ export const SkillRequestModal: React.FC<SkillRequestModalProps> = ({
                   className="w-full bg-hover-bg border-2 border-transparent rounded-2xl px-4 py-4 text-[11px] font-semibold outline-none focus:ring-2 focus:ring-primary/20 resize-none transition-all leading-relaxed"
                 />
               </div>
-            </div>
+            </>
+          )}
+        </div>
 
             <div className="p-6 border-t border-border-main shrink-0 bg-theme-card transition-colors">
+              {!subStatus.allowed || limitExceeded ? null : (
               <button 
                 onClick={handleSubmit}
                 disabled={loading}
@@ -320,6 +385,7 @@ export const SkillRequestModal: React.FC<SkillRequestModalProps> = ({
                   </>
                 )}
               </button>
+              )}
             </div>
           </motion.div>
         </div>
