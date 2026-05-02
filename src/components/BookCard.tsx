@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Course } from '../types';
 import { Star, ShoppingCart, ExternalLink, MessageCircle, Link2 } from 'lucide-react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
-import { collection, query, where, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs, addDoc, serverTimestamp, doc, updateDoc, increment, arrayUnion, getDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -14,9 +14,30 @@ interface BookCardProps {
 export const BookCard = ({ book }: BookCardProps) => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [hasVisited, setHasVisited] = useState(false);
+  const [isRating, setIsRating] = useState(false);
+  const [hasRated, setHasRated] = useState(false);
+  const [localRating, setLocalRating] = useState(book.rating || 0);
+
+  // Seeded random for affiliate books to keep them consistent but different
+  const getSeededRating = (id: string) => {
+    const seed = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const rating = 3.5 + (seed % 15) / 10; // 3.5 to 5.0
+    const reviews = 20 + (seed % 200);
+    return { rating, reviews };
+  };
+
+  const affiliateData = book.bookOrigin === 'affiliate' ? getSeededRating(book.id) : null;
+
+  useEffect(() => {
+    if (user && book.bookOrigin === 'own' && (book as any).ratedBy?.includes(user.uid)) {
+      setHasRated(true);
+    }
+  }, [user, book]);
 
   const handleAction = async (e: React.MouseEvent) => {
     e.stopPropagation();
+    setHasVisited(true);
     
     // Logic: Paid Own Book -> Inbox, else -> External Link
     if (book.bookOrigin === 'own' && book.price && book.price > 0) {
@@ -26,7 +47,6 @@ export const BookCard = ({ book }: BookCardProps) => {
       }
       
       try {
-        // Find existing conversation or start new one
         const chatsRef = collection(db, 'conversations');
         const q = query(chatsRef, where('participants', 'array-contains', user.uid));
         const querySnapshot = await getDocs(q);
@@ -82,11 +102,41 @@ export const BookCard = ({ book }: BookCardProps) => {
     }
   };
 
+  const handleRate = async (e: React.MouseEvent, rating: number) => {
+    e.stopPropagation();
+    if (!user || hasRated || isRating || !hasVisited) return;
+
+    setIsRating(true);
+    try {
+      const bookRef = doc(db, 'courses', book.id);
+      const currentRating = book.rating || 0;
+      const currentCount = book.reviewCount || 0;
+      
+      const newCount = currentCount + 1;
+      const newRatingValue = ((currentRating * currentCount) + rating) / newCount;
+
+      await updateDoc(bookRef, {
+        rating: Number(newRatingValue.toFixed(1)),
+        reviewCount: increment(1),
+        ratedBy: arrayUnion(user.uid)
+      });
+
+      setLocalRating(newRatingValue);
+      setHasRated(true);
+    } catch (err) {
+      console.error("Rating error:", err);
+    } finally {
+      setIsRating(false);
+    }
+  };
+
   const discount = book.originalPrice && book.price 
     ? Math.round(((book.originalPrice - book.price) / book.originalPrice) * 100) 
     : 0;
 
   const isPaidOwnBook = book.bookOrigin === 'own' && book.price && book.price > 0;
+  const displayRating = affiliateData ? affiliateData.rating : localRating;
+  const displayReviews = affiliateData ? affiliateData.reviews : book.reviewCount || 0;
 
   return (
     <motion.div 
@@ -111,13 +161,6 @@ export const BookCard = ({ book }: BookCardProps) => {
           </div>
         )}
 
-        {discount > 0 && (
-          <div className="absolute top-2 left-2 bg-red-500 text-bg-main text-[9px] font-black px-1.5 py-1 rounded-full shadow-lg flex items-center justify-center min-w-[32px] aspect-square flex-col leading-none z-10">
-            <span>{discount}%</span>
-            <span>OFF</span>
-          </div>
-        )}
-
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
             <div className="w-10 h-10 rounded-full bg-primary text-bg-main flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100 shadow-xl">
                 {isPaidOwnBook ? <MessageCircle size={18} /> : <ExternalLink size={18} />}
@@ -138,25 +181,40 @@ export const BookCard = ({ book }: BookCardProps) => {
           {book.teacherName}
         </p>
         
-        <div className="flex items-center gap-1">
-            <div className="flex items-center">
-                {[...Array(5)].map((_, i) => (
-                    <Star 
-                        key={i} 
-                        size={8} 
-                        fill={i < Math.floor(book.rating || 4.5) ? "currentColor" : "none"} 
-                        className={i < Math.floor(book.rating || 4.5) ? "text-yellow-400" : "text-border-main"}
-                    />
-                ))}
+        <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-1">
+                <div className="flex items-center">
+                    {[...Array(5)].map((_, i) => (
+                        <motion.div
+                          key={i}
+                          whileTap={book.bookOrigin === 'own' && !hasRated && hasVisited ? { scale: 1.4 } : {}}
+                          onClick={(e) => book.bookOrigin === 'own' && handleRate(e, i + 1)}
+                          className={book.bookOrigin === 'own' && !hasRated && hasVisited ? "cursor-pointer" : ""}
+                        >
+                            <Star 
+                                size={8} 
+                                fill={i < Math.floor(displayRating || 4) ? "currentColor" : "none"} 
+                                className={i < Math.floor(displayRating || 4) ? "text-yellow-400" : "text-border-main"}
+                            />
+                        </motion.div>
+                    ))}
+                </div>
+                <span className="text-[8px] font-bold text-text-muted">({displayReviews})</span>
             </div>
-            <span className="text-[8px] font-bold text-text-muted">({book.reviewCount || 42})</span>
+            
+            {book.bookOrigin === 'own' && !hasRated && hasVisited && !isRating && (
+                <p className="text-[7px] text-primary font-bold animate-pulse">Rate this book!</p>
+            )}
+            {book.bookOrigin === 'own' && hasRated && (
+                <p className="text-[7px] text-green-500 font-bold">Thanks for rating!</p>
+            )}
         </div>
 
         <p className="text-[9px] font-bold text-green-500">Product In Stock</p>
         
         <div className="flex items-center gap-2 pt-0.5">
             <span className="text-[11px] font-black text-text-main">TK. {book.price}</span>
-            {book.originalPrice && (
+            {book.originalPrice && book.originalPrice > (book.price || 0) && (
                 <span className="text-[9px] font-bold text-text-muted line-through">TK. {book.originalPrice}</span>
             )}
         </div>

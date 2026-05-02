@@ -178,6 +178,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   );
 };
 
+import { BooksExplorerPage } from './pages/BooksExplorerPage';
+
 export default function App() {
   return (
     <ErrorBoundary>
@@ -188,6 +190,7 @@ export default function App() {
                 <Layout>
                   <Routes>
                     <Route path="/" element={<HomePage />} />
+                    <Route path="/books/explore" element={<BooksExplorerPage />} />
                     <Route path="/group" element={<GroupPage />} />
                     <Route path="/create" element={<CreatePage />} />
                     <Route path="/notification" element={<NotificationPage />} />

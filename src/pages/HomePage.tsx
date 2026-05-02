@@ -89,6 +89,7 @@ const FilterSystem = ({ selectedTags, setSelectedTags, searchQuery, setSearchQue
 
 export default function HomePage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [courses, setCourses] = useState<Course[]>([]);
   const [userInterests, setUserInterests] = useState<UserInterest | null>(null);
   const [loading, setLoading] = useState(true);
@@ -177,7 +178,18 @@ export default function HomePage() {
     userInterests
   );
 
-  const books = courses.filter(c => c.itemType === 'book');
+  const filteredBooks = courses.filter(course => {
+    if (course.itemType !== 'book') return false;
+
+    const matchesSearch = course.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                         course.teacherName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         (course.tags && course.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())));
+    
+    const matchesTags = selectedTags.length === 0 || 
+                       (course.tags && selectedTags.every(tag => course.tags?.includes(tag)));
+    
+    return matchesSearch && matchesTags;
+  });
 
   const isVisible = scrollDir === 'up' || isAtTop;
 
@@ -243,14 +255,19 @@ export default function HomePage() {
       ) : (
         <div className="flex flex-col">
           {/* Books Row */}
-          {books.length > 0 && (
+          {filteredBooks.length > 0 && (
             <div className="py-4 space-y-3 bg-hover-bg/30">
               <div className="px-4 flex items-center justify-between">
                 <h3 className="text-sm font-black text-text-main uppercase tracking-wider">New Books</h3>
-                <span className="text-[10px] font-bold text-primary">View All</span>
+                <button 
+                  onClick={() => navigate('/books/explore')}
+                  className="text-[10px] font-black text-primary px-3 py-1 rounded-full border border-primary/30 hover:bg-primary/10 transition-colors uppercase tracking-widest active:scale-95"
+                >
+                  View All
+                </button>
               </div>
               <div className="flex gap-3 overflow-x-auto no-scrollbar px-4 pb-2">
-                {books.map(book => (
+                {filteredBooks.map(book => (
                   <BookCard key={book.id} book={book} />
                 ))}
               </div>
