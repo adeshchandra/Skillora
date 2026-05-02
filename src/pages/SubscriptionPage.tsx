@@ -15,7 +15,8 @@ import {
   AlertCircle,
   Send,
   RefreshCw,
-  Clock
+  Clock,
+  Copy
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -94,12 +95,21 @@ const PackageCard = ({ type, price, duration, features, isSelected, onSelect, ic
 export default function SubscriptionPage() {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
-  const [selectedPack, setSelectedPack] = useState<'monthly' | 'yearly'>('monthly');
+  const [selectedPack, setSelectedPack] = useState<'free' | 'monthly' | 'yearly'>('monthly');
   const [showPayment, setShowPayment] = useState(false);
   const [txId, setTxId] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<'bKash' | 'Nagad' | 'Rocket'>('bKash');
   const [submitting, setSubmitting] = useState(false);
   const [mySubs, setMySubs] = useState<SubscriptionType[]>([]);
+  const [copied, setCopied] = useState(false);
+
+  const PAYMENT_NUMBER = "01934264301";
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(PAYMENT_NUMBER);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -114,6 +124,19 @@ export default function SubscriptionPage() {
   }, [user]);
 
   const packages = {
+    free: {
+      price: 0,
+      duration: 'forever',
+      features: [
+        'Explore Home Feed',
+        'Search All Content',
+        'View Guru Profiles',
+        'Public Discussions',
+        'Limited Mastery View'
+      ],
+      icon: Sparkles,
+      color: 'slate-400'
+    },
     monthly: {
       price: 149,
       duration: 'month',
@@ -152,7 +175,7 @@ export default function SubscriptionPage() {
       await addDoc(collection(db, 'subscriptions'), {
         userId: user.uid,
         userName: profile.displayName,
-        amount: packages[selectedPack].price,
+        amount: packages[selectedPack as keyof typeof packages].price,
         packageType: selectedPack,
         paymentMethod,
         transactionId: txId,
@@ -243,6 +266,18 @@ export default function SubscriptionPage() {
             <div className="flex gap-4 overflow-x-auto px-6 pb-4 no-scrollbar snap-x snap-mandatory">
               <div className="flex-shrink-0 w-[280px] snap-center">
                 <PackageCard 
+                  type="Free"
+                  price={0}
+                  duration="forever"
+                  features={packages.free.features}
+                  isSelected={selectedPack === 'free'}
+                  onSelect={() => setSelectedPack('free')}
+                  icon={packages.free.icon}
+                  color={packages.free.color}
+                />
+              </div>
+              <div className="flex-shrink-0 w-[280px] snap-center">
+                <PackageCard 
                   type="Monthly"
                   price={149}
                   duration="month"
@@ -270,14 +305,16 @@ export default function SubscriptionPage() {
 
             <div className="px-6">
               <button 
-                onClick={() => setShowPayment(true)}
+                onClick={() => selectedPack === 'free' ? navigate('/') : setShowPayment(true)}
                 className={`w-full h-16 rounded-[32px] font-black text-xs uppercase tracking-widest shadow-xl transition-all ${
-                    selectedPack === 'monthly' 
-                      ? 'bg-slate-200 text-slate-800 shadow-slate-200/20 border-2 border-slate-300' 
-                      : 'bg-primary text-bg-main shadow-primary/20'
+                    selectedPack === 'free'
+                      ? 'bg-hover-bg text-text-main border-2 border-border-main'
+                      : selectedPack === 'monthly' 
+                        ? 'bg-slate-200 text-slate-800 shadow-slate-200/20 border-2 border-slate-300' 
+                        : 'bg-primary text-bg-main shadow-primary/20'
                   }`}
               >
-                Continue with {selectedPack} Pack
+                {selectedPack === 'free' ? 'Explore App Now' : `Continue with ${selectedPack} Pack`}
               </button>
             </div>
           </div>
@@ -298,9 +335,31 @@ export default function SubscriptionPage() {
                 </div>
               </div>
 
-              <div className="p-5 bg-primary/5 rounded-2xl border border-primary/10 space-y-3 text-center">
+              <div className="p-5 bg-primary/5 rounded-2xl border border-primary/10 space-y-3 text-center relative overflow-hidden">
                 <p className="text-[10px] font-black text-text-muted uppercase tracking-widest">Send Money to (Personal)</p>
-                <p className="text-2xl font-black text-text-main tracking-widest">01934-264301</p>
+                <div className="flex flex-col items-center gap-2">
+                  <p className="text-2xl font-black text-text-main tracking-widest">01934-264301</p>
+                  <button 
+                    onClick={handleCopy}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                      copied 
+                        ? 'bg-green-500 text-white' 
+                        : 'bg-bg-main border border-border-main text-text-main hover:border-primary'
+                    }`}
+                  >
+                    {copied ? (
+                      <>
+                        <Check size={12} strokeWidth={3} />
+                        Copied
+                      </>
+                    ) : (
+                      <>
+                        <Copy size={12} />
+                        Copy Number
+                      </>
+                    )}
+                  </button>
+                </div>
                 <div className="flex justify-center gap-4 grayscale opacity-60">
                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR07nOshE1_P_XyZ7_d_0Z6Hq-j_3t5S4S7nA&s" className="h-5" alt="bkash" />
                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-Tj_uH_Jvx6Vp0Z_Y1L5Y_L8VqR6rE_rYwA&s" className="h-5" alt="nagad" />
