@@ -45,7 +45,7 @@ const FloatingInput = ({ label, value, onChange, type = 'text', showPasswordTogg
 };
 
 export default function AuthPage() {
-  const { signIn: signInWithGoogle } = useAuth();
+  const { signIn: signInWithGoogle, authError } = useAuth();
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
@@ -57,6 +57,13 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [showResetForm, setShowResetForm] = useState(false);
+
+  // Sync context error to local error state
+  React.useEffect(() => {
+    if (authError) {
+      setError(authError);
+    }
+  }, [authError]);
 
   const handlePasswordReset = async (e: React.FormEvent) => {
       e.preventDefault();
@@ -245,6 +252,13 @@ export default function AuthPage() {
                                             Recovery?
                                         </button>
                                     </div>
+                                    
+                                    {error && (
+                                        <div className="p-3 bg-red-500/10 text-red-500 text-[10px] font-bold rounded-xl flex items-center gap-2 border border-red-500/20 mb-4">
+                                            <X size={14} strokeWidth={3} />
+                                            {error}
+                                        </div>
+                                    )}
 
                     {!isLogin && (
                         <div className="flex items-start gap-3 p-4 bg-hover-bg/30 border border-border-main/20 rounded-2xl group transition-all">
