@@ -106,9 +106,9 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
   const displayRating = typeof course.rating === 'number' && !isNaN(course.rating) ? course.rating : 0;
 
   return (
-    <div className="flex flex-col bg-bg-main mb-8 border-b border-border-main last:border-0 pb-2 transition-colors">
+    <div className="flex flex-col bg-bg-main mb-2 border-b border-border-main last:border-0 transition-colors">
       <div 
-        className="relative aspect-video w-full cursor-pointer group overflow-hidden border-b border-border-main/20" 
+        className="relative aspect-video w-full cursor-pointer group overflow-hidden" 
         onClick={() => handleVisit()}
       >
         <img 
@@ -122,7 +122,7 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
         </div>
       </div>
 
-      <div className="flex gap-3 pt-4 pb-4 px-3">
+      <div className="flex gap-3 pt-3 pb-3 px-3">
         {!hideTeacher && (
             <div className="flex-shrink-0 pt-0.5 cursor-pointer" 
             onClick={() => navigate(`/user/${course.teacherId}`)}

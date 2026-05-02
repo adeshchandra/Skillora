@@ -220,7 +220,7 @@ export default function HomePage() {
       </motion.div>
 
       {loading ? (
-        <div className="space-y-6">
+        <div className="space-y-2">
           {[1, 2, 3].map(i => (
             <div key={`skel-${i}`} className="space-y-4 animate-pulse">
               <div className="aspect-video bg-hover-bg" />
