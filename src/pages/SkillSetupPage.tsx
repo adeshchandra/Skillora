@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAuth } from '../App';
+import { useAuth } from '../contexts/AuthContext';
 import { motion, AnimatePresence } from 'motion/react';
 import { BookOpen, GraduationCap, ArrowRight, Check, Brain, Target, Sparkles, ChevronRight, X, Plus } from 'lucide-react';
 import { db } from '../lib/firebase';
@@ -78,7 +78,7 @@ export default function SkillSetupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col font-sans">
+    <div className="min-h-screen bg-bg-main flex flex-col font-sans transition-colors">
       <div className="flex-1 flex flex-col items-center justify-center px-6 max-w-[400px] mx-auto w-full py-20">
         
         {/* Progress Header */}
@@ -121,8 +121,8 @@ export default function SkillSetupPage() {
                       }`}
                     >
                       <div className="flex gap-5">
-                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-colors ${role === r.id ? 'bg-primary text-white' : 'bg-white shadow-sm'}`}>
-                          <Icon size={24} className={role === r.id ? 'text-white' : r.textColor} />
+                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-colors ${role === r.id ? 'bg-primary text-bg-main' : 'bg-theme-card shadow-sm'}`}>
+                          <Icon size={24} className={role === r.id ? 'text-bg-main' : r.textColor} />
                         </div>
                         <div className="space-y-1">
                           <div className="flex items-center gap-2">
@@ -136,7 +136,7 @@ export default function SkillSetupPage() {
                         {role === r.id && (
                            <motion.div 
                              initial={{ scale: 0 }} animate={{ scale: 1 }}
-                             className="absolute top-4 right-4 w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center shadow-lg"
+                             className="absolute top-4 right-4 w-6 h-6 bg-primary text-bg-main rounded-full flex items-center justify-center shadow-lg"
                            >
                              <Check size={14} strokeWidth={3} />
                            </motion.div>
@@ -150,7 +150,7 @@ export default function SkillSetupPage() {
               <button
                 disabled={!role}
                 onClick={() => setStep(2)}
-                className="w-full py-4.5 bg-text-main text-white font-black text-sm rounded-[24px] hover:bg-black transition-all active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2 group shadow-xl"
+                className="w-full py-4.5 bg-text-main text-bg-main font-black text-sm rounded-[24px] hover:bg-black transition-all active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2 group shadow-xl"
               >
                 Continue
                 <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
@@ -167,7 +167,7 @@ export default function SkillSetupPage() {
               <div className="text-center space-y-2">
                 <div className="flex items-center justify-center gap-2 mb-2">
                     <div className="w-8 h-8 rounded-full bg-text-main flex items-center justify-center shadow-lg">
-                        <Sparkles size={16} className="text-white" />
+                        <Sparkles size={16} className="text-bg-main" />
                     </div>
                 </div>
                 <h1 className="text-2xl font-black text-text-main tracking-tight transition-colors">
@@ -186,8 +186,8 @@ export default function SkillSetupPage() {
                       onClick={() => toggleSkill(skill)}
                       className={`px-5 py-2 rounded-full text-[11px] font-bold border-2 transition-all active:scale-95 ${
                         selectedSkills.includes(skill)
-                          ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20'
-                          : 'bg-white text-text-muted border-border-main hover:border-primary/50'
+                          ? 'bg-primary text-bg-main border-primary shadow-lg shadow-primary/20'
+                          : 'bg-theme-card text-text-muted border-border-main hover:border-primary/50'
                       }`}
                     >
                       {skill}
@@ -206,7 +206,7 @@ export default function SkillSetupPage() {
                     />
                     <button 
                         type="submit"
-                        className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-text-main text-white rounded-xl hover:bg-black transition-all active:scale-95"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-text-main text-bg-main rounded-xl hover:bg-black transition-all active:scale-95"
                     >
                         <Plus size={16} />
                     </button>
@@ -218,7 +218,7 @@ export default function SkillSetupPage() {
                         {selectedSkills.map(s => (
                             <motion.div 
                                 initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-                                key={s} className="px-2.5 py-1.5 bg-white border border-border-main rounded-xl flex items-center gap-1.5 shadow-sm"
+                                key={s} className="px-2.5 py-1.5 bg-theme-card border border-border-main rounded-xl flex items-center gap-1.5 shadow-sm"
                             >
                                 <span className="text-[10px] font-black text-text-main transition-colors">{s}</span>
                                 <button onClick={() => toggleSkill(s)} className="text-text-muted hover:text-red-500 transition-colors">
@@ -240,7 +240,7 @@ export default function SkillSetupPage() {
                 <button
                     disabled={selectedSkills.length === 0 || loading}
                     onClick={handleComplete}
-                    className={`flex-1 py-4.5 text-white font-black text-sm rounded-[24px] transition-all active:scale-[0.98] disabled:opacity-30 shadow-xl ${role === 'tutor' ? 'bg-accent-gold shadow-accent-gold/20' : 'bg-primary shadow-primary/20'}`}
+                    className={`flex-1 py-4.5 text-bg-main font-black text-sm rounded-[24px] transition-all active:scale-[0.98] disabled:opacity-30 shadow-xl ${role === 'tutor' ? 'bg-accent-gold shadow-accent-gold/20' : 'bg-primary shadow-primary/20'}`}
                 >
                     {loading ? 'Finalizing...' : 'Finish Setup'}
                 </button>

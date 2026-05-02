@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { doc, getDoc, setDoc, updateDoc, increment, onSnapshot, collection, query, where } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import { useAuth } from '../App';
+import { useAuth } from '../contexts/AuthContext';
 import { Course } from '../types';
 import { Star, Play, User as UserIcon, MessageCircle, Handshake, Check, ExternalLink } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -106,7 +106,7 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
   const displayRating = typeof course.rating === 'number' && !isNaN(course.rating) ? course.rating : 0;
 
   return (
-    <div className="flex flex-col bg-white mb-8 border-b border-border-main last:border-0 pb-2 transition-colors">
+    <div className="flex flex-col bg-bg-main mb-8 border-b border-border-main last:border-0 pb-2 transition-colors">
       <div 
         className="relative aspect-video w-full cursor-pointer group overflow-hidden border-b border-border-main/20" 
         onClick={() => handleVisit()}
@@ -117,7 +117,7 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
           className="w-full h-full object-cover bg-hover-bg transition-transform group-hover:scale-105"
           referrerPolicy="no-referrer"
         />
-        <div className="absolute bottom-3 right-3 bg-text-main/80 text-white text-[10px] px-2 py-1 rounded-lg font-bold backdrop-blur-sm border border-white/10 shadow-lg">
+        <div className="absolute bottom-3 right-3 bg-text-main/80 text-bg-main text-[10px] px-2 py-1 rounded-lg font-bold backdrop-blur-sm border border-white/10 shadow-lg">
           {hasVisited ? 'Respin' : 'Unlock'}
         </div>
       </div>
@@ -155,7 +155,7 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
               <ExternalLink size={14} />
             </button>
           </div>
-          <div className="text-[12px] text-text-muted font-medium flex flex-wrap items-center gap-x-1 gap-y-0.5">
+          <div className="text-[12px] text-text-muted font-medium flex flex-wrap items-center gap-x-1 gap-y-0.5 transition-colors">
             {!hideTeacher && (
                 <>
                 <span 
@@ -189,10 +189,10 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
                   disabled={!course.daoGroupLink && hasSentRequest}
                   className={`px-5 py-2 rounded-xl text-[10.5px] font-bold tracking-wide transition-all active:scale-95 flex items-center gap-2 shadow-sm ${
                     course.daoGroupLink 
-                      ? 'bg-text-main text-white hover:bg-black' 
+                      ? 'bg-text-main text-bg-main hover:bg-black' 
                       : (hasSentRequest 
-                          ? 'bg-green-50 text-green-600 border border-green-200' 
-                          : 'bg-primary text-white hover:bg-primary-dark')
+                          ? 'bg-green-500/10 text-green-500 border border-green-500/20' 
+                          : 'bg-primary text-bg-main hover:bg-primary-dark')
                   }`}
                 >
                   {!course.daoGroupLink && (hasSentRequest ? <Check size={12} /> : <MessageCircle size={12} />)}
@@ -211,14 +211,14 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
                 {course.daoGroupLink ? (
                   <button 
                     onClick={() => window.open(course.daoGroupLink, '_blank')}
-                    className="px-5 py-2 bg-text-main text-white rounded-xl text-[10.5px] font-bold tracking-wide hover:bg-black transition-all active:scale-95 shadow-sm"
+                    className="px-5 py-2 bg-text-main text-bg-main rounded-xl text-[10.5px] font-bold tracking-wide hover:bg-black transition-all active:scale-95 shadow-sm"
                   >
                     Join DAO
                   </button>
                 ) : (
                   <button 
                     onClick={() => handleVisit()}
-                    className="px-5 py-2 bg-hover-bg hover:bg-border-main text-text-main rounded-xl text-[10.5px] font-bold tracking-wide transition-colors shadow-sm"
+                    className="px-5 py-2 bg-hover-bg hover:bg-border-main text-text-main rounded-xl text-[10.5px] font-bold tracking-wide transition-all shadow-sm border border-border-main/50"
                   >
                     Watch again
                   </button>
@@ -249,7 +249,7 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
                 initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.95, opacity: 0 }}
-                className="bg-white w-full max-w-sm rounded-[32px] p-6 border border-border-main space-y-6 shadow-2xl"
+                className="bg-theme-card w-full max-w-sm rounded-[32px] p-6 border border-border-main space-y-6 shadow-2xl transition-colors"
             >
                 <div className="text-center space-y-1">
                 <h4 className="text-lg font-bold text-text-main tracking-tighter">Rate this resource</h4>
@@ -258,11 +258,11 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
                 <div className="flex justify-center gap-2">
                 {[1, 2, 3, 4, 5].map((s) => (
                     <button
-                    key={s}
-                    onClick={() => handleRate(s)}
-                    className="w-10 h-10 rounded-xl flex items-center justify-center bg-hover-bg hover:bg-primary hover:text-white transition-all font-black text-sm border border-border-main/50"
+                        key={s}
+                        onClick={() => handleRate(s)}
+                        className="w-10 h-10 rounded-xl flex items-center justify-center bg-hover-bg text-text-main hover:bg-primary hover:text-bg-main transition-all font-black text-sm border border-border-main/50"
                     >
-                    {s}
+                        {s}
                     </button>
                 ))}
                 </div>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { collection, query, onSnapshot, doc, getDoc, updateDoc, increment, arrayUnion, setDoc, where, orderBy, deleteDoc, addDoc, serverTimestamp, limit } from 'firebase/firestore';
+import { collection, query, onSnapshot, doc, getDoc, updateDoc, increment, arrayUnion, setDoc, where, orderBy, deleteDoc, addDoc, serverTimestamp, limit, getDocs } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import { useAuth } from '../App';
+import { useAuth } from '../contexts/AuthContext';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { DAOGroup, Quiz, UserProfile, UserInterest } from '../types';
 import { POPULAR_SKILLS } from '../constants';
@@ -23,7 +23,7 @@ const FilterSystem = ({ selectedTags, setSelectedTags, searchQuery, setSearchQue
   };
 
   return (
-    <div className="bg-white border-b border-border-main">
+    <div className="bg-bg-main border-b border-border-main transition-colors">
       <div className="px-4 py-3 space-y-3">
         <div className="relative flex items-center">
             <SearchIcon size={16} className="absolute left-3 text-text-muted" />
@@ -44,7 +44,7 @@ const FilterSystem = ({ selectedTags, setSelectedTags, searchQuery, setSearchQue
             <button 
                 onClick={() => setSelectedTags([])}
                 className={`flex-shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold transition-all ${
-                    selectedTags.length === 0 ? 'bg-primary text-white shadow-sm shadow-primary/20' : 'bg-hover-bg text-text-main hover:bg-border-main'
+                    selectedTags.length === 0 ? 'bg-primary text-bg-main shadow-sm shadow-primary/20' : 'bg-hover-bg text-text-main hover:bg-border-main'
                 }`}
             >
                 All
@@ -54,7 +54,7 @@ const FilterSystem = ({ selectedTags, setSelectedTags, searchQuery, setSearchQue
                     key={skill}
                     onClick={() => toggleTag(skill)}
                     className={`flex-shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold transition-all ${
-                        selectedTags.includes(skill) ? 'bg-primary text-white' : 'bg-hover-bg text-text-main hover:bg-border-main'
+                        selectedTags.includes(skill) ? 'bg-primary text-bg-main' : 'bg-hover-bg text-text-main hover:bg-border-main'
                     }`}
                 >
                     {skill}
@@ -64,7 +64,7 @@ const FilterSystem = ({ selectedTags, setSelectedTags, searchQuery, setSearchQue
                 <button 
                     key={`filter-tag-${tag}`}
                     onClick={() => toggleTag(tag)}
-                    className="flex-shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold transition-all bg-primary text-white border-primary border flex items-center gap-1.5"
+                    className="flex-shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold transition-all bg-primary text-bg-main border-primary border flex items-center gap-1.5"
                 >
                     {tag}
                     <X size={10} />
@@ -222,28 +222,28 @@ const QuizComponent = ({ group, onComplete }: { group: DAOGroup, onComplete: () 
           <motion.div 
             key="locked"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="p-6 bg-text-main rounded-xl text-white space-y-4 shadow-xl border border-white/10"
+            className="p-6 bg-theme-card rounded-xl text-text-main space-y-4 shadow-xl border border-border-main transition-colors"
           >
              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center">
+                <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
                     <Lock size={20} />
                 </div>
                 <div>
                   <h3 className="font-bold text-sm">Daily Verification Quiz</h3>
-                  <p className="text-white/60 text-[11px] font-medium flex items-center gap-1.5">
+                  <p className="text-text-muted text-[11px] font-medium flex items-center gap-1.5">
                     <Clock size={10} /> {quiz.durationMinutes}m duration • {quiz.questions.length} Questions
                   </p>
                 </div>
              </div>
              {quiz.negativeMarking && (
-                <div className="bg-red-500/20 border border-red-500/30 p-2.5 rounded-lg flex items-center gap-2">
-                    <AlertTriangle size={14} className="text-red-400" />
-                    <p className="text-[10px] font-bold text-red-100 tracking-wide">Negative marking active (-0.25)</p>
+                <div className="bg-red-500/10 border border-red-500/20 p-2.5 rounded-lg flex items-center gap-2">
+                    <AlertTriangle size={14} className="text-red-500" />
+                    <p className="text-[10px] font-bold text-red-500 tracking-wide">Negative marking active (-0.25)</p>
                 </div>
              )}
              <button 
                onClick={handleStart}
-               className="w-full bg-white text-text-main py-2.5 rounded-full font-bold text-xs hover:bg-white/90 transition-all flex items-center justify-center gap-2 active:scale-95"
+               className="w-full bg-primary text-bg-main py-2.5 rounded-full font-bold text-xs hover:bg-primary-dark transition-all flex items-center justify-center gap-2 active:scale-95"
              >
                Start Verification Quiz
              </button>
@@ -257,26 +257,26 @@ const QuizComponent = ({ group, onComplete }: { group: DAOGroup, onComplete: () 
              className="space-y-4"
           >
              {currentStep === 'result' ? (
-                <div className="p-6 bg-primary rounded-xl text-white text-center space-y-4 shadow-xl mb-6">
-                    <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto">
+                <div className="p-6 bg-primary rounded-xl text-bg-main text-center space-y-4 shadow-xl mb-6">
+                    <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center mx-auto">
                         <Trophy size={24} />
                     </div>
                     <div className="space-y-1">
                         <h3 className="text-[16px] font-bold">Verification submitted</h3>
-                        <p className="text-white/80 text-sm font-medium">Final score: <span className="font-bold text-white">{score}</span> / {quiz.questions.length}</p>
+                        <p className="text-bg-main text-sm font-medium">Final score: <span className="font-bold">{score}</span> / {quiz.questions.length}</p>
                     </div>
-                    <div className="h-1.5 w-full bg-white/20 rounded-full overflow-hidden">
+                    <div className="h-1.5 w-full bg-black/10 rounded-full overflow-hidden">
                         <div className="h-full bg-white transition-all duration-1000" style={{ width: `${quiz?.questions?.length ? (Math.max(0, Number(score) || 0) / quiz.questions.length) * 100 : 0}%` }} />
                     </div>
-                    <p className="text-[10px] text-white/60 font-medium tracking-widest pt-2">Detailed report below</p>
+                    <p className="text-[10px] text-bg-main/70 font-medium tracking-widest pt-2 uppercase">Detailed report below</p>
                 </div>
-             ) : (
-                <div className="p-3 bg-white border border-border-main rounded-xl flex justify-between items-center text-[10px] font-bold text-text-muted sticky top-0 z-10 shadow-sm">
+              ) : (
+                <div className="p-3 bg-theme-card border border-border-main rounded-xl flex justify-between items-center text-[10px] font-bold text-text-muted sticky top-0 z-10 shadow-sm transition-colors">
                     <div className="flex items-center gap-3">
-                        <div className="bg-primary text-white px-2.5 py-1 rounded-lg">Live quiz</div>
+                        <div className="bg-primary text-bg-main px-2.5 py-1 rounded-lg">Live quiz</div>
                         <span className="text-primary italic">{Object.keys(selections).length} / {quiz.questions.length} done</span>
                     </div>
-                    <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full ${timeLeft && timeLeft < 30 ? 'bg-red-100 text-red-600 animate-pulse' : 'bg-hover-bg text-text-main'}`}>
+                    <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full ${timeLeft && timeLeft < 30 ? 'bg-red-500/10 text-red-500 animate-pulse' : 'bg-hover-bg text-text-main'}`}>
                         <Clock size={12} />
                         {timeLeft !== null && Math.floor(timeLeft / 60)}:{timeLeft !== null && (timeLeft % 60).toString().padStart(2, '0')}
                     </div>
@@ -288,7 +288,7 @@ const QuizComponent = ({ group, onComplete }: { group: DAOGroup, onComplete: () 
                     const isAnswered = selectedIdx !== undefined;
 
                     return (
-                        <div key={`quiz-q-${qIdx}`} className="p-5 bg-white rounded-2xl border border-border-main space-y-4 shadow-sm">
+                        <div key={`quiz-q-${qIdx}`} className="p-5 bg-theme-card rounded-2xl border border-border-main space-y-4 shadow-sm transition-colors">
                             <h3 className="text-sm font-bold text-text-main leading-tight">
                                 <span className="text-primary mr-2">Q{qIdx + 1}.</span>
                                 {q.question}
@@ -311,19 +311,19 @@ const QuizComponent = ({ group, onComplete }: { group: DAOGroup, onComplete: () 
                                             onClick={() => handleSelectOption(qIdx, oIdx)}
                                             className={`
                                                 w-full text-left p-3.5 rounded-xl border transition-all font-medium text-xs flex justify-between items-center group
-                                                ${variant === 'correct' ? 'bg-green-50 border-green-500 text-green-700 shadow-sm' : ''}
-                                                ${variant === 'wrong' ? 'bg-red-50 border-red-500 text-red-700' : ''}
+                                                ${variant === 'correct' ? 'bg-green-500/10 border-green-500 text-green-500 shadow-sm' : ''}
+                                                ${variant === 'wrong' ? 'bg-red-500/10 border-red-500 text-red-500' : ''}
                                                 ${variant === 'selected' ? 'bg-primary/5 border-primary text-primary' : ''}
-                                                ${variant === 'default' ? 'bg-white border-border-main hover:bg-hover-bg hover:border-primary/30 text-text-main' : ''}
+                                                ${variant === 'default' ? 'bg-theme-card border-border-main hover:bg-hover-bg hover:border-primary/30 text-text-main' : ''}
                                                 ${isAnswered && variant === 'default' ? 'opacity-50' : ''}
                                             `}
                                         >
                                             <div className="flex items-center gap-3">
                                                 <div className={`w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black
-                                                    ${variant === 'correct' ? 'bg-green-500 text-white' : ''}
-                                                    ${variant === 'wrong' ? 'bg-red-500 text-white' : ''}
-                                                    ${variant === 'selected' ? 'bg-primary text-white' : ''}
-                                                    ${variant === 'default' ? 'bg-hover-bg text-text-muted' : ''}
+                                                    ${variant === 'correct' ? 'bg-green-500 text-bg-main' : ''}
+                                                    ${variant === 'wrong' ? 'bg-red-500 text-bg-main' : ''}
+                                                    ${variant === 'selected' ? 'bg-primary text-bg-main' : ''}
+                                                    ${variant === 'default' ? 'bg-hover-bg text-text-muted transition-colors' : ''}
                                                 `}>
                                                     {String.fromCharCode(65 + oIdx)}
                                                 </div>
@@ -343,7 +343,7 @@ const QuizComponent = ({ group, onComplete }: { group: DAOGroup, onComplete: () 
              {currentStep === 'active' && (
                 <button 
                     onClick={handleSubmit}
-                    className="w-full py-4 bg-primary text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl hover:bg-primary-dark transition-all active:scale-[0.98] mt-4"
+                    className="w-full py-4 bg-primary text-bg-main rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl hover:bg-primary-dark transition-all active:scale-[0.98] mt-4"
                 >
                     Submit Verification Quiz
                 </button>
@@ -355,16 +355,16 @@ const QuizComponent = ({ group, onComplete }: { group: DAOGroup, onComplete: () 
           <motion.div 
             key="expired"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            className="p-8 bg-red-50 border border-red-100 rounded-xl text-center space-y-4"
+            className="p-8 bg-red-500/10 border border-red-500/20 rounded-xl text-center space-y-4"
           >
-            <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto text-red-600">
+            <div className="w-14 h-14 bg-red-500/20 rounded-full flex items-center justify-center mx-auto text-red-500">
                 <AlertTriangle size={32} />
             </div>
             <div className="space-y-1">
-                <h3 className="text-base font-bold text-red-900">Quiz Canceled</h3>
-                <p className="text-xs text-red-700/70 font-medium">Time limit expired before submission.</p>
+                <h3 className="text-base font-bold text-red-500">Quiz Canceled</h3>
+                <p className="text-xs text-red-500/70 font-medium">Time limit expired before submission.</p>
             </div>
-            <p className="text-[10px] text-red-800 font-bold uppercase tracking-widest bg-red-100/50 py-1 rounded">No Points Earned</p>
+            <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest bg-red-500/20 py-1 rounded">No Points Earned</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -469,12 +469,12 @@ const ManageQuizzes = ({ groupId, onBack }: { groupId: string, onBack: () => voi
   };
 
   return (
-    <div className="flex flex-col h-full bg-white animate-in slide-in-from-bottom duration-300">
-      <div className="p-4 border-b border-border-main flex items-center justify-between sticky top-0 bg-white z-10">
+    <div className="flex flex-col h-full bg-bg-main animate-in slide-in-from-bottom duration-300 transition-colors">
+      <div className="p-4 border-b border-border-main flex items-center justify-between sticky top-0 bg-bg-main z-10 transition-colors">
         <button onClick={onBack} className="p-2 -ml-2 text-text-muted hover:text-text-main"><ArrowRight size={22} className="rotate-180" /></button>
         <h2 className="font-bold text-sm">Quiz Management</h2>
         {!isAdding ? (
-            <button onClick={() => setIsAdding(true)} className="p-2 bg-primary text-white rounded-lg"><Plus size={18} /></button>
+            <button onClick={() => setIsAdding(true)} className="p-2 bg-primary text-bg-main rounded-lg"><Plus size={18} /></button>
         ) : (
             <button onClick={resetForm} className="p-2 text-text-muted"><X size={20} /></button>
         )}
@@ -492,7 +492,7 @@ const ManageQuizzes = ({ groupId, onBack }: { groupId: string, onBack: () => voi
                                 type="datetime-local" 
                                 value={availableFrom} 
                                 onChange={e => setAvailableFrom(e.target.value)}
-                                className="w-full bg-white border border-border-main rounded-xl p-2.5 text-xs font-bold outline-none focus:ring-2 focus:ring-primary/20 [color-scheme:light] transition-all"
+                                className="w-full bg-bg-main border border-border-main rounded-xl p-2.5 text-xs font-bold outline-none focus:ring-2 focus:ring-primary/20 [color-scheme:dark] transition-all"
                             />
                         </div>
                         <div className="space-y-1">
@@ -501,7 +501,7 @@ const ManageQuizzes = ({ groupId, onBack }: { groupId: string, onBack: () => voi
                                 type="datetime-local" 
                                 value={availableUntil} 
                                 onChange={e => setAvailableUntil(e.target.value)}
-                                className="w-full bg-white border border-border-main rounded-xl p-2.5 text-xs font-bold outline-none focus:ring-2 focus:ring-primary/20 [color-scheme:light] transition-all"
+                                className="w-full bg-bg-main border border-border-main rounded-xl p-2.5 text-xs font-bold outline-none focus:ring-2 focus:ring-primary/20 [color-scheme:dark] transition-all"
                             />
                         </div>
                     </div>
@@ -515,10 +515,10 @@ const ManageQuizzes = ({ groupId, onBack }: { groupId: string, onBack: () => voi
                             min="1" 
                             value={duration || ''} 
                             onChange={e => setDuration(parseInt(e.target.value) || 0)}
-                            className="w-16 bg-white border border-border-main rounded-lg p-2 text-xs font-bold text-center outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                            className="w-16 bg-bg-main border border-border-main rounded-lg p-2 text-xs font-bold text-center outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                         />
                     </div>
-                    <div className="flex items-center justify-between p-3 bg-white rounded-xl border border-border-main/50">
+                    <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <AlertTriangle size={14} className={negativeMarking ? "text-red-500" : "text-text-muted"} />
                             <span className="text-xs font-bold text-text-main">Negative Marking (-0.25)</span>
@@ -528,7 +528,7 @@ const ManageQuizzes = ({ groupId, onBack }: { groupId: string, onBack: () => voi
                             onClick={() => setNegativeMarking(!negativeMarking)}
                             className={`w-10 h-5 rounded-full relative transition-colors ${negativeMarking ? 'bg-red-500' : 'bg-border-main'}`}
                         >
-                            <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${negativeMarking ? 'left-6' : 'left-1'}`} />
+                            <div className={`absolute top-1 w-3 h-3 bg-bg-main rounded-full transition-all ${negativeMarking ? 'left-6' : 'left-1'}`} />
                         </button>
                     </div>
                 </div>
@@ -539,8 +539,8 @@ const ManageQuizzes = ({ groupId, onBack }: { groupId: string, onBack: () => voi
                     </h3>
                     <div className="space-y-3">
                         {questions.map((q, i) => (
-                            <div key={`manage-q-${i}`} className="p-3 bg-white border border-border-main rounded-xl relative group">
-                                <button onClick={() => removeQuestion(i)} className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"><X size={12} /></button>
+                            <div key={`manage-q-${i}`} className="p-3 bg-theme-card border border-border-main rounded-xl relative group transition-colors">
+                                <button onClick={() => removeQuestion(i)} className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-bg-main rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"><X size={12} /></button>
                                 <p className="text-xs font-bold text-text-main mb-2">{i+1}. {q.question}</p>
                                 <div className="grid grid-cols-2 gap-1.5">
                                     {q.options.map((o, oi) => (
@@ -558,7 +558,7 @@ const ManageQuizzes = ({ groupId, onBack }: { groupId: string, onBack: () => voi
                             value={qText} 
                             onChange={e => setQText(e.target.value)} 
                             placeholder="Type question here..."
-                            className="w-full bg-white border border-border-main rounded-xl p-3 text-xs font-medium outline-none focus:ring-2 focus:ring-primary/20 min-h-[80px] transition-all"
+                            className="w-full bg-bg-main border border-border-main rounded-xl p-3 text-xs font-medium outline-none focus:ring-2 focus:ring-primary/20 min-h-[80px] transition-all"
                         />
                         <div className="space-y-2">
                             {opts.map((o, i) => (
@@ -571,22 +571,22 @@ const ManageQuizzes = ({ groupId, onBack }: { groupId: string, onBack: () => voi
                                             setOpts(newOpts);
                                         }}
                                         placeholder={`Option ${i+1}`}
-                                        className="flex-grow bg-white border border-border-main rounded-lg px-3 py-1.5 text-xs outline-none focus:ring-2 focus:ring-primary/20 transition-all font-sans"
+                                        className="flex-grow bg-bg-main border border-border-main rounded-lg px-3 py-1.5 text-xs outline-none focus:ring-2 focus:ring-primary/20 transition-all font-sans"
                                     />
                                     <button 
                                         onClick={() => setCorrectIdx(i)}
-                                        className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 border transition-colors ${correctIdx === i ? 'bg-green-500 border-green-500 text-white' : 'bg-white border-border-main text-transparent'}`}
+                                        className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 border transition-colors ${correctIdx === i ? 'bg-green-500 border-green-500 text-bg-main' : 'bg-bg-main border-border-main text-transparent'}`}
                                     >
                                         <CheckCircle size={14} />
                                     </button>
                                 </div>
                             ))}
                         </div>
-                        <button onClick={addQuestion} className="w-full py-2 bg-text-main text-white rounded-xl text-xs font-bold tracking-wide">+ Add question</button>
+                        <button onClick={addQuestion} className="w-full py-2 bg-text-main text-bg-main rounded-xl text-xs font-bold tracking-wide active:scale-95 transition-all">+ Add question</button>
                     </div>
                 </div>
 
-                <button onClick={handleSave} className="w-full py-3.5 bg-primary text-white rounded-2xl font-black text-sm uppercase tracking-[0.2em] shadow-xl">
+                <button onClick={handleSave} className="w-full py-3.5 bg-primary text-bg-main rounded-2xl font-black text-sm uppercase tracking-[0.2em] shadow-xl hover:bg-primary/90 transition-all active:scale-95">
                     {editingQuiz ? 'Update Quiz' : 'Publish Quiz'}
                 </button>
             </div>
@@ -605,11 +605,11 @@ const ManageQuizzes = ({ groupId, onBack }: { groupId: string, onBack: () => voi
                         const isActive = now >= start && now <= end;
                         const isExpired = now > end;
                         return (
-                            <div key={`${q.id}-${idx}`} className="p-4 bg-white border border-border-main rounded-2xl space-y-3 shadow-sm hover:border-primary/30 transition-colors">
+                            <div key={`${q.id}-${idx}`} className="p-4 bg-theme-card border border-border-main rounded-2xl space-y-3 shadow-sm hover:border-primary/30 transition-colors">
                                 <div className="flex justify-between items-start">
                                     <div className="space-y-1">
                                         <div className="flex items-center gap-2">
-                                            <span className={`text-[9px] font-bold tracking-wide px-2 py-0.5 rounded ${isActive ? 'bg-green-500 text-white' : isExpired ? 'bg-red-500 text-white' : 'bg-orange-500 text-white'}`}>
+                                            <span className={`text-[9px] font-bold tracking-wide px-2 py-0.5 rounded ${isActive ? 'bg-green-500 text-bg-main' : isExpired ? 'bg-red-500 text-bg-main' : 'bg-orange-500 text-bg-main'}`}>
                                                 {isActive ? 'Active' : isExpired ? 'Expired' : 'Scheduled'}
                                             </span>
                                             <span className="text-[10px] font-bold text-text-muted">{q.questions.length} Questions</span>
@@ -621,7 +621,7 @@ const ManageQuizzes = ({ groupId, onBack }: { groupId: string, onBack: () => voi
                                     <div className="flex items-center gap-1.5">
                                         <button onClick={() => reuseQuiz(q)} className="p-1.5 hover:bg-hover-bg rounded-lg text-text-muted" title="Reuse"><Copy size={14} /></button>
                                         <button onClick={() => startEdit(q)} className="p-1.5 hover:bg-hover-bg rounded-lg text-text-muted" title="Edit"><Edit3 size={14} /></button>
-                                        <button onClick={() => handleDelete(q.id)} className="p-1.5 hover:bg-hover-bg rounded-lg text-red-400" title="Delete"><Trash2 size={14} /></button>
+                                        <button onClick={() => handleDelete(q.id)} className="p-1.5 hover:bg-red-500/10 rounded-lg text-red-500" title="Delete"><Trash2 size={14} /></button>
                                     </div>
                                 </div>
                             </div>
@@ -740,13 +740,19 @@ const DAODetail = ({ groupId, onBack }: { groupId: string, onBack: () => void })
       setSearchResults([]);
       return;
     }
-    setIsSearching(true);
-    const q = query(collection(db, 'users'), where('displayName', '>=', userSearch), where('displayName', '<=', userSearch + '\uf8ff'), limit(5));
-    const unsub = onSnapshot(q, (snap) => {
-      setSearchResults(snap.docs.map(d => ({ uid: d.id, ...d.data() })));
-      setIsSearching(false);
-    });
-    return unsub;
+    const performSearch = async () => {
+      setIsSearching(true);
+      try {
+        const q = query(collection(db, 'users'), where('displayName', '>=', userSearch), where('displayName', '<=', userSearch + '\uf8ff'), limit(5));
+        const snap = await getDocs(q);
+        setSearchResults(snap.docs.map(d => ({ uid: d.id, ...d.data() })));
+      } catch (err) {
+        console.error("Search error:", err);
+      } finally {
+        setIsSearching(false);
+      }
+    };
+    performSearch();
   }, [userSearch]);
 
   const addMember = async (targetUser: any) => {
@@ -780,17 +786,21 @@ const DAODetail = ({ groupId, onBack }: { groupId: string, onBack: () => void })
   };
 
   useEffect(() => {
-    const unsub = onSnapshot(doc(db, 'daoGroups', groupId), (snap) => {
-      if (snap.exists()) setGroup({ id: snap.id, ...snap.data() } as DAOGroup);
-    });
-    
-    const unsubMembers = onSnapshot(collection(db, `daoGroups/${groupId}/members`), (snap) => {
-        const m = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        setMembers(m);
-        setIsMember(user ? snap.docs.some(d => d.id === user.uid) : false);
-    });
+    const fetchGroupData = async () => {
+      try {
+        const groupSnap = await getDoc(doc(db, 'daoGroups', groupId));
+        if (groupSnap.exists()) setGroup({ id: groupSnap.id, ...groupSnap.data() } as DAOGroup);
 
-    return () => { unsub(); unsubMembers(); };
+        const membersSnap = await getDocs(collection(db, `daoGroups/${groupId}/members`));
+        const m = membersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        setMembers(m);
+        setIsMember(user ? membersSnap.docs.some(d => d.id === user.uid) : false);
+      } catch (err) {
+        console.error("Error fetching group details:", err);
+      }
+    };
+    
+    fetchGroupData();
   }, [groupId, user]);
 
   const downloadLeaderboardPDF = () => {
@@ -874,9 +884,9 @@ const DAODetail = ({ groupId, onBack }: { groupId: string, onBack: () => void })
   const isAdmin = user?.uid === group.adminId;
 
   return (
-    <div className="flex flex-col h-full bg-white animate-in slide-in-from-right duration-200">
-      <div className="sticky top-0 bg-white z-40 px-4 h-14 flex items-center gap-4 border-b border-border-main">
-        <button onClick={onBack} className="p-1 -ml-1 text-text-muted hover:text-text-main">
+    <div className="flex flex-col h-full bg-bg-main animate-in slide-in-from-right duration-200 transition-colors">
+      <div className="sticky top-0 bg-bg-main z-40 px-4 h-14 flex items-center gap-4 border-b border-border-main transition-colors">
+        <button onClick={onBack} className="p-1 -ml-1 text-text-muted hover:text-text-main transition-colors">
            <ArrowRight className="rotate-180" size={24} />
         </button>
         <h2 className="font-bold text-[16px] truncate flex-grow text-text-main">{group.name}</h2>
@@ -891,7 +901,7 @@ const DAODetail = ({ groupId, onBack }: { groupId: string, onBack: () => void })
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed top-20 left-1/2 -translate-x-1/2 z-[60] bg-green-500 text-white px-6 py-2.5 rounded-full text-xs font-black shadow-xl"
+            className="fixed top-20 left-1/2 -translate-x-1/2 z-[60] bg-green-500 text-bg-main px-6 py-2.5 rounded-full text-xs font-black shadow-xl"
           >
             {successMsg}
           </motion.div>
@@ -928,11 +938,11 @@ const DAODetail = ({ groupId, onBack }: { groupId: string, onBack: () => void })
         </div>
 
         <div className="flex gap-2">
-            <div className="flex-1 p-3 bg-hover-bg rounded-xl border border-border-main/50 text-center">
+            <div className="flex-1 p-3 bg-hover-bg rounded-xl border border-border-main/50 text-center transition-colors">
                 <p className="text-[10px] font-bold text-text-muted mb-1">Members</p>
                 <p className="text-sm font-bold text-text-main">{members.length} / {group.memberLimit}</p>
             </div>
-            <div className="flex-1 p-3 bg-hover-bg rounded-xl border border-border-main/50 text-center">
+            <div className="flex-1 p-3 bg-hover-bg rounded-xl border border-border-main/50 text-center transition-colors">
                 <p className="text-[10px] font-bold text-text-muted mb-1">Period</p>
                 <p className="text-sm font-bold text-text-main">{group.goalPeriodDays} days</p>
             </div>
@@ -943,7 +953,7 @@ const DAODetail = ({ groupId, onBack }: { groupId: string, onBack: () => void })
                 {group.isPrivate && (
                   <button 
                       onClick={() => setShowAddMember(!showAddMember)}
-                      className="w-full py-3 bg-primary text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 hover:bg-primary-dark transition-all shadow-md shadow-primary/10 tracking-wide"
+                      className="w-full py-3 bg-primary text-bg-main rounded-xl font-bold text-xs flex items-center justify-center gap-2 hover:bg-primary-dark transition-all shadow-md shadow-primary/10 tracking-wide"
                   >
                       <Plus size={16} /> {showAddMember ? 'Close Add Member' : 'Add Member (Private Group)'}
                   </button>
@@ -964,7 +974,7 @@ const DAODetail = ({ groupId, onBack }: { groupId: string, onBack: () => void })
                           value={userSearch}
                           onChange={(e) => setUserSearch(e.target.value)}
                           placeholder="Search user by name..."
-                          className="w-full pl-9 pr-4 py-2.5 bg-white border-2 border-border-main/50 rounded-lg text-xs font-bold outline-none focus:ring-2 focus:ring-primary/20 transition-all font-sans"
+                          className="w-full pl-9 pr-4 py-2.5 bg-bg-main border-2 border-border-main/50 rounded-lg text-xs font-bold outline-none focus:ring-2 focus:ring-primary/20 transition-all font-sans"
                         />
                       </div>
                       
@@ -973,14 +983,14 @@ const DAODetail = ({ groupId, onBack }: { groupId: string, onBack: () => void })
                           <p className="text-[10px] font-bold text-text-muted text-center py-2">Searching...</p>
                         ) : searchResults.length > 0 ? (
                           searchResults.map((u, idx) => (
-                            <div key={`${u.uid}-${idx}`} className="flex items-center justify-between p-2 bg-white rounded-lg border border-border-main/30 shadow-sm">
+                            <div key={`${u.uid}-${idx}`} className="flex items-center justify-between p-2 bg-theme-card rounded-lg border border-border-main/30 shadow-sm transition-colors">
                               <div className="flex items-center gap-2">
                                 <img src={u.photoURL} className="w-6 h-6 rounded-full" referrerPolicy="no-referrer" />
                                 <span className="text-[11px] font-bold text-text-main">{u.displayName}</span>
                               </div>
                               <button 
                                 onClick={() => addMember(u)}
-                                className="px-3 py-1 bg-primary text-white rounded-md text-[10px] font-bold hover:bg-primary-dark transition-colors"
+                                className="px-3 py-1 bg-primary text-bg-main rounded-md text-[10px] font-bold hover:bg-primary-dark transition-colors"
                               >
                                 Add
                               </button>
@@ -996,7 +1006,7 @@ const DAODetail = ({ groupId, onBack }: { groupId: string, onBack: () => void })
 
                 <button 
                     onClick={() => setShowManager(true)}
-                    className="w-full py-3 bg-white text-primary rounded-xl font-bold text-xs border-2 border-primary/20 flex items-center justify-center gap-2 hover:bg-primary hover:text-white transition-all shadow-sm tracking-wide"
+                    className="w-full py-3 bg-bg-main text-primary rounded-xl font-bold text-xs border-2 border-primary/20 flex items-center justify-center gap-2 hover:bg-primary hover:text-bg-main transition-all shadow-sm tracking-wide"
                 >
                     <Edit3 size={16} /> Manage group quizzes
                 </button>
@@ -1008,7 +1018,6 @@ const DAODetail = ({ groupId, onBack }: { groupId: string, onBack: () => void })
                 </button>
             </div>
         )}
-
         {isMember && (
           <div className="space-y-3">
              <div className="p-4 bg-primary/5 rounded-2xl border border-primary/20 space-y-3">
@@ -1027,7 +1036,7 @@ const DAODetail = ({ groupId, onBack }: { groupId: string, onBack: () => void })
                 </div>
 
                 {group.meetingLink ? (
-                  <div className="flex items-center justify-between p-3 bg-white rounded-xl border border-border-main/50 shadow-sm">
+                  <div className="flex items-center justify-between p-3 bg-theme-card rounded-xl border border-border-main/50 text-text-main shadow-sm transition-colors">
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="w-8 h-8 bg-hover-bg rounded-lg flex items-center justify-center text-primary shrink-0">
                         <Users size={16} />
@@ -1058,11 +1067,11 @@ const DAODetail = ({ groupId, onBack }: { groupId: string, onBack: () => void })
                       value={meetingLink}
                       onChange={(e) => setMeetingLink(e.target.value)}
                       placeholder="Enter meeting link or ID..."
-                      className="w-full bg-white border border-border-main rounded-xl p-3 text-xs font-medium focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                      className="w-full bg-bg-main border border-border-main rounded-xl p-3 text-xs font-medium focus:ring-2 focus:ring-primary/20 outline-none transition-all"
                     />
                     <button 
                       onClick={updateMeetingLink}
-                      className="w-full py-2.5 bg-primary text-white rounded-xl font-bold text-xs active:scale-95 transition-all shadow-lg shadow-primary/10"
+                      className="w-full py-2.5 bg-primary text-bg-main rounded-xl font-bold text-xs active:scale-95 transition-all shadow-lg shadow-primary/10"
                     >
                       Save Meeting Info
                     </button>
@@ -1087,7 +1096,7 @@ const DAODetail = ({ groupId, onBack }: { groupId: string, onBack: () => void })
                 <button 
                   onClick={joinGroup}
                   disabled={credits < (group.stakedPoints || 0)}
-                  className="w-full py-3 bg-primary text-white rounded-full font-bold text-sm hover:bg-primary-dark shadow-lg shadow-primary/20 active:scale-[0.98] transition-all disabled:opacity-50"
+                  className="w-full py-3 bg-primary text-bg-main rounded-full font-bold text-sm hover:bg-primary-dark shadow-lg shadow-primary/20 active:scale-[0.98] transition-all disabled:opacity-50"
                 >
                   Stake & Join DAO
                 </button>
@@ -1095,7 +1104,7 @@ const DAODetail = ({ groupId, onBack }: { groupId: string, onBack: () => void })
                 <button 
                   onClick={handleMessageAdmin}
                   disabled={isStartingChat}
-                  className="w-full py-3 bg-primary text-white rounded-full font-bold text-sm hover:bg-primary-dark shadow-lg shadow-primary/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                  className="w-full py-3 bg-primary text-bg-main rounded-full font-bold text-sm hover:bg-primary-dark shadow-lg shadow-primary/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
                 >
                   <MessageSquare size={16} />
                   {isStartingChat ? 'Connecting...' : 'Message Admin to Join'}
@@ -1115,7 +1124,7 @@ const DAODetail = ({ groupId, onBack }: { groupId: string, onBack: () => void })
                     {[...members].sort((a,b) => (b.quizzesPassed || 0) - (a.quizzesPassed || 0)).map((m, idx) => (
                       <div 
                         key={`leader-${m.id || m.userId || idx}-${idx}`} 
-                        className="flex items-center gap-3 p-3 bg-white border border-border-main rounded-xl hover:bg-hover-bg transition-colors"
+                        className="flex items-center gap-3 p-3 bg-theme-card border border-border-main rounded-xl hover:bg-hover-bg transition-colors"
                       >
                          <span className="w-4 text-center font-bold text-xs text-text-muted shrink-0">{idx + 1}</span>
                          <div 
@@ -1138,7 +1147,7 @@ const DAODetail = ({ groupId, onBack }: { groupId: string, onBack: () => void })
                                   e.stopPropagation();
                                   removeMember(m.id || m.userId);
                                 }}
-                                className="p-1.5 hover:bg-red-50 text-red-400 rounded-lg transition-colors"
+                                className="p-1.5 hover:bg-red-500/10 text-red-500 rounded-lg transition-colors"
                               >
                                 <Trash2 size={14} />
                               </button>
@@ -1307,7 +1316,7 @@ export default function GroupPage() {
 
   return (
     <div 
-      className="min-h-screen pb-20 relative"
+      className="min-h-screen pb-20 relative bg-bg-main transition-colors"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
@@ -1321,14 +1330,14 @@ export default function GroupPage() {
           <motion.div 
             animate={refreshing ? { rotate: 360 } : { rotate: pullDistance * 2 }}
             transition={refreshing ? { repeat: Infinity, duration: 1, ease: "linear" } : { duration: 0 }}
-            className={`w-8 h-8 rounded-full bg-white shadow-lg border border-border-main flex items-center justify-center ${refreshing ? 'text-primary' : 'text-text-muted'}`}
+            className={`w-8 h-8 rounded-full bg-bg-main shadow-lg border border-border-main flex items-center justify-center ${refreshing ? 'text-primary' : 'text-text-muted'}`}
           >
             <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
           </motion.div>
         </div>
       )}
 
-      <div className="p-5 bg-white border-b border-border-main">
+      <div className="p-5 bg-bg-main border-b border-border-main transition-colors">
         <h1 className="text-xl font-bold text-text-main tracking-tight mb-0.5">DeadlineDAO</h1>
         <p className="text-text-muted text-[10px] font-bold tracking-wide">Commit together. Earn together.</p>
       </div>

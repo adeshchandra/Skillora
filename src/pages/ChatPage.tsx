@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { collection, query, where, onSnapshot, orderBy, doc, addDoc, serverTimestamp, updateDoc, increment, getDoc, writeBatch } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { handleFirestoreError, OperationType } from '../lib/firestoreErrorHandler';
-import { useAuth } from '../App';
+import { useAuth } from '../contexts/AuthContext';
 import { ChatMessage, ChatConversation } from '../types';
 import { ArrowLeft, Send, User as UserIcon, Plus, Smile, Image as ImageIcon, Handshake, Zap, Clock, MessageCircle, Shield, Edit, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -62,7 +62,7 @@ const PersistenceAgreement = ({ onAgree }: { onAgree: () => void }) => (
         <motion.div 
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="bg-white rounded-[32px] p-8 max-w-sm w-full text-center space-y-6 border border-border-main shadow-2xl"
+            className="bg-theme-card rounded-[32px] p-8 max-w-sm w-full text-center space-y-6 border border-border-main shadow-2xl transition-colors"
         >
             <div className="w-16 h-16 bg-primary/10 rounded-2xl mx-auto flex items-center justify-center text-primary">
                 <Shield size={32} />
@@ -76,7 +76,7 @@ const PersistenceAgreement = ({ onAgree }: { onAgree: () => void }) => (
             <div className="flex flex-col gap-3 pt-2">
                 <button 
                     onClick={onAgree}
-                    className="w-full py-4 bg-primary text-white rounded-2xl font-bold text-xs shadow-lg shadow-primary/20 active:scale-95 transition-all"
+                    className="w-full py-4 bg-primary text-bg-main rounded-2xl font-bold text-xs shadow-lg shadow-primary/20 active:scale-95 transition-all"
                 >
                     I agree, Sync to my device
                 </button>
@@ -117,12 +117,12 @@ const SkillRequestBubble = ({ requestId, isMe, onOpenNegotiation }: { requestId:
     }, [requestId]);
 
     if (loading) return <div className="p-4 bg-hover-bg animate-pulse rounded-2xl w-full">Loading request...</div>;
-    if (!request) return <div className="p-4 bg-red-50 text-red-500 rounded-2xl text-xs">Request not found</div>;
+    if (!request) return <div className="p-4 bg-red-500/10 text-red-500 rounded-2xl text-xs border border-red-500/20">Request not found</div>;
 
     const isRecipient = request.recipientId === user?.uid;
 
     return (
-        <div className={`w-full max-w-[280px] rounded-[24px] overflow-hidden border border-border-main/50 bg-white shadow-xl transition-colors ${isMe ? 'ml-auto' : ''}`}>
+        <div className={`w-full max-w-[280px] rounded-[24px] overflow-hidden border border-border-main/50 bg-theme-card shadow-xl transition-colors ${isMe ? 'ml-auto' : ''}`}>
             <div className="p-4 bg-primary/5 border-b border-primary/10 flex items-center justify-between transition-colors">
                 <div className="flex items-center gap-2">
                     <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary transition-colors">
@@ -131,8 +131,8 @@ const SkillRequestBubble = ({ requestId, isMe, onOpenNegotiation }: { requestId:
                     <span className="text-[10px] font-black text-primary transition-colors">Skill Request</span>
                 </div>
                 <span className={`px-2 py-0.5 rounded text-[8px] font-black ${
-                    request.status === 'Accepted' ? 'bg-green-500 text-white' : 
-                    request.status === 'Declined' ? 'bg-red-500 text-white' : 'bg-accent-gold text-white'
+                    request.status === 'Accepted' ? 'bg-green-500 text-bg-main' : 
+                    request.status === 'Declined' ? 'bg-red-500 text-bg-main' : 'bg-accent-gold text-bg-main'
                 }`}>
                     {request.status}
                 </span>
@@ -171,7 +171,7 @@ const SkillRequestBubble = ({ requestId, isMe, onOpenNegotiation }: { requestId:
                 {!isMe && request.status === 'Pending' && (
                     <button 
                         onClick={() => onOpenNegotiation(request)}
-                        className="w-full py-2 bg-primary text-white rounded-xl text-[10px] font-bold hover:bg-primary-dark transition-all shadow-md shadow-primary/10 border border-primary active:scale-95"
+                        className="w-full py-2 bg-primary text-bg-main rounded-xl text-[10px] font-bold hover:bg-primary-dark transition-all shadow-md shadow-primary/10 border border-primary active:scale-95"
                     >
                         Negotiate Contract
                     </button>
@@ -360,7 +360,7 @@ export default function ChatPage() {
 
     if (loading) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-screen bg-white transition-colors">
+            <div className="flex flex-col items-center justify-center min-h-screen bg-bg-main transition-colors">
                 <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
             </div>
         );
@@ -381,7 +381,7 @@ export default function ChatPage() {
             />
 
             {/* Header */}
-            <div className="h-14 bg-white border-b border-border-main flex items-center px-4 shrink-0 transition-all sticky top-0 z-40">
+            <div className="h-14 bg-bg-main border-b border-border-main flex items-center px-4 shrink-0 transition-all sticky top-0 z-40 transition-colors">
                 <button onClick={() => navigate('/messages')} className="p-2 -ml-2 rounded-xl hover:bg-hover-bg transition-colors mr-2">
                     <ArrowLeft size={20} className="text-text-main" />
                 </button>
@@ -406,9 +406,9 @@ export default function ChatPage() {
             </div>
 
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto px-4 py-2 space-y-4 transition-colors">
+            <div className="flex-1 overflow-y-auto px-4 py-2 space-y-4 transition-colors bg-bg-main">
                 <div className="py-8 text-center">
-                    <div className="w-12 h-12 bg-white rounded-2xl mx-auto flex items-center justify-center border border-border-main/50 mb-3 shadow-sm transition-colors">
+                    <div className="w-12 h-12 bg-theme-card rounded-2xl mx-auto flex items-center justify-center border border-border-main/50 mb-3 shadow-sm transition-colors">
                         <UserIcon className="text-text-muted" size={20} />
                     </div>
                     <h3 className="text-xs font-bold text-text-main leading-none transition-colors">Conversation with {otherInfo?.displayName}</h3>
@@ -449,7 +449,7 @@ export default function ChatPage() {
                                                         {msg.text}
                                                     </p>
                                                     <div className="h-[1px] w-8 bg-primary/20 mx-auto" />
-                                                    <p className="text-[8px] font-black text-primary">Verified Skillora Suggestion</p>
+                                                    <p className="text-[8px] font-black text-primary uppercase tracking-widest">Verified Skillora Suggestion</p>
                                                 </div>
                                             </motion.div>
                                         ) : msg.skillRequestId ? (
@@ -467,8 +467,8 @@ export default function ChatPage() {
                                                 animate={{ opacity: 1, scale: 1, y: 0 }}
                                                 className={`max-w-[85%] ${msg.image ? 'p-1' : 'px-4 py-2.5'} rounded-[24px] text-sm font-medium shadow-sm transition-all ${
                                                     isMe 
-                                                    ? 'bg-primary text-white rounded-br-none' 
-                                                    : 'bg-white text-text-main border border-border-main/50 rounded-bl-none'
+                                                    ? 'bg-primary text-bg-main rounded-br-none' 
+                                                    : 'bg-theme-card text-text-main border border-border-main/50 rounded-bl-none'
                                                 }`}
                                             >
                                                 {msg.image ? (
@@ -486,14 +486,14 @@ export default function ChatPage() {
             </div>
 
             {/* Input Area */}
-            <div className="p-4 bg-white border-t border-border-main shrink-0 relative z-30 transition-colors">
+            <div className="p-4 bg-bg-main border-t border-border-main shrink-0 relative z-30 transition-colors">
                 {isUploading && (
                     <div className="absolute top-0 left-0 right-0 h-1 bg-primary/20 animate-pulse">
                         <div className="h-full bg-primary animate-[shimmer_2s_infinite]" style={{ width: '40%' }} />
                     </div>
                 )}
                 <form onSubmit={handleSendMessage} className="flex items-center gap-2 max-w-lg mx-auto w-full">
-                    <div className="flex items-center">
+                    <div className="flex items-center gap-1">
                         <button 
                             type="button" 
                             onClick={() => setIsRequestModalOpen(true)}
@@ -517,7 +517,7 @@ export default function ChatPage() {
                             value={newMessage}
                             onChange={(e) => setNewMessage(e.target.value)}
                             placeholder="Type an idea..."
-                            className="w-full px-4 py-3 bg-hover-bg/40 border-2 border-transparent rounded-2xl text-[13px] font-bold text-text-main focus:ring-2 focus:ring-primary/20 focus:bg-white focus:border-primary outline-none shadow-sm transition-all pr-12"
+                            className="w-full px-4 py-3 bg-hover-bg/40 border-2 border-transparent rounded-2xl text-[13px] font-bold text-text-main focus:ring-2 focus:ring-primary/20 focus:bg-theme-card focus:border-primary outline-none shadow-sm transition-all pr-12"
                         />
                         <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-primary transition-colors">
                             <Smile size={18} />
@@ -526,7 +526,7 @@ export default function ChatPage() {
                     <button 
                         type="submit"
                         disabled={!newMessage.trim() || isUploading}
-                        className="p-3 bg-primary text-white rounded-2xl shadow-lg border-2 border-primary-dark disabled:opacity-50 disabled:grayscale hover:bg-primary-dark transition-all active:scale-[0.98] shrink-0"
+                        className="p-3 bg-primary text-bg-main rounded-2xl shadow-lg border-2 border-primary-dark disabled:opacity-50 disabled:grayscale hover:bg-primary-dark transition-all active:scale-[0.98] shrink-0"
                     >
                         <Send size={18} strokeWidth={3} />
                     </button>

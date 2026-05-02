@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { collection, query, where, orderBy, onSnapshot, doc, updateDoc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import { useAuth } from '../App';
+import { useAuth } from '../contexts/AuthContext';
 import { Notification } from '../types';
 import { Bell, Heart, Users, MessageCircle, AlertCircle, ShoppingBag, CheckCircle2, Handshake, Star, Sparkles } from 'lucide-react';
 import { format } from 'date-fns';
@@ -59,7 +59,7 @@ const NotificationItem = ({ notification }: NotificationItemProps) => {
   return (
     <div 
       onClick={handleNotificationClick}
-      className={`p-4 flex gap-4 transition-colors cursor-pointer hover:bg-hover-bg bg-white border-b border-border-main/50 relative ${!notification.read ? '' : 'opacity-70'}`}
+      className={`p-4 flex gap-4 transition-colors cursor-pointer hover:bg-hover-bg bg-bg-main border-b border-border-main/50 relative ${!notification.read ? '' : 'opacity-70'}`}
     >
       <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-hover-bg`}>
         {getIcon()}
@@ -100,9 +100,9 @@ export default function NotificationPage() {
     return unsubscribe;
   }, [user]);
 
-  return (
-    <div className="min-h-screen bg-white transition-colors">
-      <header className="sticky top-0 bg-white z-40 px-4 h-14 border-b border-border-main flex items-center justify-between transition-colors">
+   return (
+    <div className="min-h-screen bg-bg-main transition-colors">
+      <header className="sticky top-0 bg-bg-main z-40 px-4 h-14 border-b border-border-main flex items-center justify-between transition-colors">
          <h1 className="text-xl font-bold text-text-main transition-colors">Notifications</h1>
       </header>
 

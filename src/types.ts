@@ -15,6 +15,7 @@ export interface UserProfile {
     hideFromSearch: boolean;
   };
   location?: string;
+  darkMode?: boolean;
 }
 
 export interface Course {

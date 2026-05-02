@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../App';
+import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { auth } from '../lib/firebase';
 import { sendPasswordResetEmail } from 'firebase/auth';
@@ -14,9 +14,9 @@ import {
   ChevronRight, 
   ShieldCheck, 
   Eye, 
+  EyeOff,
   UserCircle,
-  RefreshCw,
-  Moon
+  RefreshCw
 } from 'lucide-react';
 import { doc, updateDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
@@ -40,7 +40,7 @@ const MenuItem = ({ icon: Icon, label, onClick, rightElement, description }: any
 const Section = ({ title, children }: any) => (
   <div className="space-y-2">
     <h3 className="px-4 text-[11px] font-black uppercase tracking-widest text-text-muted">{title}</h3>
-    <div className="bg-white border-y border-border-main overflow-hidden text-left">
+    <div className="bg-theme-card border-y border-border-main overflow-hidden text-left">
       {children}
     </div>
   </div>
@@ -48,7 +48,6 @@ const Section = ({ title, children }: any) => (
 
 export default function SettingsPage() {
   const { user, logout } = useAuth();
-  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -83,31 +82,24 @@ export default function SettingsPage() {
     }
   };
 
-  // Sync theme with local storage or profile if implemented
-  useEffect(() => {
-    // No longer needed to sync darkMode state as it's always dark
-  }, []);
+
+  const { theme, toggleTheme } = useTheme();
+  const isDarkMode = theme === 'dark';
 
   const menuItems = [
     {
-      section: "Appearance",
+      section: "Display",
       items: [
         {
-          icon: Moon,
+          icon: Eye,
           label: "Dark Mode",
-          description: theme === 'dark' ? "Deep dark aesthetic enabled" : "Standard light mode view",
+          description: "Switch between light and dark themes",
+          onClick: toggleTheme,
           rightElement: (
-            <div 
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleTheme();
-              }}
-              className={`w-11 h-6 rounded-full relative transition-all duration-300 cursor-pointer ${theme === 'dark' ? 'bg-primary' : 'bg-border-main'}`}
-            >
-              <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all duration-300 ${theme === 'dark' ? 'left-6 shadow-sm' : 'left-1'}`} />
+            <div className={`w-10 h-5 rounded-full relative transition-colors ${isDarkMode ? 'bg-primary' : 'bg-border-main'}`}>
+              <div className={`absolute top-0.5 w-4 h-4 bg-bg-main rounded-full transition-all ${isDarkMode ? 'left-5.5' : 'left-0.5'}`} />
             </div>
-          ),
-          onClick: toggleTheme
+          )
         }
       ]
     },
@@ -157,9 +149,9 @@ export default function SettingsPage() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col pb-20">
+    <div className="min-h-screen flex flex-col pb-20 bg-bg-main transition-colors">
       {/* Header */}
-      <div className="bg-white border-b border-border-main p-4 flex items-center gap-4 sticky top-0 z-50 transition-colors">
+      <div className="bg-theme-card border-b border-border-main p-4 flex items-center gap-4 sticky top-0 z-50 transition-colors">
         <button 
           onClick={() => navigate(-1)} 
           className="p-2 -ml-2 rounded-xl hover:bg-hover-bg transition-colors"
@@ -182,7 +174,7 @@ export default function SettingsPage() {
         <div className="px-4 pt-4">
           <button 
             onClick={() => setShowLogoutConfirm(true)}
-            className="w-full flex items-center justify-center gap-2 py-4 bg-red-50 text-red-600 rounded-2xl font-black text-xs uppercase tracking-widest border border-red-100 hover:bg-red-100 transition-all active:scale-[0.98]"
+            className="w-full flex items-center justify-center gap-2 py-4 bg-red-500/10 text-red-500 rounded-2xl font-black text-xs uppercase tracking-widest border border-red-500/20 hover:bg-red-500/20 transition-all active:scale-[0.98]"
           >
             <LogOut size={16} />
             Logout from Session
@@ -206,9 +198,9 @@ export default function SettingsPage() {
             />
             <motion.div 
               initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white w-full max-w-xs rounded-[32px] p-6 border-2 border-black relative z-10 space-y-6 text-center shadow-2xl transition-colors"
+              className="bg-theme-card w-full max-w-xs rounded-[32px] p-6 border-2 border-black relative z-10 space-y-6 text-center shadow-2xl transition-colors"
             >
-              <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto text-red-500 mb-2">
+              <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto text-red-500 mb-2">
                 <LogOut size={32} />
               </div>
               <div className="space-y-1">
@@ -218,7 +210,7 @@ export default function SettingsPage() {
               <div className="flex flex-col gap-2">
                 <button 
                   onClick={logout}
-                  className="w-full py-3 bg-red-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-red-200"
+                  className="w-full py-3 bg-red-500 text-bg-main rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-red-200"
                 >
                   Yes, Logout
                 </button>
@@ -245,11 +237,11 @@ export default function SettingsPage() {
             />
             <motion.div 
               initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white w-full max-w-xs rounded-[32px] p-8 border-2 border-black relative z-10 space-y-6 text-center shadow-2xl transition-colors"
+              className="bg-theme-card w-full max-w-xs rounded-[32px] p-8 border-2 border-black relative z-10 space-y-6 text-center shadow-2xl transition-colors"
             >
               {resetSent ? (
                 <>
-                  <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto text-green-500">
+                  <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto text-green-500">
                     <ShieldCheck size={32} />
                   </div>
                   <div className="space-y-2">
@@ -260,7 +252,7 @@ export default function SettingsPage() {
                   </div>
                   <button 
                     onClick={() => setShowPasswordModal(false)}
-                    className="w-full py-3.5 bg-text-main text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl transition-all active:scale-[0.98]"
+                    className="w-full py-3.5 bg-text-main text-bg-main rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl transition-all active:scale-[0.98]"
                   >
                     Got it
                   </button>
@@ -280,7 +272,7 @@ export default function SettingsPage() {
                     <button 
                       onClick={handlePasswordReset}
                       disabled={loading}
-                      className="w-full py-3.5 bg-primary text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl flex items-center justify-center gap-2 active:scale-[0.98] transition-all disabled:opacity-50"
+                      className="w-full py-3.5 bg-primary text-bg-main rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl flex items-center justify-center gap-2 active:scale-[0.98] transition-all disabled:opacity-50"
                     >
                       {loading ? <RefreshCw className="animate-spin" size={14} /> : "Send Reset Link"}
                     </button>
@@ -309,7 +301,7 @@ export default function SettingsPage() {
             />
             <motion.div 
               initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white w-full max-w-sm rounded-[32px] p-6 border-2 border-black relative z-10 space-y-6 shadow-2xl transition-colors"
+              className="bg-theme-card w-full max-w-sm rounded-[32px] p-6 border-2 border-black relative z-10 space-y-6 shadow-2xl transition-colors"
             >
               <div className="text-center space-y-1">
                 <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto text-primary mb-2">
@@ -323,7 +315,7 @@ export default function SettingsPage() {
                 {[
                   { key: 'hideGoals', label: 'Hide Learning Goals', icon: Eye },
                   { key: 'hideMastery', label: 'Hide Mastery Skills', icon: ShieldCheck },
-                  { key: 'hideFromSearch', label: 'Incognito Mode', icon: Moon }
+                  { key: 'hideFromSearch', label: 'Incognito Mode', icon: EyeOff }
                 ].map((item) => {
                   const isActive = profile?.privacy?.[(item.key as any)] || false;
                   return (
@@ -337,7 +329,7 @@ export default function SettingsPage() {
                         <span className="text-sm font-bold text-text-main">{item.label}</span>
                       </div>
                       <div className={`w-10 h-5 rounded-full relative transition-colors ${isActive ? 'bg-primary' : 'bg-border-main'}`}>
-                        <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-all ${isActive ? 'left-5.5' : 'left-0.5'}`} />
+                        <div className={`absolute top-0.5 w-4 h-4 bg-bg-main rounded-full transition-all ${isActive ? 'left-5.5' : 'left-0.5'}`} />
                       </div>
                     </button>
                   );
@@ -346,7 +338,7 @@ export default function SettingsPage() {
 
               <button 
                 onClick={() => setShowPrivacyModal(false)}
-                className="w-full py-4 bg-text-main text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl transition-all active:scale-[0.98]"
+                className="w-full py-4 bg-text-main text-bg-main rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl transition-all active:scale-[0.98]"
               >
                 Close & Save
               </button>

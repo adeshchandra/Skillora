@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { doc, getDoc, onSnapshot, updateDoc, collection, query, where, getDocs, setDoc, addDoc, serverTimestamp, orderBy, deleteDoc, writeBatch, increment } from 'firebase/firestore';
 import { db, auth } from '../lib/firebase';
-import { useAuth } from '../App';
+import { useAuth } from '../contexts/AuthContext';
 import { handleFirestoreError, OperationType } from '../lib/firestore-utils';
 import { UserProfile, Session, LearningRequest, Course, DAOGroup, Quiz } from '../types';
 import { useNavigate } from 'react-router-dom';
@@ -25,7 +25,7 @@ const RatingModal = ({ isOpen, onClose, onRate, name }: { isOpen: boolean, onClo
                         initial={{ scale: 0.95, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0.95, opacity: 0 }}
-                        className="bg-white w-full max-w-sm rounded-[32px] p-6 border border-border-main space-y-6 shadow-2xl"
+                        className="bg-theme-card w-full max-w-sm rounded-[32px] p-6 border border-border-main space-y-6 shadow-2xl"
                     >
                         <div className="text-center space-y-1">
                             <h4 className="text-lg font-bold text-text-main tracking-tighter">Rate {name}</h4>
@@ -36,7 +36,7 @@ const RatingModal = ({ isOpen, onClose, onRate, name }: { isOpen: boolean, onClo
                                 <button
                                     key={s}
                                     onClick={() => setScore(s)}
-                                    className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all font-black text-sm border ${score === s ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20' : 'bg-hover-bg text-text-muted border-border-main/50 hover:bg-border-main'}`}
+                                    className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all font-black text-sm border ${score === s ? 'bg-primary text-bg-main border-primary shadow-lg shadow-primary/20' : 'bg-hover-bg text-text-muted border-border-main/50 hover:bg-border-main'}`}
                                 >
                                     {s}
                                 </button>
@@ -52,7 +52,7 @@ const RatingModal = ({ isOpen, onClose, onRate, name }: { isOpen: boolean, onClo
                             <button onClick={onClose} className="flex-1 py-3 text-xs font-bold text-text-muted hover:text-text-main">Cancel</button>
                             <button 
                                 onClick={() => onRate(score, review)}
-                                className="flex-1 py-3 bg-primary text-white rounded-xl text-xs font-bold shadow-lg shadow-primary/20 active:scale-95 transition-all"
+                                className="flex-1 py-3 bg-primary text-bg-main rounded-xl text-xs font-bold shadow-lg shadow-primary/20 active:scale-95 transition-all"
                             >
                                 Submit Rating
                             </button>
@@ -106,11 +106,11 @@ const SessionCard: React.FC<{
 
     const getStatusColor = (s: string) => {
         switch (s) {
-            case 'Ready': return 'bg-blue-500 text-white border-blue-600';
-            case 'Live': return 'bg-red-500 text-white border-red-600 animate-pulse';
-            case 'Completed': return 'bg-gray-400 text-white border-gray-500';
-            case 'Cancelled': return 'bg-red-100 text-red-600 border-red-200';
-            default: return 'bg-primary text-white border-primary';
+            case 'Ready': return 'bg-blue-500 text-bg-main border-blue-600';
+            case 'Live': return 'bg-red-500 text-bg-main border-red-600 animate-pulse';
+            case 'Completed': return 'bg-gray-400 text-bg-main border-gray-500';
+            case 'Cancelled': return 'bg-red-500/10 text-red-500 border-red-500/20';
+            default: return 'bg-primary text-bg-main border-primary';
         }
     };
 
@@ -121,10 +121,10 @@ const SessionCard: React.FC<{
     return (
         <div 
             id={`session-${session.id}`}
-            className={`p-4 bg-white border rounded-3xl relative overflow-hidden transition-all duration-500 scroll-mt-20 ${status === 'Live' ? 'border-primary ring-4 ring-primary/10 bg-primary/5' : 'border-border-main shadow-sm'}`}
+            className={`p-4 bg-theme-card border rounded-3xl relative overflow-hidden transition-all duration-500 scroll-mt-20 ${status === 'Live' ? 'border-primary ring-4 ring-primary/10 bg-primary/5' : 'border-border-main shadow-sm'}`}
         >
             {status === 'Live' && (
-                <div className="absolute top-0 right-0 px-3 py-1 bg-red-500 text-white text-[8px] font-black animate-pulse">
+                <div className="absolute top-0 right-0 px-3 py-1 bg-red-500 text-bg-main text-[8px] font-black animate-pulse">
                     Live Session
                 </div>
             )}
@@ -149,7 +149,7 @@ const SessionCard: React.FC<{
                     </button>
                     <button 
                         onClick={onCancel}
-                        className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all border border-transparent hover:border-red-100"
+                        className="p-2 text-red-400 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all border border-transparent hover:border-red-500/20"
                     >
                         <Trash2 size={18} />
                     </button>
@@ -160,7 +160,7 @@ const SessionCard: React.FC<{
                 <div className="p-3 bg-hover-bg rounded-2xl space-y-1 border border-border-main/30">
                     <p className="text-[10px] font-bold text-text-muted opacity-60">Contract Participant</p>
                     <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-lg bg-white border border-border-main/50 flex items-center justify-center text-[10px] font-bold text-primary">
+                        <div className="w-6 h-6 rounded-lg bg-theme-card border border-border-main/50 flex items-center justify-center text-[10px] font-bold text-primary">
                             {(isTeacher ? session.learnerName : session.teacherName)?.[0]}
                         </div>
                         <p className="text-xs font-bold text-text-main truncate">{isTeacher ? session.learnerName : session.teacherName}</p>
@@ -178,7 +178,7 @@ const SessionCard: React.FC<{
             <div className="flex flex-col gap-2">
                 {status !== 'Completed' && status !== 'Cancelled' && (
                     <>
-                        <div className="bg-white border-2 border-border-main rounded-2xl overflow-hidden p-1.5 flex flex-col gap-1.5 transition-all">
+                        <div className="bg-theme-card border-2 border-border-main rounded-2xl overflow-hidden p-1.5 flex flex-col gap-1.5 transition-all">
                             {isTeacher ? (
                                 <>
                                     {showLinkInput ? (
@@ -191,7 +191,7 @@ const SessionCard: React.FC<{
                                             />
                                             <button 
                                                 onClick={() => { onUpdateLink?.(meetingLink); setShowLinkInput(false); }}
-                                                className="px-4 py-2 bg-text-main text-white rounded-xl text-xs font-bold"
+                                                className="px-4 py-2 bg-text-main text-bg-main rounded-xl text-xs font-bold"
                                             >
                                                 Save
                                             </button>
@@ -202,7 +202,7 @@ const SessionCard: React.FC<{
                                                 <>
                                                     <button 
                                                         onClick={() => window.open(session.link, '_blank')}
-                                                        className="flex-1 py-3 bg-primary text-white rounded-xl text-xs font-bold shadow-lg shadow-primary/20 active:scale-95 transition-all"
+                                                        className="flex-1 py-3 bg-primary text-bg-main rounded-xl text-xs font-bold shadow-lg shadow-primary/20 active:scale-95 transition-all"
                                                     >
                                                         Launch Session
                                                     </button>
@@ -235,7 +235,7 @@ const SessionCard: React.FC<{
                                         )}
                                         <button 
                                             onClick={onComplete}
-                                            className="flex-1 py-2 bg-text-main text-white rounded-xl text-[10px] font-bold"
+                                            className="flex-1 py-2 bg-text-main text-bg-main rounded-xl text-[10px] font-bold"
                                         >
                                             Finalize Session
                                         </button>
@@ -248,7 +248,7 @@ const SessionCard: React.FC<{
                                         disabled={!session.link}
                                         className={`w-full py-4 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all ${
                                             session.link 
-                                            ? 'bg-primary text-white shadow-lg shadow-primary/20 active:scale-95' 
+                                            ? 'bg-primary text-bg-main shadow-lg shadow-primary/20 active:scale-95' 
                                             : 'bg-hover-bg text-text-muted border border-border-main/30'
                                         }`}
                                     >
@@ -267,7 +267,7 @@ const SessionCard: React.FC<{
                                         )}
                                         <button 
                                             onClick={onComplete}
-                                            className="flex-1 py-2 bg-text-main text-white rounded-xl text-[10px] font-bold"
+                                            className="flex-1 py-2 bg-text-main text-bg-main rounded-xl text-[10px] font-bold"
                                         >
                                             Propose Completion
                                         </button>
@@ -279,8 +279,8 @@ const SessionCard: React.FC<{
                 )}
                 {(status === 'Completed' || status === 'Cancelled') && (
                     <div className="space-y-3">
-                         <div className={`p-3 rounded-2xl flex items-center gap-3 border ${status === 'Completed' ? 'bg-green-50 border-green-100 text-green-700' : 'bg-red-50 border-red-100 text-red-700'}`}>
-                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${status === 'Completed' ? 'bg-green-200' : 'bg-red-200'}`}>
+                         <div className={`p-3 rounded-2xl flex items-center gap-3 border ${status === 'Completed' ? 'bg-green-500/10 border-green-500/20 text-green-500' : 'bg-red-500/10 border-red-500/20 text-red-500'}`}>
+                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${status === 'Completed' ? 'bg-green-500/20' : 'bg-red-500/20'}`}>
                                 {status === 'Completed' ? <Check size={18} /> : <X size={18} />}
                             </div>
                             <p className="text-[10px] font-bold">
@@ -291,7 +291,7 @@ const SessionCard: React.FC<{
                         {!hasIRated && status === 'Completed' && (
                             <button 
                                 onClick={onRate}
-                                className="w-full py-3.5 bg-accent-gold text-white rounded-2xl text-xs font-bold shadow-xl shadow-accent-gold/20 active:scale-95 transition-all"
+                                className="w-full py-3.5 bg-accent-gold text-bg-main rounded-2xl text-xs font-bold shadow-xl shadow-accent-gold/20 active:scale-95 transition-all"
                             >
                                 Leave Immutable Feedback
                             </button>
@@ -354,9 +354,9 @@ const DAOEditModal = ({ group, onClose }: { group: DAOGroup; onClose: () => void
         <div className="fixed inset-0 z-[110] flex items-end md:items-center justify-center bg-text-main/20 backdrop-blur-sm p-0 md:p-4">
             <motion.div 
                 initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
-                className="w-full max-w-lg bg-white rounded-t-3xl md:rounded-3xl flex flex-col border border-border-main overflow-hidden shadow-2xl"
+                className="w-full max-w-lg bg-theme-card rounded-t-3xl md:rounded-3xl flex flex-col border border-border-main overflow-hidden shadow-2xl"
             >
-                <div className="p-6 border-b border-border-main flex items-center justify-between bg-white shrink-0">
+                <div className="p-6 border-b border-border-main flex items-center justify-between bg-theme-card shrink-0">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
                             <Shield size={20} />
@@ -400,7 +400,7 @@ const DAOEditModal = ({ group, onClose }: { group: DAOGroup; onClose: () => void
                     <button 
                         onClick={handleSaveGroup} 
                         disabled={loading} 
-                        className="w-full py-4 bg-text-main text-white rounded-2xl font-bold text-xs flex items-center justify-center gap-2 hover:bg-black transition-all active:scale-[0.98]"
+                        className="w-full py-4 bg-text-main text-bg-main rounded-2xl font-bold text-xs flex items-center justify-center gap-2 hover:bg-black transition-all active:scale-[0.98]"
                     >
                         {loading ? <RefreshCw className="animate-spin" size={16} /> : <Save size={16} />} 
                         Save changes
@@ -415,24 +415,24 @@ const RequestCard = ({ request, onAccept, onDecline, onMessage }: { request: Lea
     return (
         <div 
             id={`request-${request.id}`}
-            className="p-4 bg-white border border-accent-gold/30 rounded-3xl relative overflow-hidden bg-accent-gold/5 shadow-sm scroll-mt-20 hover:border-accent-gold/50 transition-all"
+            className="p-4 bg-theme-card border border-accent-gold/30 rounded-3xl relative overflow-hidden bg-accent-gold/5 shadow-sm scroll-mt-20 hover:border-accent-gold/50 transition-all"
         >
             <div className="flex items-start justify-between mb-3">
                 <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                        <div className="px-2 py-0.5 rounded-full text-[8px] font-black bg-accent-gold text-white">
+                        <div className="px-2 py-0.5 rounded-full text-[8px] font-black bg-accent-gold text-bg-main">
                             New Contract Proposal
                         </div>
                         <span className="text-[10px] font-black text-text-muted">{request.learnSkill}</span>
                     </div>
                     <h4 className="text-sm font-bold text-text-main line-clamp-1">{request.senderName} wants to collaborate</h4>
                 </div>
-                <button onClick={onMessage} className="p-2 bg-text-main text-white rounded-xl hover:bg-black transition-all shadow-md active:scale-95">
+                <button onClick={onMessage} className="p-2 bg-text-main text-bg-main rounded-xl hover:bg-black transition-all shadow-md active:scale-95">
                     <MessageCircle size={18} />
                 </button>
             </div>
             
-            <div className="p-3 bg-white/60 rounded-2xl mb-4 border border-black/5 prose-xs">
+            <div className="p-3 bg-bg-main/60 rounded-2xl mb-4 border border-black/5 prose-xs">
                 <Markdown>{request.message}</Markdown>
             </div>
 
@@ -440,7 +440,7 @@ const RequestCard = ({ request, onAccept, onDecline, onMessage }: { request: Lea
                 <button onClick={onDecline} className="flex-1 py-3 text-[11px] font-bold text-text-muted hover:text-red-500 transition-colors">
                     Decline proposal
                 </button>
-                <button onClick={onAccept} className="flex-2 py-3 bg-accent-gold text-white rounded-xl text-[11px] font-black shadow-lg shadow-accent-gold/20 active:scale-95 transition-all">
+                <button onClick={onAccept} className="flex-2 py-3 bg-accent-gold text-bg-main rounded-xl text-[11px] font-black shadow-lg shadow-accent-gold/20 active:scale-95 transition-all">
                     View Entire Form
                 </button>
             </div>
@@ -635,80 +635,37 @@ export default function ProfilePage() {
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [selectedSessionForRating, setSelectedSessionForRating] = useState<Session | null>(null);
 
+  // Profile is synced via authProfile from useAuth() in AuthProvider
   useEffect(() => {
     if (authProfile) {
       setProfile(authProfile);
     }
   }, [authProfile]);
 
-  // 1. Core Profile Listener
-  useEffect(() => {
+  // 2. Data Fetching (Sessions, Requests, Courses)
+  const fetchProfileData = async () => {
     if (!user) return;
-    return onSnapshot(doc(db, 'users', user.uid), (snap) => {
-      if (snap.exists()) {
-        setProfile({ uid: snap.id, ...snap.data() } as UserProfile);
-      } else {
-        // Auto-create profile if missing
-        const userData = {
-          uid: user.uid,
-          email: user.email?.toLowerCase() || '',
-          displayName: user.displayName || 'Learner',
-          photoURL: user.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${user.displayName || 'U'}`,
-          role: 'student',
-          credits: 150,
-          teachSkills: [],
-          learnSkills: [],
-          joinedGroups: [],
-          rating: 5.0,
-          reviewCount: 0,
-          createdAt: new Date().toISOString(),
-          onboardingCompleted: true
-        };
-        setDoc(doc(db, 'users', user.uid), userData);
-      }
-    });
-  }, [user]);
+    try {
+        const [learnerSnap, teacherSnap, coursesSnap, daoSnap, requestsSnap] = await Promise.all([
+            getDocs(query(collection(db, 'sessions'), where('learnerId', '==', user.uid))),
+            getDocs(query(collection(db, 'sessions'), where('teacherId', '==', user.uid))),
+            getDocs(query(collection(db, 'courses'), where('teacherId', '==', user.uid))),
+            getDocs(query(collection(db, 'daoGroups'), where('adminId', '==', user.uid))),
+            getDocs(query(collection(db, 'learningRequests'), where('recipientId', '==', user.uid)))
+        ]);
 
-  // 2. Data Listeners (Sessions, Requests, Courses)
+        setLearnerSessions(learnerSnap.docs.map(d => ({ id: d.id, ...d.data() } as Session)));
+        setTeacherSessions(teacherSnap.docs.map(d => ({ id: d.id, ...d.data() } as Session)));
+        setMyCourses(coursesSnap.docs.map(d => ({ id: d.id, ...d.data() } as Course)));
+        setMyDAOGroups(daoSnap.docs.map(d => ({ id: d.id, ...d.data() } as DAOGroup)));
+        setPendingRequests(requestsSnap.docs.map(d => ({ id: d.id, ...d.data() } as LearningRequest)));
+    } catch (err) {
+        console.error("Error fetching profile data:", err);
+    }
+  };
+
   useEffect(() => {
-    if (!user) return;
-
-    const unsubLearner = onSnapshot(query(
-        collection(db, 'sessions'), 
-        where('learnerId', '==', user.uid)
-    ), (snap) => {
-        setLearnerSessions(snap.docs.map(d => ({ id: d.id, ...d.data() } as Session)));
-    });
-
-    const unsubTeacher = onSnapshot(query(
-        collection(db, 'sessions'), 
-        where('teacherId', '==', user.uid)
-    ), (snap) => {
-        setTeacherSessions(snap.docs.map(d => ({ id: d.id, ...d.data() } as Session)));
-    });
-
-    const unsubCourses = onSnapshot(query(collection(db, 'courses'), where('teacherId', '==', user.uid)), (snap) => {
-        setMyCourses(snap.docs.map(d => ({ id: d.id, ...d.data() } as Course)));
-    });
-
-    const unsubDAORef = onSnapshot(query(collection(db, 'daoGroups'), where('adminId', '==', user.uid)), (snap) => {
-        setMyDAOGroups(snap.docs.map(d => ({ id: d.id, ...d.data() } as DAOGroup)));
-    });
-
-    const unsubRequests = onSnapshot(query(
-        collection(db, 'learningRequests'),
-        where('recipientId', '==', user.uid)
-    ), (snap) => {
-        setPendingRequests(snap.docs.map(d => ({ id: d.id, ...d.data() } as LearningRequest)));
-    });
-
-    return () => { 
-        unsubLearner(); 
-        unsubTeacher();
-        unsubCourses();
-        unsubDAORef();
-        unsubRequests();
-    };
+    fetchProfileData();
   }, [user]);
 
   // 2.5 Fetch Stats for Joined Groups
@@ -1259,7 +1216,7 @@ export default function ProfilePage() {
 
   if (!profile) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white p-10">
+      <div className="min-h-screen flex items-center justify-center bg-bg-main p-10">
         <div className="flex flex-col items-center gap-6 text-center">
             <div className="flex items-center justify-center gap-2">
                 <span className="text-4xl font-black tracking-tighter text-text-main">Skillora</span>
@@ -1280,7 +1237,7 @@ export default function ProfilePage() {
   const getReputation = (rating: number) => {
       if (rating >= 4.5) return { label: "Visionary Elite", color: "text-accent-gold bg-accent-gold/5 border-accent-gold/20" };
       if (rating >= 4.0) return { label: "Trusted Mentor", color: "text-primary bg-primary/5 border-primary/20" };
-      if (rating >= 3.5) return { label: "Rising Expert", color: "text-green-600 bg-green-50 border-green-200" };
+      if (rating >= 3.5) return { label: "Rising Expert", color: "text-green-500 bg-green-500/10 border-green-500/20" };
       return { label: "Skill Seeker", color: "text-text-muted bg-hover-bg border-border-main" };
   };
 
@@ -1289,7 +1246,7 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen relative">
       {/* Profile Header */}
-      <div className="bg-white p-4 space-y-4 border-b border-border-main sticky top-0 z-10">
+      <div className="bg-theme-card p-4 space-y-4 border-b border-border-main sticky top-0 z-10">
         <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-full overflow-hidden border border-border-main/50 ring-2 ring-primary/5 bg-hover-bg flex items-center justify-center">
                 {profile.photoURL ? (
@@ -1323,7 +1280,7 @@ export default function ProfilePage() {
         <div className="flex gap-2">
             <button 
                 onClick={() => setIsEditing(!isEditing)}
-                className="flex-1 py-2 bg-text-main text-white rounded-xl text-xs font-bold active:scale-[0.98] transition-all"
+                className="flex-1 py-2 bg-text-main text-bg-main rounded-xl text-xs font-bold active:scale-[0.98] transition-all"
             >
                 Edit Profile
             </button>
@@ -1343,7 +1300,7 @@ export default function ProfilePage() {
                     initial={{ opacity: 0, y: -10 }} 
                     animate={{ opacity: 1, y: 0 }} 
                     exit={{ opacity: 0, y: -10 }}
-                    className="space-y-4 bg-white p-4 rounded-2xl border border-border-main"
+                    className="space-y-4 bg-theme-card p-4 rounded-2xl border border-border-main"
                 >
                     <div className="flex items-center gap-4 pb-2">
                         <div className="relative group">
@@ -1355,11 +1312,11 @@ export default function ProfilePage() {
                                 />
                             </div>
                             <label className="absolute inset-0 flex items-center justify-center cursor-pointer bg-text-main/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl">
-                                <Camera size={18} className="text-white" />
+                                <Camera size={18} className="text-bg-main" />
                                 <input type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
                             </label>
                             {uploading && (
-                                <div className="absolute inset-0 flex items-center justify-center bg-white rounded-2xl">
+                                <div className="absolute inset-0 flex items-center justify-center bg-theme-card rounded-2xl">
                                     <RefreshCw size={16} className="text-primary animate-spin" />
                                 </div>
                             )}
@@ -1385,7 +1342,7 @@ export default function ProfilePage() {
                                             await updateDoc(doc(db, 'users', profile.uid), { role: r.id });
                                         }}
                                         className={`flex-1 flex items-center justify-center gap-2 py-2 px-1 rounded-lg text-[10px] font-bold transition-all ${
-                                            isSelected ? 'bg-white text-primary shadow-sm ring-1 ring-primary/10' : 'text-text-muted hover:text-text-main'
+                                            isSelected ? 'bg-theme-card text-primary shadow-sm ring-1 ring-primary/10' : 'text-text-muted hover:text-text-main'
                                         }`}
                                     >
                                         <r.icon size={12} />
@@ -1416,14 +1373,14 @@ export default function ProfilePage() {
                           placeholder="e.g. Cooking, piano" 
                         />
                     </div>
-                    <button onClick={updateSkills} className="w-full bg-text-main text-white py-3.5 rounded-xl font-bold text-xs active:scale-[0.98] transition-all">Save changes</button>
+                    <button onClick={updateSkills} className="w-full bg-text-main text-bg-main py-3.5 rounded-xl font-bold text-xs active:scale-[0.98] transition-all">Save changes</button>
                 </motion.div>
             )}
         </AnimatePresence>
 
         {/* Skills Quick Grid */}
         <div className="grid grid-cols-2 gap-4">
-            <div className="bg-white p-4 rounded-2xl border border-border-main space-y-3 shadow-sm">
+            <div className="bg-theme-card p-4 rounded-2xl border border-border-main space-y-3 shadow-sm">
                 <div className="flex items-center gap-2">
                     <GraduationCap size={14} className="text-accent-gold" />
                     <h3 className="text-[10px] font-bold text-text-muted">Mastery</h3>
@@ -1438,7 +1395,7 @@ export default function ProfilePage() {
                     {(profile.teachSkills || []).length === 0 && <p className="text-[10px] text-text-muted italic">No skills listed</p>}
                 </div>
             </div>
-            <div className="bg-white p-4 rounded-2xl border border-border-main space-y-3 shadow-sm">
+            <div className="bg-theme-card p-4 rounded-2xl border border-border-main space-y-3 shadow-sm">
                 <div className="flex items-center gap-2">
                     <BookOpen size={14} className="text-primary" />
                     <h3 className="text-[10px] font-bold text-text-muted">Goals</h3>
@@ -1468,10 +1425,10 @@ export default function ProfilePage() {
             ) : (
                 <div className="grid grid-cols-2 gap-3">
                     {myCourses.map((course, idx) => (
-                        <div key={`my-course-${course.id}-${idx}`} className="bg-white rounded-2xl border border-border-main overflow-hidden group/card relative shadow-sm hover:border-primary/20 transition-all">
+                        <div key={`my-course-${course.id}-${idx}`} className="bg-theme-card rounded-2xl border border-border-main overflow-hidden group/card relative shadow-sm hover:border-primary/20 transition-all">
                             <div className="aspect-video relative overflow-hidden">
                                 <img src={course.thumbnail} className="w-full h-full object-cover transition-transform group-hover/card:scale-105" referrerPolicy="no-referrer" />
-                                <div className="absolute top-2 right-2 bg-black px-1.5 py-0.5 rounded text-[9px] font-bold text-white flex items-center gap-1">
+                                <div className="absolute top-2 right-2 bg-black px-1.5 py-0.5 rounded text-[9px] font-bold text-bg-main flex items-center gap-1">
                                     <Star size={8} fill="currentColor" /> {course.rating?.toFixed(1) || '0.0'}
                                 </div>
                             </div>
@@ -1497,7 +1454,7 @@ export default function ProfilePage() {
                                             initial={{ opacity: 0, scale: 0.9, y: 5 }}
                                             animate={{ opacity: 1, scale: 1, y: 0 }}
                                             exit={{ opacity: 0, scale: 0.9, y: 5 }}
-                                            className="absolute right-2 bottom-10 w-32 bg-white border-2 border-border-main rounded-xl shadow-2xl z-20 overflow-hidden transition-colors"
+                                            className="absolute right-2 bottom-10 w-32 bg-theme-card border-2 border-border-main rounded-xl shadow-2xl z-20 overflow-hidden transition-colors"
                                         >
                                             <button 
                                                 onClick={() => { setSelectedCourse(course); setShowCourseEdit(true); setActiveCourseMenu(null); }}
@@ -1513,7 +1470,7 @@ export default function ProfilePage() {
                                             </button>
                                             <button 
                                                 onClick={() => handleDeleteCourse(course)}
-                                                className="w-full flex items-center gap-2 px-3 py-2 text-[10px] font-bold text-red-500 hover:bg-red-50 transition-colors"
+                                                className="w-full flex items-center gap-2 px-3 py-2 text-[10px] font-bold text-red-500 hover:bg-red-500/10 transition-colors"
                                             >
                                                 <Trash2 size={12} /> Delete
                                             </button>
@@ -1543,7 +1500,7 @@ export default function ProfilePage() {
                         <div key={`my-dao-${group.id}-${idx}`} className="relative">
                             <div 
                                 onClick={() => navigate(`/group?id=${group.id}`)}
-                                className="p-4 bg-white rounded-2xl border border-border-main flex items-center justify-between group cursor-pointer hover:border-primary/30 transition-all active:scale-[0.99] shadow-sm"
+                                className="p-4 bg-theme-card rounded-2xl border border-border-main flex items-center justify-between group cursor-pointer hover:border-primary/30 transition-all active:scale-[0.99] shadow-sm"
                             >
                                 <div className="flex items-center gap-4">
                                     <div className="w-12 h-12 bg-hover-bg rounded-xl flex items-center justify-center relative overflow-hidden shrink-0 border border-border-main/50">
@@ -1581,7 +1538,7 @@ export default function ProfilePage() {
                                             initial={{ opacity: 0, scale: 0.95, y: -10 }}
                                             animate={{ opacity: 1, scale: 1, y: 0 }}
                                             exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                                            className="absolute right-0 top-14 w-44 bg-white border border-border-main rounded-2xl shadow-2xl z-20 overflow-hidden transition-all"
+                                            className="absolute right-0 top-14 w-44 bg-theme-card border border-border-main rounded-2xl shadow-2xl z-20 overflow-hidden transition-all"
                                         >
                                             <button 
                                                 onClick={() => { setSelectedDAOGroup(group); setShowDAOEdit(true); setActiveDAOMenu(null); }}
@@ -1597,7 +1554,7 @@ export default function ProfilePage() {
                                             </button>
                                             <button 
                                                 onClick={() => handleDeleteDAO(group)}
-                                                className="w-full flex items-center gap-3 px-4 py-3 text-[11px] font-bold text-red-500 hover:bg-red-50 transition-colors"
+                                                className="w-full flex items-center gap-3 px-4 py-3 text-[11px] font-bold text-red-500 hover:bg-red-500/10 transition-colors"
                                             >
                                                 <Trash2 size={14} /> Delete DAO Group
                                             </button>
@@ -1625,7 +1582,7 @@ export default function ProfilePage() {
                             onClick={() => setSessionTab(tab)}
                             className={`px-3 py-1.5 rounded-lg text-[10px] font-black transition-all ${
                                 sessionTab === tab 
-                                ? 'bg-white text-primary shadow-sm ring-1 ring-primary/5' 
+                                ? 'bg-theme-card text-primary shadow-sm ring-1 ring-primary/5' 
                                 : 'text-text-muted hover:text-text-main'
                             }`}
                         >
@@ -1662,7 +1619,7 @@ export default function ProfilePage() {
                                 animate={{ opacity: 1 }}
                                 className="py-12 bg-hover-bg/20 border-2 border-dashed border-border-main/50 rounded-3xl text-center space-y-3"
                             >
-                                <div className="w-12 h-12 bg-white rounded-2xl mx-auto flex items-center justify-center text-text-muted border border-border-main/30 shadow-sm">
+                                <div className="w-12 h-12 bg-theme-card rounded-2xl mx-auto flex items-center justify-center text-text-muted border border-border-main/30 shadow-sm">
                                     <Clock size={20} className="opacity-40" />
                                 </div>
                                 <div className="space-y-1">
@@ -1730,7 +1687,7 @@ export default function ProfilePage() {
             </h3>
             {matchingUsers.length === 0 ? (
                 <div className="py-12 bg-hover-bg border-2 border-dashed border-border-main rounded-2xl text-center space-y-3">
-                    <div className="w-12 h-12 bg-white rounded-full mx-auto flex items-center justify-center text-accent-gold border border-border-main/20 shadow-sm">
+                    <div className="w-12 h-12 bg-theme-card rounded-full mx-auto flex items-center justify-center text-accent-gold border border-border-main/20 shadow-sm">
                         <MapPin size={24} />
                     </div>
                     <p className="text-xs text-text-muted font-bold px-12 leading-relaxed">The algorithm is looking for partners with overlapping skills. Try adding more skills to find them.</p>
@@ -1738,11 +1695,11 @@ export default function ProfilePage() {
             ) : (
                 <div className="flex gap-3 overflow-x-auto pb-4 -mx-4 px-4 no-scrollbar">
                     {matchingUsers.map((u, idx) => (
-                        <div key={`${u.uid}-${idx}`} className="flex-shrink-0 w-48 p-4 bg-white border border-border-main rounded-2xl space-y-3 hover:bg-hover-bg transition-all shadow-sm">
+                        <div key={`${u.uid}-${idx}`} className="flex-shrink-0 w-48 p-4 bg-theme-card border border-border-main rounded-2xl space-y-3 hover:bg-hover-bg transition-all shadow-sm">
                             <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate(`/user/${u.uid}`)}>
                                 <div className="relative">
                                     <img src={u.photoURL} alt={u.displayName} className="w-11 h-11 rounded-full bg-hover-bg border border-border-main/50" referrerPolicy="no-referrer" />
-                                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-white rounded-full flex items-center justify-center border border-border-main">
+                                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-theme-card rounded-full flex items-center justify-center border border-border-main">
                                         <Zap size={10} className="text-accent-gold" />
                                     </div>
                                 </div>
@@ -1763,7 +1720,7 @@ export default function ProfilePage() {
                             </div>
                              <button 
                                  onClick={() => sendRequest(u)}
-                                 className="w-full py-2 bg-primary text-white rounded-xl text-xs font-bold transition-all hover:bg-primary-dark active:scale-[0.98] shadow-lg shadow-primary/10"
+                                 className="w-full py-2 bg-primary text-bg-main rounded-xl text-xs font-bold transition-all hover:bg-primary-dark active:scale-[0.98] shadow-lg shadow-primary/10"
                              >
                                  Initiate Match
                              </button>
@@ -1785,7 +1742,7 @@ export default function ProfilePage() {
                 </div>
                 <div className="grid grid-cols-1 gap-3">
                     {joinedGroupStats.map((stat, idx) => (
-                        <div key={`${stat.id}-${idx}`} className="p-4 bg-white border border-border-main rounded-2xl flex items-center gap-4 hover:border-primary/20 transition-all group shadow-sm">
+                        <div key={`${stat.id}-${idx}`} className="p-4 bg-theme-card border border-border-main rounded-2xl flex items-center gap-4 hover:border-primary/20 transition-all group shadow-sm">
                             <div className="w-12 h-12 rounded-xl bg-hover-bg flex flex-col items-center justify-center border border-border-main/50 shrink-0">
                                 <p className="text-[10px] font-bold text-primary leading-none">{stat.quizzesPassed}</p>
                                 <p className="text-[7px] font-bold text-text-muted mt-0.5">Passed</p>
@@ -1831,7 +1788,7 @@ export default function ProfilePage() {
                 </div>
                 <div className="w-full max-w-lg space-y-4">
                     <div className="space-y-2">
-                        <label className="text-[10px] font-bold text-white opacity-50 block text-center">Zoom Level</label>
+                        <label className="text-[10px] font-bold text-bg-main opacity-50 block text-center">Zoom Level</label>
                         <input
                             type="range"
                             value={zoom}
@@ -1846,13 +1803,13 @@ export default function ProfilePage() {
                     <div className="flex gap-3">
                         <button 
                             onClick={() => setImageToCrop(null)}
-                            className="flex-1 py-4 bg-hover-bg text-white rounded-2xl text-xs font-bold border border-border-main hover:bg-border-main transition-all"
+                            className="flex-1 py-4 bg-hover-bg text-bg-main rounded-2xl text-xs font-bold border border-border-main hover:bg-border-main transition-all"
                         >
                             Cancel
                         </button>
                         <button 
                             onClick={getCroppedImg}
-                            className="flex-1 py-4 bg-primary text-white rounded-2xl text-xs font-bold hover:bg-primary-dark transition-all scale-[0.98] active:scale-95"
+                            className="flex-1 py-4 bg-primary text-bg-main rounded-2xl text-xs font-bold hover:bg-primary-dark transition-all scale-[0.98] active:scale-95"
                         >
                             Apply Crop
                         </button>
@@ -1895,7 +1852,7 @@ export default function ProfilePage() {
                     initial={{ scale: 0.9, opacity: 0 }} 
                     animate={{ scale: 1, opacity: 1 }} 
                     exit={{ scale: 0.9, opacity: 0 }}
-                    className="w-full max-w-sm bg-white rounded-[2.5rem] p-8 space-y-6 border border-border-main relative overflow-hidden shadow-2xl"
+                    className="w-full max-w-sm bg-theme-card rounded-[2.5rem] p-8 space-y-6 border border-border-main relative overflow-hidden shadow-2xl"
                 >
                     <div className="flex items-center justify-between">
                         <h2 className="text-lg font-bold text-text-main tracking-tight">Edit course</h2>
@@ -1945,7 +1902,7 @@ export default function ProfilePage() {
 
                     <button 
                         onClick={updateCourse}
-                        className="w-full py-4 bg-primary text-white rounded-2xl font-bold text-xs shadow-xl shadow-primary/20 active:scale-[0.98] transition-all"
+                        className="w-full py-4 bg-primary text-bg-main rounded-2xl font-bold text-xs shadow-xl shadow-primary/20 active:scale-[0.98] transition-all"
                     >
                         Update course
                     </button>

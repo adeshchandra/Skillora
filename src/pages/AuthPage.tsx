@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAuth } from '../App';
+import { useAuth } from '../contexts/AuthContext';
 import { motion, AnimatePresence } from 'motion/react';
 import { Mail, Lock, Check, X, Eye, EyeOff, User } from 'lucide-react';
 import { auth, db } from '../lib/firebase';
@@ -27,7 +27,7 @@ const FloatingInput = ({ label, value, onChange, type = 'text', showPasswordTogg
           type={showPasswordToggle ? (isPasswordVisible ? 'text' : 'password') : type}
           value={value}
           onChange={onChange}
-          className={`w-full ${Icon ? 'pl-11' : 'px-4'} pr-4 py-4 bg-hover-bg/40 border-2 border-transparent rounded-2xl outline-none focus:bg-white focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-[13px] font-bold text-text-main placeholder:text-text-muted/20 shadow-sm`}
+          className={`w-full ${Icon ? 'pl-11' : 'px-4'} pr-4 py-4 bg-hover-bg/40 border-2 border-transparent rounded-2xl outline-none focus:bg-theme-card focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-[13px] font-bold text-text-main placeholder:text-text-muted/20 shadow-sm`}
           placeholder={`Enter your ${label.toLowerCase()}...`}
         />
         {showPasswordToggle && (
@@ -149,7 +149,7 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center pt-24 px-6 md:px-0">
+    <div className="min-h-screen bg-bg-main flex flex-col items-center pt-24 px-6 md:px-0 transition-colors">
       <div className="w-full max-w-[340px] flex flex-col items-center space-y-8">
         
         <div className="text-center space-y-3 w-full">
@@ -186,7 +186,7 @@ export default function AuthPage() {
                         onChange={(e: any) => setEmail(e.target.value)}
                     />
                     {error && (
-                        <div className="p-3 bg-red-50 text-red-600 text-[10px] font-bold rounded-xl flex items-center gap-2 border border-red-100">
+                        <div className="p-3 bg-red-500/10 text-red-500 text-[10px] font-bold rounded-xl flex items-center gap-2 border border-red-500/20">
                             <X size={14} strokeWidth={3} />
                             {error}
                         </div>
@@ -195,7 +195,7 @@ export default function AuthPage() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full py-4 bg-text-main text-white font-bold text-sm rounded-2xl hover:bg-black transition-all active:scale-[0.98] disabled:opacity-50"
+                            className="w-full py-4 bg-text-main text-bg-main font-bold text-sm rounded-2xl hover:bg-black transition-all active:scale-[0.98] disabled:opacity-50"
                         >
                             {loading ? 'Processing...' : 'Request Link'}
                         </button>
@@ -236,7 +236,7 @@ export default function AuthPage() {
                         onTogglePassword={() => setShowPassword(!showPassword)}
                         onChange={(e: any) => setPassword(e.target.value)}
                     />
-                                    <div className="flex justify-end px-1 -mt-2 pb-2">
+                                     <div className="flex justify-end px-1 -mt-2 pb-2">
                                         <button 
                                             type="button"
                                             onClick={() => { setShowResetForm(true); setError(''); setSuccessMsg(''); }}
@@ -266,13 +266,13 @@ export default function AuthPage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full py-4 bg-text-main text-white font-bold text-sm rounded-2xl hover:bg-black transition-all active:scale-[0.98] disabled:opacity-50 mt-4 shadow-sm"
+                        className="w-full py-4 bg-text-main text-bg-main font-bold text-sm rounded-2xl hover:bg-black transition-all active:scale-[0.98] disabled:opacity-50 mt-4 shadow-sm"
                     >
                         {loading ? 'Processing...' : (isLogin ? 'Sign In' : 'Create Account')}
                     </button>
                 </form>
 
-                <div className="w-full pt-8 space-y-8">
+                 <div className="w-full pt-8 space-y-8">
                     <div className="flex flex-col items-center">
                         <button 
                             onClick={() => { setIsLogin(!isLogin); setError(''); setSuccessMsg(''); }}
@@ -291,7 +291,7 @@ export default function AuthPage() {
                     <button
                         onClick={handleGoogleSignIn}
                         disabled={loading}
-                        className="w-full flex items-center justify-center gap-4 px-6 py-4 bg-white border border-border-main text-text-main rounded-2xl font-bold text-sm hover:bg-hover-bg transition-all active:scale-[0.98] disabled:opacity-50"
+                        className="w-full flex items-center justify-center gap-4 px-6 py-4 bg-theme-card border border-border-main text-text-main rounded-2xl font-bold text-sm hover:bg-hover-bg transition-all active:scale-[0.98] disabled:opacity-50 transition-colors"
                     >
                         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4 grayscale opacity-70" alt="G" />
                         {loading ? 'Processing...' : 'Continue with Google'}

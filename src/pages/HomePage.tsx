@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { collection, query, orderBy, onSnapshot, limit } from 'firebase/firestore';
+import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import { useAuth } from '../App';
+import { useAuth } from '../contexts/AuthContext';
 import { Course, UserInterest } from '../types';
 import { POPULAR_SKILLS } from '../constants';
 import { Star, ExternalLink, Play, User as UserIcon, X, Search as SearchIcon, RefreshCw } from 'lucide-react';
@@ -28,7 +28,7 @@ const FilterSystem = ({ selectedTags, setSelectedTags, searchQuery, setSearchQue
   };
 
   return (
-    <div className="bg-white border-b border-border-main">
+    <div className="bg-theme-card border-b border-border-main">
       <div className="px-4 py-3 space-y-3">
         {/* Search Bar */}
         <div className="relative flex items-center">
@@ -52,7 +52,7 @@ const FilterSystem = ({ selectedTags, setSelectedTags, searchQuery, setSearchQue
             <button 
                 onClick={() => setSelectedTags([])}
                 className={`flex-shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold transition-all ${
-                    selectedTags.length === 0 ? 'bg-primary text-white shadow-sm shadow-primary/20' : 'bg-hover-bg text-text-main group hover:bg-border-main'
+                    selectedTags.length === 0 ? 'bg-primary text-bg-main shadow-sm shadow-primary/20' : 'bg-hover-bg text-text-main group hover:bg-border-main'
                 }`}
             >
                 All
@@ -62,7 +62,7 @@ const FilterSystem = ({ selectedTags, setSelectedTags, searchQuery, setSearchQue
                     key={skill}
                     onClick={() => toggleTag(skill)}
                     className={`flex-shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold transition-all ${
-                        selectedTags.includes(skill) ? 'bg-primary text-white border-primary' : 'bg-hover-bg text-text-main group hover:bg-border-main border border-transparent'
+                        selectedTags.includes(skill) ? 'bg-primary text-bg-main border-primary' : 'bg-hover-bg text-text-main group hover:bg-border-main border border-transparent'
                     }`}
                 >
                     {skill}
@@ -72,7 +72,7 @@ const FilterSystem = ({ selectedTags, setSelectedTags, searchQuery, setSearchQue
                 <button 
                     key={`filter-tag-${tag}`}
                     onClick={() => toggleTag(tag)}
-                    className="flex-shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold transition-all bg-primary text-white border-primary border flex items-center gap-1.5"
+                    className="flex-shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold transition-all bg-primary text-bg-main border-primary border flex items-center gap-1.5"
                 >
                     {tag}
                     <X size={10} />
@@ -124,16 +124,17 @@ export default function HomePage() {
     };
   }, []);
 
-  const fetchCourses = (isRefreshing = false) => {
+  const fetchCourses = async (isRefreshing = false) => {
     if (isRefreshing) setRefreshing(true);
     else setLoading(true);
 
-    const q = query(collection(db, 'courses'), orderBy('createdAt', 'desc'), limit(50));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    try {
+      const q = query(collection(db, 'courses'), orderBy('createdAt', 'desc'), limit(50));
+      const snapshot = await getDocs(q);
       let data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Course));
       
       if (isRefreshing) {
-        // Keep top 5 most recent, shuffle the rest (11-50) to give that "YouTube" feel
+        // Keep top 8 most recent, shuffle the rest (9-50) to give that "YouTube" feel
         const recent = data.slice(0, 8);
         const older = data.slice(8);
         const shuffled = [...older].sort(() => Math.random() - 0.5);
@@ -141,15 +142,16 @@ export default function HomePage() {
       }
 
       setCourses(data);
+    } catch (error) {
+      console.error("Error fetching courses:", error);
+    } finally {
       setLoading(false);
       setRefreshing(false);
-    });
-    return unsubscribe;
+    }
   };
 
   useEffect(() => {
-    const unsubscribe = fetchCourses();
-    return unsubscribe;
+    fetchCourses();
   }, []);
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -207,7 +209,7 @@ export default function HomePage() {
           <motion.div 
             animate={refreshing ? { rotate: 360 } : { rotate: pullDistance * 2 }}
             transition={refreshing ? { repeat: Infinity, duration: 1, ease: "linear" } : { duration: 0 }}
-            className={`w-8 h-8 rounded-full bg-white shadow-lg border border-border-main flex items-center justify-center ${refreshing ? 'text-primary' : 'text-text-muted'}`}
+            className={`w-8 h-8 rounded-full bg-theme-card shadow-lg border border-border-main flex items-center justify-center ${refreshing ? 'text-primary' : 'text-text-muted'}`}
           >
             <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
           </motion.div>

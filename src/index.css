@@ -24,27 +24,29 @@
 }
 
 :root {
-  --primary: #1877f2;
-  --primary-dark: #166fe5;
-  --bg-main: #f0f2f5;
+  --primary: #000000;
+  --primary-dark: #111111;
+  --bg-main: #ffffff;
   --card-bg: #ffffff;
-  --text-main: #1c1e21;
-  --text-muted: #65676b;
-  --border-main: #e4e6eb;
-  --accent-gold: #ff9800;
-  --accent-green: #42b72a;
-  --hover-bg: #f2f2f2;
+  --text-main: #000000;
+  --text-muted: #737373;
+  --border-main: #efefef;
+  --accent-gold: #D4AF37;
+  --accent-green: #22C55E;
+  --hover-bg: #fafafa;
 }
 
 .dark {
+  --primary: #ffffff;
+  --primary-dark: #eeeeee;
   --bg-main: #000000;
-  --card-bg: #121212;
-  --text-main: #f1f1f1;
-  --text-muted: #9ba3af;
-  --border-main: #2a2a2a;
-  --hover-bg: #1e1e1e;
-  --primary: #3ea6ff;
-  --primary-dark: #1a73e8;
+  --card-bg: #000000;
+  --text-main: #ffffff;
+  --text-muted: #888888;
+  --border-main: #1a1a1a;
+  --accent-gold: #EAB308;
+  --accent-green: #10B981;
+  --hover-bg: #111111;
 }
 
 @layer base {
@@ -66,45 +68,6 @@
 .text-theme-main { @apply text-text-main; }
 .text-theme-muted { @apply text-text-muted; }
 .border-theme-main { @apply border-border-main; }
-
-/* Force Overrides for No Mixing */
-.dark .bg-white {
-  @apply bg-card-bg!;
-}
-
-.dark .bg-black {
-  @apply bg-bg-main!;
-}
-
-.dark .bg-bg-main {
-  @apply bg-bg-main!;
-}
-
-.dark .text-black, .dark .text-text-main {
-  @apply text-text-main!;
-}
-
-.dark .border-border-main {
-  @apply border-border-main!;
-}
-
-.dark .border-black {
-  @apply border-border-main;
-}
-
-.dark .bg-text-main {
-  @apply bg-white text-bg-main!;
-}
-
-.dark .text-text-muted {
-  @apply text-text-muted;
-}
-
-.dark button.bg-text-main, 
-.dark a.bg-text-main,
-.dark div.bg-text-main {
-  @apply text-bg-main!;
-}
 
 .nav-active {
   @apply text-primary;

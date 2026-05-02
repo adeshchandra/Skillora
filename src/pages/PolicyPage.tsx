@@ -37,7 +37,7 @@ export default function PolicyPage() {
   return (
     <div className="min-h-screen bg-bg-main flex flex-col pb-10">
       {/* Header */}
-      <div className="bg-white border-b border-border-main p-4 flex items-center gap-4 sticky top-0 z-50">
+      <div className="bg-bg-main border-b border-border-main p-4 flex items-center gap-4 sticky top-0 z-50 transition-colors">
         <button 
           onClick={() => navigate(-1)} 
           className="p-2 -ml-2 rounded-xl hover:bg-hover-bg transition-colors"
@@ -63,7 +63,7 @@ export default function PolicyPage() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.1 }}
-                    className="bg-white p-6 rounded-3xl border border-border-main shadow-sm flex gap-4"
+                    className="bg-theme-card p-6 rounded-3xl border border-border-main shadow-sm flex gap-4 transition-colors"
                 >
                     <div className="w-10 h-10 bg-hover-bg rounded-2xl flex items-center justify-center text-primary shrink-0">
                         <sec.icon size={20} />

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { collection, addDoc, serverTimestamp, doc, updateDoc, increment, setDoc, arrayUnion } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import { useAuth } from '../App';
+import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { POPULAR_SKILLS } from '../constants';
 import { Video, Users, CheckCircle2, Image as ImageIcon, Link as LinkIcon, Send, X, Plus, Info, Sparkles, Wand2, ArrowRight, Lock } from 'lucide-react';
@@ -13,23 +13,23 @@ const SuggestionBox = ({ title, icon: Icon, description, steps, onDismiss, type 
         <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="p-4 bg-primary/5 rounded-2xl border border-primary/10 space-y-3 relative overflow-hidden shadow-sm"
+            className="p-4 bg-primary/5 rounded-2xl border border-primary/10 space-y-3 relative overflow-hidden shadow-sm transition-colors"
         >
             <div className="absolute -top-4 -right-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl" />
             <div className="flex items-center gap-2">
                 <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
                     <Icon size={18} />
                 </div>
-                <h3 className="text-sm font-bold text-text-main">{title}</h3>
-                <button onClick={onDismiss} className="ml-auto text-text-muted hover:text-text-main">
+                <h3 className="text-sm font-bold text-text-main transition-colors">{title}</h3>
+                <button onClick={onDismiss} className="ml-auto text-text-muted hover:text-text-main scale-90">
                     <X size={16} />
                 </button>
             </div>
-            <p className="text-xs text-text-muted font-medium leading-relaxed">{description}</p>
+            <p className="text-xs text-text-muted font-medium leading-relaxed transition-colors">{description}</p>
             {steps && (
                 <div className="space-y-1.5 pt-1">
                     {steps.map((step: string, i: number) => (
-                        <div key={i} className="flex gap-2 items-start text-[11px] font-medium text-text-main">
+                        <div key={i} className="flex gap-2 items-start text-[11px] font-medium text-text-main transition-colors">
                             <span className="w-4 h-4 rounded-full bg-primary/10 flex items-center justify-center shrink-0 text-primary text-[10px]">{i + 1}</span>
                             <span>{step}</span>
                         </div>
@@ -202,14 +202,14 @@ export default function CreatePage() {
   };
 
   return (
-    <div className="flex flex-col h-full transition-colors">
-      <div className="p-4 border-b border-border-main flex items-center gap-4 sticky top-0 z-10 transition-colors">
+    <div className="flex flex-col h-full bg-bg-main transition-colors">
+      <div className="p-4 border-b border-border-main flex items-center gap-4 sticky top-0 z-10 bg-bg-main transition-colors">
          <h1 className="text-xl font-bold text-text-main">Create</h1>
          <div className="flex items-center gap-1.5 ml-auto">
             <button 
                 onClick={() => setActiveTab('course')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm ${
-                    activeTab === 'course' ? 'bg-text-main text-white' : 'bg-hover-bg text-text-main group hover:bg-border-main'
+                    activeTab === 'course' ? 'bg-text-main text-bg-main' : 'bg-hover-bg text-text-main group hover:bg-border-main'
                 }`}
             >
                 Course
@@ -217,7 +217,7 @@ export default function CreatePage() {
             <button 
                 onClick={() => setActiveTab('dao')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm ${
-                    activeTab === 'dao' ? 'bg-text-main text-white' : 'bg-hover-bg text-text-main group hover:bg-border-main'
+                    activeTab === 'dao' ? 'bg-text-main text-bg-main' : 'bg-hover-bg text-text-main group hover:bg-border-main'
                 }`}
             >
                 DAO Group
@@ -280,7 +280,7 @@ export default function CreatePage() {
                                         <img src={courseThumb} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                                     ) : (
                                         <>
-                                            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-text-muted shadow-sm transition-colors">
+                                            <div className="w-10 h-10 bg-theme-card rounded-xl flex items-center justify-center text-text-muted shadow-sm transition-colors">
                                                 <ImageIcon size={20} />
                                             </div>
                                             <p className="text-[11px] font-bold text-text-muted">{uploading ? 'Compressing...' : 'Tap to upload cover (16:9)'}</p>
@@ -289,7 +289,7 @@ export default function CreatePage() {
                                 </div>
                             </label>
                             {courseThumb && (
-                                <button type="button" onClick={() => setCourseThumb('')} className="absolute top-2 right-2 p-1.5 bg-black/50 text-white rounded-full hover:bg-black transition-colors">
+                                <button type="button" onClick={() => setCourseThumb('')} className="absolute top-2 right-2 p-1.5 bg-black/50 text-bg-main rounded-full hover:bg-black transition-colors">
                                     <X size={14} />
                                 </button>
                             )}
@@ -302,7 +302,7 @@ export default function CreatePage() {
                           required type="text" value={courseTitle}
                           onChange={(e) => setCourseTitle(e.target.value)}
                           placeholder="e.g. Master React in 10 mins"
-                          className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold"
+                          className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-theme-card focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold"
                         />
                     </div>
                     <div className="space-y-1">
@@ -312,10 +312,10 @@ export default function CreatePage() {
                               required type="url" value={courseLink}
                               onChange={(e) => setCourseLink(e.target.value)}
                               placeholder="YouTube, Facebook, etc."
-                              className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold pr-10"
+                              className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-theme-card focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold pr-10"
                             />
                             {courseLink && (
-                                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-[10px] bg-white px-2 py-0.5 rounded border border-border-main/20 shadow-sm transition-colors">
+                                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-[10px] bg-theme-card px-2 py-0.5 rounded border border-border-main/20 shadow-sm transition-colors">
                                     <LinkIcon size={10} className="text-primary" />
                                     <span className="font-bold text-text-muted">{reduceURL(courseLink)}</span>
                                 </div>
@@ -328,7 +328,7 @@ export default function CreatePage() {
                           type="url" value={daoGroupLink}
                           onChange={(e) => setDaoGroupLink(e.target.value)}
                           placeholder="Link to your DAO group"
-                          className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold"
+                          className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-theme-card focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold"
                         />
                     </div>
                 </div>
@@ -342,12 +342,12 @@ export default function CreatePage() {
                             onChange={(e) => setCustomTag(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addCustomTag())}
                             placeholder="Add custom skill..."
-                            className="flex-grow px-4 py-2 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-primary/20 outline-none text-xs font-bold transition-all"
+                            className="flex-grow px-4 py-2 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-theme-card focus:ring-2 focus:ring-primary/20 outline-none text-xs font-bold transition-all"
                         />
                         <button 
                             type="button" 
                             onClick={addCustomTag}
-                            className="px-4 py-2 bg-text-main text-white rounded-xl text-xs font-bold hover:bg-black transition-colors shadow-sm"
+                            className="px-4 py-2 bg-text-main text-bg-main rounded-xl text-xs font-bold hover:bg-black transition-colors shadow-sm"
                         >
                             Add
                         </button>
@@ -359,7 +359,7 @@ export default function CreatePage() {
                                 key={`course-tag-${tag}`}
                                 type="button"
                                 onClick={() => toggleTag(tag)}
-                                className="px-3 py-1.5 rounded-full text-[11px] font-bold bg-primary text-white border border-primary shadow-sm flex items-center gap-1.5 group transition-all active:scale-95"
+                                className="px-3 py-1.5 rounded-full text-[11px] font-bold bg-primary text-bg-main border border-primary shadow-sm flex items-center gap-1.5 group transition-all active:scale-95"
                             >
                                 <CheckCircle2 size={12} />
                                 {tag}
@@ -375,7 +375,7 @@ export default function CreatePage() {
                                     onClick={() => toggleTag(skill)}
                                     className={`px-3 py-1.5 rounded-full text-[11px] font-bold transition-all flex items-center gap-1.5 border active:scale-95 ${
                                         isSelected 
-                                            ? 'bg-primary text-white border-primary shadow-sm' 
+                                            ? 'bg-primary text-bg-main border-primary shadow-sm' 
                                             : 'bg-hover-bg text-text-main border-border-main/50'
                                     }`}
                                 >
@@ -388,13 +388,13 @@ export default function CreatePage() {
                 </div>
 
                 <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10 flex items-center gap-3">
-                    <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-xs">+10</div>
+                    <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-bg-main font-bold text-xs">+10</div>
                     <p className="text-[13px] font-bold text-text-main tracking-tight">Post & earn 10 skill credits.</p>
                 </div>
 
                 <button
                   disabled={loading || uploading}
-                  className="w-full py-4 bg-primary text-white rounded-2xl font-black text-sm hover:bg-primary-dark transition-all disabled:opacity-50 border-2 border-primary-dark active:scale-[0.98] shadow-lg"
+                  className="w-full py-4 bg-primary text-bg-main rounded-2xl font-black text-sm hover:bg-primary-dark transition-all disabled:opacity-50 border-2 border-primary-dark active:scale-[0.98] shadow-lg"
                 >
                   {loading ? 'Publishing...' : 'Publish Course'}
                 </button>
@@ -422,7 +422,7 @@ export default function CreatePage() {
                                         <img src={daoImage} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                                     ) : (
                                         <>
-                                            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-text-muted shadow-sm transition-colors">
+                                            <div className="w-10 h-10 bg-theme-card rounded-xl flex items-center justify-center text-text-muted shadow-sm transition-colors">
                                                 <Sparkles size={20} className="text-primary" />
                                             </div>
                                             <p className="text-[11px] font-bold text-text-muted">{uploading ? 'Compressing...' : 'Tap to upload DAO cover (21:9)'}</p>
@@ -431,7 +431,7 @@ export default function CreatePage() {
                                 </div>
                             </label>
                             {daoImage && (
-                                <button type="button" onClick={() => setDaoImage('')} className="absolute top-2 right-2 p-1.5 bg-black/50 text-white rounded-full hover:bg-black transition-colors">
+                                <button type="button" onClick={() => setDaoImage('')} className="absolute top-2 right-2 p-1.5 bg-black/50 text-bg-main rounded-full hover:bg-black transition-colors">
                                     <X size={14} />
                                 </button>
                             )}
@@ -444,7 +444,7 @@ export default function CreatePage() {
                           required type="text" value={daoName}
                           onChange={(e) => setDaoName(e.target.value)}
                           placeholder="e.g. Python Warriors"
-                          className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold"
+                          className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-theme-card focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold"
                         />
                     </div>
                     <div className="grid grid-cols-2 gap-3">
@@ -453,7 +453,7 @@ export default function CreatePage() {
                             <input
                               required type="number" min="3" value={daoLimit || ''}
                               onChange={(e) => setDaoLimit(parseInt(e.target.value) || 0)}
-                              className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold"
+                              className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-theme-card focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold"
                             />
                         </div>
                         <div className="space-y-1">
@@ -461,7 +461,7 @@ export default function CreatePage() {
                             <input
                               required type="number" min="1" value={daoStake || ''}
                               onChange={(e) => setDaoStake(parseInt(e.target.value) || 0)}
-                              className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold"
+                              className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-theme-card focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold"
                             />
                         </div>
                     </div>
@@ -470,13 +470,13 @@ export default function CreatePage() {
                         <input
                           required type="datetime-local" value={daoDeadline}
                           onChange={(e) => setDaoDeadline(e.target.value)}
-                          className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold [color-scheme:light]"
+                          className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-theme-card focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold [color-scheme:light]"
                         />
                     </div>
                     
                     <div className="p-4 bg-hover-bg rounded-2xl flex items-center justify-between border border-border-main/20 transition-all">
                         <div className="flex items-center gap-3">
-                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${daoIsPrivate ? 'bg-primary/20 text-primary' : 'bg-white text-text-muted border border-border-main/50 shadow-sm'}`}>
+                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${daoIsPrivate ? 'bg-primary/20 text-primary' : 'bg-theme-card text-text-muted border border-border-main/50 shadow-sm'}`}>
                                 <Lock size={20} />
                             </div>
                             <div className="space-y-0.5">
@@ -491,7 +491,7 @@ export default function CreatePage() {
                         >
                             <motion.div 
                                 animate={{ x: daoIsPrivate ? 26 : 2 }}
-                                className="absolute top-1 left-0 w-4 h-4 bg-white rounded-full shadow-md"
+                                className="absolute top-1 left-0 w-4 h-4 bg-bg-main rounded-full shadow-md transition-colors"
                             />
                         </button>
                     </div>
@@ -502,7 +502,7 @@ export default function CreatePage() {
                           required type="text" value={daoTopic}
                           onChange={(e) => setDaoTopic(e.target.value)}
                           placeholder="e.g. Design Systems"
-                          className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold"
+                          className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-theme-card focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold"
                         />
                     </div>
                 </div>
@@ -516,12 +516,12 @@ export default function CreatePage() {
                             onChange={(e) => setCustomTag(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addCustomTag())}
                             placeholder="Add custom skill..."
-                            className="flex-grow px-4 py-2 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-primary/20 outline-none text-xs font-bold transition-all"
+                            className="flex-grow px-4 py-2 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-theme-card focus:ring-2 focus:ring-primary/20 outline-none text-xs font-bold transition-all"
                         />
                         <button 
                             type="button" 
                             onClick={addCustomTag}
-                            className="px-4 py-2 bg-text-main text-white rounded-xl text-xs font-bold hover:bg-black transition-colors shadow-sm"
+                            className="px-4 py-2 bg-text-main text-bg-main rounded-xl text-xs font-bold hover:bg-black transition-colors shadow-sm"
                         >
                             Add
                         </button>
@@ -533,7 +533,7 @@ export default function CreatePage() {
                                 key={`dao-tag-${tag}`}
                                 type="button"
                                 onClick={() => toggleTag(tag)}
-                                className="px-3 py-1.5 rounded-full text-[11px] font-bold bg-primary text-white border border-primary shadow-sm flex items-center gap-1.5 group"
+                                className="px-3 py-1.5 rounded-full text-[11px] font-bold bg-primary text-bg-main border border-primary shadow-sm flex items-center gap-1.5 group"
                             >
                                 <CheckCircle2 size={12} />
                                 {tag}
@@ -549,7 +549,7 @@ export default function CreatePage() {
                                     onClick={() => toggleTag(skill)}
                                     className={`px-3 py-1.5 rounded-full text-[11px] font-bold transition-all flex items-center gap-1.5 border active:scale-95 ${
                                         isSelected 
-                                            ? 'bg-primary text-white border-primary shadow-sm' 
+                                            ? 'bg-primary text-bg-main border-primary shadow-sm' 
                                             : 'bg-hover-bg text-text-main border-border-main/50'
                                     }`}
                                 >
@@ -563,7 +563,7 @@ export default function CreatePage() {
 
                 <button
                   disabled={loading || uploading}
-                  className="w-full py-4 bg-primary text-white rounded-2xl font-black text-sm hover:bg-primary-dark transition-all disabled:opacity-50 border-2 border-primary-dark active:scale-[0.98] shadow-lg"
+                  className="w-full py-4 bg-primary text-bg-main rounded-2xl font-black text-sm hover:bg-primary-dark transition-all disabled:opacity-50 border-2 border-primary-dark active:scale-[0.98] shadow-lg"
                 >
                   <div className="flex items-center justify-center gap-2">
                     <span>{loading ? 'Creating...' : 'Initiate DAO Group'}</span>
@@ -581,12 +581,12 @@ export default function CreatePage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-white/90 backdrop-blur-md transition-colors"
+                className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-bg-main/90 backdrop-blur-md transition-colors"
             >
                 <motion.div 
                     initial={{ scale: 0.9, opacity: 0, y: 20 }}
                     animate={{ scale: 1, opacity: 1, y: 0 }}
-                    className="w-full max-w-sm bg-white border border-border-main rounded-[32px] p-8 shadow-2xl flex flex-col items-center text-center gap-6 transition-all"
+                    className="w-full max-w-sm bg-theme-card border border-border-main rounded-[32px] p-8 shadow-2xl flex flex-col items-center text-center gap-6 transition-all"
                 >
                     <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center text-primary border border-primary/20">
                         <CheckCircle2 size={40} className="animate-in zoom-in duration-500" />

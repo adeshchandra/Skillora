@@ -27,7 +27,7 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen bg-bg-main flex flex-col pb-10">
       {/* Header */}
-      <div className="bg-white border-b border-border-main p-4 flex items-center gap-4 sticky top-0 z-50">
+      <div className="bg-bg-main border-b border-border-main p-4 flex items-center gap-4 sticky top-0 z-50 transition-colors">
         <button 
           onClick={() => navigate(-1)} 
           className="p-2 -ml-2 rounded-xl hover:bg-hover-bg transition-colors"
@@ -40,9 +40,9 @@ export default function AboutPage() {
       <div className="max-w-lg mx-auto w-full px-4 pt-8 space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
         {/* Intro */}
         <div className="text-center space-y-4">
-            <div className="w-20 h-20 bg-primary rounded-[2.5rem] flex items-center justify-center mx-auto text-white shadow-2xl shadow-primary/20 relative group">
+            <div className="w-20 h-20 bg-primary rounded-[2.5rem] flex items-center justify-center mx-auto text-bg-main shadow-2xl shadow-primary/20 relative group">
                 <Sparkles size={40} className="group-hover:rotate-12 transition-transform" />
-                <div className="absolute -top-1 -right-1 w-6 h-6 bg-accent-gold rounded-full border-4 border-white" />
+                <div className="absolute -top-1 -right-1 w-6 h-6 bg-accent-gold rounded-full border-4 border-bg-main" />
             </div>
             <div className="space-y-1">
                 <h2 className="text-3xl font-black text-text-main tracking-tight uppercase">Skillora</h2>
@@ -61,7 +61,7 @@ export default function AboutPage() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.1 }}
-                    className="bg-white p-6 rounded-3xl border border-border-main flex gap-4 items-start"
+                    className="bg-theme-card p-6 rounded-3xl border border-border-main flex gap-4 items-start transition-colors"
                 >
                     <div className="w-12 h-12 rounded-2xl bg-hover-bg flex items-center justify-center text-primary shrink-0">
                         <h.icon size={24} />
@@ -75,7 +75,7 @@ export default function AboutPage() {
         </div>
 
         {/* Importance Section */}
-        <div className="bg-text-main text-white p-8 rounded-[2.5rem] space-y-6 relative overflow-hidden">
+        <div className="bg-text-main text-bg-main p-8 rounded-[2.5rem] space-y-6 relative overflow-hidden">
             <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
                 <Shield size={120} />
             </div>
@@ -89,23 +89,23 @@ export default function AboutPage() {
             </div>
 
             <div className="space-y-4 relative">
-                <div className="space-y-1.5 p-4 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm">
+                <div className="space-y-1.5 p-4 bg-bg-main/40 rounded-2xl border border-text-main/10 backdrop-blur-sm transition-colors">
                     <h4 className="text-xs font-black text-accent-gold uppercase tracking-widest">Eliminating Cost Barriers</h4>
-                    <p className="text-[11px] text-white/70 font-medium leading-relaxed">
+                    <p className="text-[11px] text-bg-main/70 font-medium leading-relaxed">
                         Traditional education is expensive. Skillora uses a credits-based exchange where your value is determined by your knowledge, not your bank balance.
                     </p>
                 </div>
                 
-                <div className="space-y-1.5 p-4 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm">
+                <div className="space-y-1.5 p-4 bg-bg-main/40 rounded-2xl border border-text-main/10 backdrop-blur-sm transition-colors">
                     <h4 className="text-xs font-black text-accent-gold uppercase tracking-widest">Incentivized Mastery</h4>
-                    <p className="text-[11px] text-white/70 font-medium leading-relaxed">
+                    <p className="text-[11px] text-bg-main/70 font-medium leading-relaxed">
                         By staking credits in DAO groups, we solve the "procrastination problem." You're financially and socially motivated to pass your daily quizzes and meet your goals.
                     </p>
                 </div>
 
-                <div className="space-y-1.5 p-4 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm">
+                <div className="space-y-1.5 p-4 bg-bg-main/40 rounded-2xl border border-text-main/10 backdrop-blur-sm transition-colors">
                     <h4 className="text-xs font-black text-accent-gold uppercase tracking-widest">Verified Communities</h4>
-                    <p className="text-[11px] text-white/70 font-medium leading-relaxed">
+                    <p className="text-[11px] text-bg-main/70 font-medium leading-relaxed">
                         Experience is better than credentials. Our rating system and shared goal structure create high-trust environments for rapid skill acquisition.
                     </p>
                 </div>
@@ -116,11 +116,11 @@ export default function AboutPage() {
         <div className="text-center space-y-4 py-6">
             <div className="flex justify-center -space-x-2">
                 {[1, 2, 3, 4].map(i => (
-                    <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-hover-bg overflow-hidden flex items-center justify-center">
+                    <div key={i} className="w-8 h-8 rounded-full border-2 border-bg-main bg-hover-bg overflow-hidden flex items-center justify-center">
                         <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i * 123}`} alt="User" />
                     </div>
                 ))}
-                <div className="w-8 h-8 rounded-full border-2 border-white bg-primary flex items-center justify-center text-[10px] font-bold text-white">
+                <div className="w-8 h-8 rounded-full border-2 border-bg-main bg-primary flex items-center justify-center text-[10px] font-bold text-bg-main">
                     +1k
                 </div>
             </div>

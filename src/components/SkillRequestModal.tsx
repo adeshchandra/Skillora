@@ -5,7 +5,7 @@ import { UserProfile } from '../types';
 import { collection, addDoc, serverTimestamp, doc, setDoc, getDoc, updateDoc, increment } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { handleFirestoreError, OperationType } from '../lib/firestoreErrorHandler';
-import { useAuth } from '../App';
+import { useAuth } from '../contexts/AuthContext';
 
 interface SkillRequestModalProps {
   isOpen: boolean;
@@ -153,10 +153,10 @@ export const SkillRequestModal: React.FC<SkillRequestModalProps> = ({
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
-            className="bg-white w-full max-w-lg rounded-[32px] overflow-hidden border border-border-main flex flex-col max-h-[90vh] shadow-2xl shadow-text-main/10"
+            className="bg-theme-card w-full max-w-lg rounded-[32px] overflow-hidden border border-border-main flex flex-col max-h-[90vh] shadow-2xl shadow-black/40 transition-colors"
           >
             {/* Header */}
-            <div className="p-6 border-b border-border-main flex items-center justify-between shrink-0 bg-white transition-colors">
+            <div className="p-6 border-b border-border-main flex items-center justify-between shrink-0 bg-theme-card transition-colors">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
                   <Handshake size={20} />
@@ -177,14 +177,14 @@ export const SkillRequestModal: React.FC<SkillRequestModalProps> = ({
               <div className="flex gap-2 p-1 bg-hover-bg rounded-2xl transition-colors">
                 <button 
                   onClick={() => setRequestType('Exchange')}
-                  className={`flex-1 py-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${requestType === 'Exchange' ? 'bg-white text-text-main shadow-sm' : 'text-text-muted hover:text-text-main'}`}
+                  className={`flex-1 py-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${requestType === 'Exchange' ? 'bg-bg-main text-text-main shadow-sm' : 'text-text-muted hover:text-text-main'}`}
                 >
                   <Handshake size={14} />
                   Skill Exchange
                 </button>
                 <button 
                   onClick={() => setRequestType('Learning')}
-                  className={`flex-1 py-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${requestType === 'Learning' ? 'bg-white text-text-main shadow-sm' : 'text-text-muted hover:text-text-main'}`}
+                  className={`flex-1 py-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${requestType === 'Learning' ? 'bg-bg-main text-text-main shadow-sm' : 'text-text-muted hover:text-text-main'}`}
                 >
                   <BookOpen size={14} />
                   Learning Only
@@ -199,7 +199,7 @@ export const SkillRequestModal: React.FC<SkillRequestModalProps> = ({
                     value={learnSkill}
                     onChange={e => setLearnSkill(e.target.value)}
                     placeholder="e.g. Advanced Figma"
-                    className="w-full bg-hover-bg border-2 border-transparent rounded-2xl px-4 py-4 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20 focus:bg-hover-bg/30 transition-all"
+                    className="w-full bg-hover-bg border-2 border-transparent rounded-2xl px-4 py-4 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                   />
                   {initialTeacherSkills.length > 0 && (
                     <div className="flex flex-wrap gap-2 mt-2">
@@ -217,7 +217,7 @@ export const SkillRequestModal: React.FC<SkillRequestModalProps> = ({
                       value={teachSkill}
                       onChange={e => setTeachSkill(e.target.value)}
                       placeholder="e.g. Next.js Basics"
-                      className="w-full bg-hover-bg border-2 border-transparent rounded-2xl px-4 py-4 text-sm font-semibold outline-none focus:ring-2 focus:ring-accent-gold/20 focus:bg-hover-bg/30 transition-all"
+                      className="w-full bg-hover-bg border-2 border-transparent rounded-2xl px-4 py-4 text-sm font-semibold outline-none focus:ring-2 focus:ring-accent-gold/20 transition-all"
                     />
                     {initialLearnerSkills.length > 0 && (
                       <div className="flex flex-wrap gap-2 mt-2">
@@ -239,12 +239,12 @@ export const SkillRequestModal: React.FC<SkillRequestModalProps> = ({
                     <select 
                       value={duration}
                       onChange={e => setDuration(e.target.value)}
-                      className="w-full bg-hover-bg border-none rounded-2xl pl-10 pr-4 py-4 text-sm font-semibold outline-none appearance-none focus:ring-2 focus:ring-primary/20 transition-all [color-scheme:light]"
+                      className="w-full bg-hover-bg border-none rounded-2xl pl-10 pr-4 py-4 text-sm font-semibold outline-none appearance-none focus:ring-2 focus:ring-primary/20 transition-all [color-scheme:dark]"
                     >
-                      <option className="bg-white">3 days</option>
-                      <option className="bg-white">1 week</option>
-                      <option className="bg-white">2 weeks</option>
-                      <option className="bg-white">1 month</option>
+                      <option className="bg-theme-card">3 days</option>
+                      <option className="bg-theme-card">1 week</option>
+                      <option className="bg-theme-card">2 weeks</option>
+                      <option className="bg-theme-card">1 month</option>
                     </select>
                   </div>
                 </div>
@@ -271,7 +271,7 @@ export const SkillRequestModal: React.FC<SkillRequestModalProps> = ({
                       <button 
                         key={media}
                         onClick={() => setContactMedia(media)}
-                        className={`flex-1 py-3 rounded-xl text-[10px] font-bold border transition-all ${contactMedia === media ? 'bg-text-main text-white border-text-main shadow-sm' : 'bg-white text-text-muted border-border-main hover:bg-hover-bg'}`}
+                        className={`flex-1 py-3 rounded-xl text-[10px] font-bold border transition-all ${contactMedia === media ? 'bg-primary text-bg-main border-primary shadow-sm' : 'bg-bg-main text-text-muted border-border-main hover:bg-hover-bg'}`}
                       >
                         {media}
                       </button>
@@ -279,7 +279,7 @@ export const SkillRequestModal: React.FC<SkillRequestModalProps> = ({
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-text-muted pl-1">Contact Information</label>
+                  <label className="text-[10px) font-bold text-text-muted pl-1">Contact Information</label>
                   <div className="relative">
                     <MessageCircle size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" />
                     <input 
@@ -305,11 +305,11 @@ export const SkillRequestModal: React.FC<SkillRequestModalProps> = ({
               </div>
             </div>
 
-            <div className="p-6 border-t border-border-main shrink-0 bg-white transition-colors">
+            <div className="p-6 border-t border-border-main shrink-0 bg-theme-card transition-colors">
               <button 
                 onClick={handleSubmit}
                 disabled={loading}
-                className="w-full py-4 bg-primary text-white rounded-2xl font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-primary/20 active:scale-[0.98] transition-all disabled:opacity-50"
+                className="w-full py-4 bg-primary text-bg-main rounded-2xl font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-primary/20 active:scale-[0.98] transition-all disabled:opacity-50"
               >
                 {loading ? (
                   <Clock className="animate-spin" size={16} />

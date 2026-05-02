@@ -4,7 +4,7 @@ import { X, Handshake, AlertCircle } from 'lucide-react';
 import { LearningRequest } from '../types';
 import { collection, addDoc, serverTimestamp, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import { useAuth } from '../App';
+import { useAuth } from '../contexts/AuthContext';
 
 interface ContractModalProps {
   isOpen: boolean;
@@ -85,7 +85,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                 initial={{ y: "100%" }} 
                 animate={{ y: 0 }} 
                 exit={{ y: "100%" }}
-                className="w-full max-w-lg bg-white rounded-t-3xl md:rounded-3xl p-6 space-y-6 border border-border-main relative overflow-hidden shadow-2xl"
+                className="w-full max-w-lg bg-theme-card rounded-t-3xl md:rounded-3xl p-6 space-y-6 border border-border-main relative overflow-hidden shadow-2xl transition-colors"
             >
                 <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-primary via-accent-gold to-primary opacity-20" />
                 
@@ -165,7 +165,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                 <button 
                     disabled={loading}
                     onClick={createContract}
-                    className="w-full py-4 bg-primary text-white rounded-2xl font-bold text-xs tracking-wide transition-all active:scale-[0.98] disabled:opacity-50 shadow-lg shadow-primary/20"
+                    className="w-full py-4 bg-primary text-bg-main rounded-2xl font-bold text-xs tracking-wide transition-all active:scale-[0.98] disabled:opacity-50 shadow-lg shadow-primary/20"
                 >
                     {loading ? 'Finalizing...' : 'Sign & finalize agreement'}
                 </button>

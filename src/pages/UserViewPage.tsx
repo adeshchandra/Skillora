@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { doc, getDoc, collection, query, where, onSnapshot, updateDoc, increment, setDoc, arrayUnion, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, onSnapshot, updateDoc, increment, setDoc, arrayUnion, serverTimestamp, getDocs } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { UserProfile, Course, DAOGroup, Session } from '../types';
-import { useAuth } from '../App';
+import { useAuth } from '../contexts/AuthContext';
 import { ArrowLeft, BookOpen, GraduationCap, Layers, Shield, MessageCircle, Star, ChevronRight, MapPin, Zap, User as UserIcon, Users, Clock, Check, MessageSquare } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import CourseCard from '../components/CourseCard';
@@ -103,42 +103,25 @@ export default function UserViewPage() {
                     setProfile({ uid: userSnap.id, ...userSnap.data() } as UserProfile);
                 }
 
-                // Fetch published courses
-                coursesUnsub = onSnapshot(query(collection(db, 'courses'), where('teacherId', '==', userId)), (snap) => {
-                    setCourses(snap.docs.map(d => ({ id: d.id, ...d.data() } as Course)));
-                });
+                // Fetch published courses (one-time)
+                const coursesSnap = await getDocs(query(collection(db, 'courses'), where('teacherId', '==', userId)));
+                setCourses(coursesSnap.docs.map(d => ({ id: d.id, ...d.data() } as Course)));
 
-                // Fetch created DAOs
-                daosUnsub = onSnapshot(query(collection(db, 'daoGroups'), where('adminId', '==', userId)), (snap) => {
-                    setDaos(snap.docs.map(d => ({ id: d.id, ...d.data() } as DAOGroup)));
-                });
+                // Fetch created DAOs (one-time)
+                const daosSnap = await getDocs(query(collection(db, 'daoGroups'), where('adminId', '==', userId)));
+                setDaos(daosSnap.docs.map(d => ({ id: d.id, ...d.data() } as DAOGroup)));
 
                 // Fetch Public Sessions (Only Completed/Rated for portfolio)
-                sessionsUnsubT = onSnapshot(query(
-                    collection(db, 'sessions'), 
-                    where('teacherId', '==', userId),
-                    where('status', '==', 'Completed')
-                ), (snap1) => {
-                    const sess1 = snap1.docs.map(d => ({ id: d.id, ...d.data() } as Session));
-                    setSessions(prev => {
-                        const others = prev.filter(s => s.teacherId !== userId);
-                        return [...sess1, ...others];
-                    });
-                });
+                const [tSessionsSnap, lSessionsSnap] = await Promise.all([
+                    getDocs(query(collection(db, 'sessions'), where('teacherId', '==', userId), where('status', '==', 'Completed'))),
+                    getDocs(query(collection(db, 'sessions'), where('learnerId', '==', userId), where('status', '==', 'Completed')))
+                ]);
+                
+                const sess1 = tSessionsSnap.docs.map(d => ({ id: d.id, ...d.data() } as Session));
+                const sess2 = lSessionsSnap.docs.map(d => ({ id: d.id, ...d.data() } as Session));
+                setSessions([...sess1, ...sess2]);
 
-                sessionsUnsubL = onSnapshot(query(
-                    collection(db, 'sessions'), 
-                    where('learnerId', '==', userId),
-                    where('status', '==', 'Completed')
-                ), (snap2) => {
-                    const sess2 = snap2.docs.map(d => ({ id: d.id, ...d.data() } as Session));
-                    setSessions(prev => {
-                        const others = prev.filter(s => s.learnerId !== userId);
-                        return [...sess2, ...others];
-                    });
-                });
-
-                // Check for sent requests
+                // Check for sent requests (Keep real-time as it changes during interaction)
                 if (user) {
                     requestsUnsub = onSnapshot(query(
                         collection(db, 'learningRequests'),
@@ -159,10 +142,6 @@ export default function UserViewPage() {
 
         fetchUser();
         return () => {
-            coursesUnsub();
-            daosUnsub();
-            sessionsUnsubT();
-            sessionsUnsubL();
             requestsUnsub();
         };
     }, [userId, user?.uid]);
@@ -213,7 +192,7 @@ export default function UserViewPage() {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen space-y-4 px-10 text-center">
                 <h2 className="text-xl font-bold text-text-main tracking-tighter">User not found</h2>
-                <button onClick={() => navigate(-1)} className="px-8 py-3 bg-text-main text-white rounded-2xl font-bold text-xs tracking-wide">Go back</button>
+                <button onClick={() => navigate(-1)} className="px-8 py-3 bg-text-main text-bg-main rounded-2xl font-bold text-xs tracking-wide">Go back</button>
             </div>
         );
     }
@@ -227,7 +206,7 @@ export default function UserViewPage() {
         const getReputation = (rating: number) => {
             if (rating >= 4.5) return { label: "Visionary Elite", color: "text-accent-gold bg-accent-gold/5 border-accent-gold/20" };
             if (rating >= 4.0) return { label: "Trusted Mentor", color: "text-primary bg-primary/5 border-primary/20" };
-            if (rating >= 3.5) return { label: "Rising Expert", color: "text-green-600 bg-green-50 border-green-200" };
+            if (rating >= 3.5) return { label: "Rising Expert", color: "text-green-500 bg-green-500/10 border-green-500/20" };
             return { label: "Skill Seeker", color: "text-text-muted bg-hover-bg border-border-main" };
         };
 
@@ -236,7 +215,7 @@ export default function UserViewPage() {
     return (
         <div className="min-h-screen bg-bg-main pb-24 transition-colors">
             {/* Header */}
-            <div className="bg-white border-b border-border-main p-4 flex items-center justify-between sticky top-0 z-50 transition-colors">
+            <div className="bg-bg-main border-b border-border-main p-4 flex items-center justify-between sticky top-0 z-50 transition-colors">
                 <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-xl hover:bg-hover-bg transition-colors">
                     <ArrowLeft size={22} className="text-text-main" />
                 </button>
@@ -246,7 +225,7 @@ export default function UserViewPage() {
 
             <div className="p-4 space-y-6">
                 {/* Minimal Professional Profile Section */}
-                <div className="bg-white rounded-[2rem] border border-border-main p-6 shadow-sm shadow-black/5 transition-all">
+                <div className="bg-theme-card rounded-[2rem] border border-border-main p-6 shadow-sm shadow-black/5 transition-all">
                     <div className="flex flex-col items-center text-center">
                         <div className="relative mb-6">
                             <div className="w-24 h-24 rounded-[32px] overflow-hidden bg-hover-bg border-2 border-border-main shadow-lg">
@@ -257,7 +236,7 @@ export default function UserViewPage() {
                                     referrerPolicy="no-referrer"
                                 />
                             </div>
-                            <div className="absolute -bottom-2 -right-2 bg-text-main w-8 h-8 rounded-xl flex items-center justify-center text-white border-4 border-white shadow-sm transition-colors">
+                            <div className="absolute -bottom-2 -right-2 bg-text-main w-8 h-8 rounded-xl flex items-center justify-center text-bg-main border-4 border-bg-main shadow-sm transition-colors">
                                 <Shield size={14} fill="currentColor" />
                             </div>
                         </div>
@@ -267,8 +246,8 @@ export default function UserViewPage() {
                                 <h2 className="text-xl font-bold text-text-main tracking-tight flex items-center gap-2">
                                     {profile.displayName}
                                     {liveSession && (
-                                        <div className="flex items-center gap-1.5 px-2 py-0.5 bg-red-500 rounded-lg text-[8px] font-bold text-white animate-pulse">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-white shadow-sm" />
+                                        <div className="flex items-center gap-1.5 px-2 py-0.5 bg-red-500 rounded-lg text-[8px] font-bold text-bg-main animate-pulse">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-bg-main shadow-sm" />
                                             Live Teaching
                                         </div>
                                     )}
@@ -290,7 +269,7 @@ export default function UserViewPage() {
                                         <button 
                                             onClick={handleStartChat}
                                             disabled={isStartingChat}
-                                            className="px-4 py-2 rounded-xl text-[10px] font-bold bg-text-main text-white hover:bg-black transition-all active:scale-[0.98] flex items-center gap-2 shadow-sm"
+                                            className="px-4 py-2 rounded-xl text-[10px] font-bold bg-text-main text-bg-main hover:bg-black transition-all active:scale-[0.98] flex items-center gap-2 shadow-sm"
                                         >
                                             <MessageSquare size={14} />
                                             {isStartingChat ? 'Connecting...' : 'Message'}
@@ -348,7 +327,7 @@ export default function UserViewPage() {
                 </div>
 
                 {/* Status Chips */}
-                <div className="flex gap-2 p-1 bg-white border border-border-main rounded-2xl shadow-sm transition-colors">
+                <div className="flex gap-2 p-1 bg-theme-card border border-border-main rounded-2xl shadow-sm transition-colors">
                     <div className="flex-1 p-3 flex flex-col gap-2 border-r border-border-main/50 text-text-main">
                         <span className="text-[9px] font-bold text-text-muted">Expertise</span>
                         <div className="flex flex-wrap gap-1">
@@ -371,22 +350,22 @@ export default function UserViewPage() {
 
                 {/* Tabs Area */}
                 <div className="space-y-4">
-                    <div className="flex gap-2 p-1 bg-white border border-border-main rounded-2xl shadow-sm transition-colors">
+                    <div className="flex gap-2 p-1 bg-theme-card border border-border-main rounded-2xl shadow-sm transition-colors">
                         <button 
                             onClick={() => setActiveTab('courses')}
-                            className={`flex-1 py-3 rounded-xl text-[10px] font-bold transition-all ${activeTab === 'courses' ? 'bg-text-main text-white shadow-lg' : 'text-text-muted hover:bg-hover-bg'}`}
+                            className={`flex-1 py-3 rounded-xl text-[10px] font-bold transition-all ${activeTab === 'courses' ? 'bg-text-main text-bg-main shadow-lg' : 'text-text-muted hover:bg-hover-bg'}`}
                         >
                             Published ({courses.length})
                         </button>
                         <button 
                             onClick={() => setActiveTab('daos')}
-                            className={`flex-1 py-3 rounded-xl text-[10px] font-bold transition-all ${activeTab === 'daos' ? 'bg-text-main text-white shadow-lg' : 'text-text-muted hover:bg-hover-bg'}`}
+                            className={`flex-1 py-3 rounded-xl text-[10px] font-bold transition-all ${activeTab === 'daos' ? 'bg-text-main text-bg-main shadow-lg' : 'text-text-muted hover:bg-hover-bg'}`}
                         >
                             DAOs ({daos.length})
                         </button>
                         <button 
                             onClick={() => setActiveTab('experience')}
-                            className={`flex-1 py-3 rounded-xl text-[10px] font-bold transition-all ${activeTab === 'experience' ? 'bg-text-main text-white shadow-lg' : 'text-text-muted hover:bg-hover-bg'}`}
+                            className={`flex-1 py-3 rounded-xl text-[10px] font-bold transition-all ${activeTab === 'experience' ? 'bg-text-main text-bg-main shadow-lg' : 'text-text-muted hover:bg-hover-bg'}`}
                         >
                             History ({sessions.length})
                         </button>
@@ -396,7 +375,7 @@ export default function UserViewPage() {
                         {activeTab === 'courses' ? (
                             <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
                                 {courses.length === 0 ? (
-                                    <div className="py-20 text-center space-y-3 bg-white rounded-[2rem] border border-dashed border-border-main shadow-sm transition-colors">
+                                    <div className="py-20 text-center space-y-3 bg-theme-card rounded-[2rem] border border-dashed border-border-main shadow-sm transition-colors">
                                         <BookOpen size={24} className="mx-auto text-text-muted opacity-30" />
                                         <p className="text-xs font-bold text-text-muted">No published content (yet).</p>
                                     </div>
@@ -409,14 +388,14 @@ export default function UserViewPage() {
                         ) : activeTab === 'daos' ? (
                             <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
                                 {daos.length === 0 ? (
-                                    <div className="py-20 text-center space-y-3 bg-white rounded-[2rem] border border-dashed border-border-main shadow-sm transition-colors">
+                                    <div className="py-20 text-center space-y-3 bg-theme-card rounded-[2rem] border border-dashed border-border-main shadow-sm transition-colors">
                                         <Shield size={24} className="mx-auto text-text-muted opacity-30" />
                                         <p className="text-xs font-bold text-text-muted">No managed DAO groups.</p>
                                     </div>
                                 ) : (
-                                    daos.map(dao => (
+                                    daos.map((dao, idx) => (
                                         <DAOGroupCard 
-                                            key={dao.id} 
+                                            key={`${dao.id}-${idx}`} 
                                             group={dao} 
                                             onJoin={handleJoinDAO}
                                             onView={(id) => navigate(`/groups?id=${id}`)}
@@ -428,7 +407,7 @@ export default function UserViewPage() {
                         ) : (
                             <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 space-y-4">
                                 {sessions.length === 0 ? (
-                                    <div className="py-20 text-center space-y-3 bg-white rounded-[2rem] border border-dashed border-border-main shadow-sm transition-colors">
+                                    <div className="py-20 text-center space-y-3 bg-theme-card rounded-[2rem] border border-dashed border-border-main shadow-sm transition-colors">
                                         <Clock size={24} className="mx-auto text-text-muted opacity-30" />
                                         <p className="text-xs font-bold text-text-muted">No ongoing or past agreements.</p>
                                     </div>
@@ -437,9 +416,9 @@ export default function UserViewPage() {
                                         const bothRated = sess.teacherRatedAt && sess.learnerRatedAt;
                                         const isTeacher = sess.teacherId === userId;
                                         return (
-                                            <div key={`${sess.id}-${idx}`} className="bg-white rounded-2xl border border-border-main p-4 space-y-3 shadow-sm border-l-4 border-l-primary transition-all">
+                                            <div key={`${sess.id}-${idx}`} className="bg-theme-card rounded-2xl border border-border-main p-4 space-y-3 shadow-sm border-l-4 border-l-primary transition-all">
                                                 <div className="flex items-center justify-between">
-                                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${sess.status === 'Completed' ? 'bg-green-50 text-green-600' : 'bg-primary/10 text-primary'}`}>
+                                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${sess.status === 'Completed' ? 'bg-green-500/10 text-green-600' : 'bg-primary/10 text-primary'}`}>
                                                         {sess.status}
                                                     </span>
                                                     <span className="text-[9px] font-bold text-text-muted">{sess.date}</span>

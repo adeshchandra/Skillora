@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { collection, query, where, onSnapshot, orderBy, doc, getDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import { useAuth } from '../App';
+import { useAuth } from '../contexts/AuthContext';
 import { ChatConversation, LearningRequest } from '../types';
 import { useNavigate } from 'react-router-dom';
 import { MessageSquare, ChevronRight, User as UserIcon, Clock, Search, Handshake } from 'lucide-react';
@@ -71,14 +71,14 @@ export default function MessagesPage() {
     }
 
     return (
-        <div className="flex flex-col h-full bg-white transition-colors">
-            <div className="p-4 border-b border-border-main bg-white sticky top-0 z-10 space-y-4 transition-colors">
+        <div className="flex flex-col h-full bg-bg-main transition-colors">
+            <div className="p-4 border-b border-border-main bg-bg-main sticky top-0 z-10 space-y-4 transition-colors">
                 <div className="flex items-center justify-between">
                     <h1 className="text-xl font-bold text-text-main transition-colors">Inbox</h1>
                     <div className="flex bg-hover-bg p-1 rounded-xl transition-colors">
                         <button 
                             onClick={() => setActiveTab('chats')}
-                            className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'chats' ? 'bg-white text-text-main shadow-sm' : 'text-text-muted hover:text-text-main'}`}
+                            className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'chats' ? 'bg-theme-card text-text-main shadow-sm' : 'text-text-muted hover:text-text-main'}`}
                         >
                             Chats
                             {conversations.some(c => (c.unreadCount?.[user?.uid || ''] || 0) > 0) && (
@@ -87,11 +87,11 @@ export default function MessagesPage() {
                         </button>
                         <button 
                             onClick={() => setActiveTab('requests')}
-                            className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all relative ${activeTab === 'requests' ? 'bg-white text-text-main shadow-sm' : 'text-text-muted hover:text-text-main'}`}
+                            className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all relative ${activeTab === 'requests' ? 'bg-theme-card text-text-main shadow-sm' : 'text-text-muted hover:text-text-main'}`}
                         >
                             Requests
                             {requests.length > 0 && (
-                                <span className="ml-1.5 px-1.5 py-0.5 bg-primary text-white text-[8px] rounded-full">
+                                <span className="ml-1.5 px-1.5 py-0.5 bg-primary text-bg-main text-[8px] rounded-full">
                                     {requests.length}
                                 </span>
                             )}
@@ -105,7 +105,7 @@ export default function MessagesPage() {
                         placeholder={activeTab === 'chats' ? "Search conversations..." : "Search requests..."}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 bg-hover-bg border-none rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all outline-none text-text-main"
+                        className="w-full pl-10 pr-4 py-2.5 bg-hover-bg border-none rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:bg-theme-card transition-all outline-none text-text-main"
                     />
                 </div>
             </div>
@@ -118,7 +118,7 @@ export default function MessagesPage() {
                             initial={{ opacity: 0, x: -10 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: -10 }}
-                            className="bg-white"
+                            className="bg-bg-main"
                         >
                             {filteredConversations.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center py-20 px-8 text-center">
@@ -192,7 +192,7 @@ export default function MessagesPage() {
                             initial={{ opacity: 0, x: 10 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: 10 }}
-                            className="bg-white"
+                            className="bg-bg-main"
                         >
                             {filteredRequests.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center py-20 px-8 text-center text-text-muted">
