@@ -20,6 +20,7 @@ import PolicyPage from './pages/PolicyPage';
 import UserViewPage from './pages/UserViewPage';
 import AuthPage from './pages/AuthPage';
 import SkillSetupPage from './pages/SkillSetupPage';
+import EditCoursePage from './pages/EditCoursePage';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -205,6 +206,7 @@ export default function App() {
                     <Route path="/policy" element={<PolicyPage />} />
                     <Route path="/user/:userId" element={<UserViewPage />} />
                     <Route path="/skill-setup" element={<SkillSetupPage />} />
+                    <Route path="/edit-course/:id" element={<EditCoursePage />} />
                   </Routes>
                 </Layout>
               </BrowserRouter>

@@ -4,7 +4,8 @@ import { db } from '../lib/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { POPULAR_SKILLS } from '../constants';
-import { Video, Users, CheckCircle2, Image as ImageIcon, Link as LinkIcon, Send, X, Plus, Info, Sparkles, Wand2, ArrowRight, Lock, Crown } from 'lucide-react';
+import { Video, Users, CheckCircle2, Image as ImageIcon, Link as LinkIcon, Send, X, Plus, Info, Sparkles, Wand2, ArrowRight, Lock, Crown, Monitor, ShoppingBag, ExternalLink } from 'lucide-react';
+import { analyzeUrl } from '../lib/video-utils';
 import { motion, AnimatePresence } from 'motion/react';
 import imageCompression from 'browser-image-compression';
 import { checkSubscriptionAccess, LIMITS, getUserContentCounts } from '../lib/firestore-utils';
@@ -195,11 +196,12 @@ export default function CreatePage() {
     if (!user || loading) return;
     setLoading(true);
     try {
+      const resourceInfo = analyzeUrl(courseLink);
       await addDoc(collection(db, 'courses'), {
         title: courseTitle,
-        description: courseDescription,
+        description: '', // Simplified as requested
         link: courseLink,
-        daoGroupLink: daoGroupLink,
+        daoGroupLink: daoGroupLink || '',
         thumbnail: courseThumb || `https://picsum.photos/seed/${Math.random()}/800/450`,
         teacherId: user.uid,
         teacherName: user.displayName,
@@ -207,8 +209,9 @@ export default function CreatePage() {
         rating: 0,
         reviewCount: 0,
         tags: selectedTags,
-        price: coursePrice || 0,
+        price: 0, // Simplified as requested
         createdAt: serverTimestamp(),
+        itemType: 'course'
       });
       const userRef = doc(db, 'users', user.uid);
       await updateDoc(userRef, { credits: increment(10) });
@@ -477,7 +480,26 @@ export default function CreatePage() {
                     </div>
 
                     <div className="space-y-1">
-                        <label className="text-xs font-bold text-text-main pl-1 uppercase tracking-wider">Link URL</label>
+                        <div className="flex items-center justify-between pl-1">
+                            <label className="text-xs font-bold text-text-main uppercase tracking-wider">Link URL</label>
+                            {(() => {
+                                const info = analyzeUrl(courseLink);
+                                if (!courseLink || !info) return null;
+                                const isVideo = info.type === 'youtube' || info.type === 'facebook';
+                                return (
+                                    <span className={`px-1.5 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest flex items-center gap-1 ${
+                                        isVideo ? 'bg-red-500/10 text-red-500' : 
+                                        info.isAffiliate ? 'bg-blue-500/10 text-blue-500' : 
+                                        'bg-green-500/10 text-green-500'
+                                    }`}>
+                                        {isVideo ? <Monitor size={8} /> : 
+                                         info.isAffiliate ? <ShoppingBag size={8} /> : 
+                                         <ExternalLink size={8} />}
+                                        {info.platform || (info.isAffiliate ? 'Affiliate' : 'Verified')}
+                                    </span>
+                                );
+                            })()}
+                        </div>
                         <div className="relative">
                             <input
                               required type="url" value={courseLink}
@@ -485,8 +507,10 @@ export default function CreatePage() {
                                 setCourseLink(e.target.value);
                                 fetchLinkPreview(e.target.value);
                               }}
-                              placeholder="YouTube, Facebook, etc."
-                              className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-theme-card focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold pr-10"
+                              placeholder="YouTube, Facebook, Rokomari, etc."
+                              className={`w-full px-4 py-3 bg-hover-bg border-2 rounded-xl focus:bg-theme-card focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold pr-10 ${
+                                courseLink ? 'border-primary/10' : 'border-transparent'
+                              }`}
                             />
                             {courseLink && (
                                 <div className="absolute right-3 top-1/2 -translate-y-1/2 text-primary">
@@ -502,27 +526,6 @@ export default function CreatePage() {
                           required type="text" value={courseTitle}
                           onChange={(e) => setCourseTitle(e.target.value)}
                           placeholder="e.g. Master React in 10 mins"
-                          className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-theme-card focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold"
-                        />
-                    </div>
-
-                    <div className="space-y-1">
-                        <label className="text-xs font-bold text-text-main pl-1 uppercase tracking-wider">Description</label>
-                        <textarea
-                          value={courseDescription}
-                          onChange={(e) => setCourseDescription(e.target.value)}
-                          placeholder="What will students learn?"
-                          rows={3}
-                          className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-theme-card focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold resize-none"
-                        />
-                    </div>
-
-                    <div className="space-y-1">
-                        <label className="text-xs font-bold text-text-main pl-1 uppercase tracking-wider">Price (TK) - Optional</label>
-                        <input
-                          type="number" value={coursePrice || ''}
-                          onChange={(e) => setCoursePrice(parseFloat(e.target.value) || undefined)}
-                          placeholder="e.g. 500 (Leave empty for free)"
                           className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-theme-card focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold"
                         />
                     </div>
@@ -645,7 +648,7 @@ export default function CreatePage() {
                                     type="button"
                                     onClick={() => setBookType('free')}
                                     className={`flex-1 py-2 text-[10px] font-bold rounded-lg transition-all ${
-                                        bookType === 'free' ? 'bg-white text-text-main shadow-sm' : 'text-text-muted'
+                                        bookType === 'free' ? 'bg-text-main text-bg-main shadow-sm' : 'text-text-muted'
                                     }`}
                                 >
                                     Free Book
@@ -654,7 +657,7 @@ export default function CreatePage() {
                                     type="button"
                                     onClick={() => setBookType('paid')}
                                     className={`flex-1 py-2 text-[10px] font-bold rounded-lg transition-all ${
-                                        bookType === 'paid' ? 'bg-white text-text-main shadow-sm' : 'text-text-muted'
+                                        bookType === 'paid' ? 'bg-text-main text-bg-main shadow-sm' : 'text-text-muted'
                                     }`}
                                 >
                                     Paid (In-Inbox)
@@ -699,7 +702,21 @@ export default function CreatePage() {
                     </div>
 
                     <div className="space-y-1">
-                        <label className="text-xs font-bold text-text-main pl-1 uppercase tracking-wider">Shop Link</label>
+                        <div className="flex items-center justify-between pl-1">
+                            <label className="text-xs font-bold text-text-main uppercase tracking-wider">Shop Link</label>
+                            {(() => {
+                                const info = analyzeUrl(courseLink);
+                                if (!courseLink || !info) return null;
+                                return (
+                                    <span className={`px-1.5 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest flex items-center gap-1 ${
+                                        info.isAffiliate ? 'bg-blue-500/10 text-blue-500' : 'bg-green-500/10 text-green-500'
+                                    }`}>
+                                        {info.isAffiliate ? <ShoppingBag size={8} /> : <ExternalLink size={8} />}
+                                        {info.platform || 'Resource Link'}
+                                    </span>
+                                );
+                            })()}
+                        </div>
                         <div className="relative">
                             <input
                               required type="url" value={courseLink}
@@ -708,7 +725,9 @@ export default function CreatePage() {
                                 fetchLinkPreview(e.target.value);
                               }}
                               placeholder="Paste Amazon, Rokomari or PDF link..."
-                              className="w-full px-4 py-3 bg-hover-bg border-2 border-transparent rounded-xl focus:bg-theme-card focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold pr-12"
+                              className={`w-full px-4 py-3 bg-hover-bg border-2 rounded-xl focus:bg-theme-card focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-semibold pr-12 ${
+                                courseLink ? 'border-primary/10' : 'border-transparent'
+                              }`}
                             />
                             <div className="absolute right-3 top-1/2 -translate-y-1/2 text-primary">
                                 <LinkIcon size={18} />

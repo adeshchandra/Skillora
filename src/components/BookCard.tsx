@@ -156,9 +156,14 @@ export const BookCard = ({ book }: BookCardProps) => {
         
         {/* Affiliate Icon */}
         {book.bookOrigin === 'affiliate' && (
-          <div className="absolute top-2 right-2 w-7 h-7 bg-primary text-bg-main rounded-full shadow-lg flex items-center justify-center backdrop-blur-sm border border-white/20 z-10">
-            <Link2 size={14} />
-          </div>
+          <>
+            <div className="absolute top-2 right-2 w-7 h-7 bg-primary text-bg-main rounded-[12px] shadow-lg flex items-center justify-center backdrop-blur-sm border border-white/20 z-10">
+              <Link2 size={14} />
+            </div>
+            <div className="absolute top-2 left-2 px-1.5 py-0.5 bg-blue-500 text-bg-main text-[7px] font-black uppercase tracking-wider rounded-md border border-white/10 z-10 shadow-sm">
+                Shop
+            </div>
+          </>
         )}
 
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">

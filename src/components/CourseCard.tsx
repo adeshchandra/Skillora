@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { doc, getDoc, setDoc, updateDoc, increment, onSnapshot, collection, query, where } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from '../contexts/AuthContext';
@@ -10,6 +10,8 @@ import { SkillRequestModal } from './SkillRequestModal';
 import { trackInteraction } from '../lib/tracking';
 import { parseVideoUrl } from '../lib/video-utils';
 import { useVideoPlayer } from '../contexts/VideoPlayerContext';
+
+import { analyzeUrl } from '../lib/video-utils';
 
 interface CourseCardProps {
   course: Course;
@@ -26,9 +28,28 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
   const [userProfile, setUserProfile] = useState<any>(null);
   const [hasSentRequest, setHasSentRequest] = useState(false);
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
+  const [isInViewport, setIsInViewport] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   const isPlaying = activeVideoId === course.id;
   const videoInfo = parseVideoUrl(course.link);
+  const resourceInfo = analyzeUrl(course.link);
+
+  // Intersection Observer for autoplay
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsInViewport(entry.isIntersecting);
+      },
+      { threshold: 0.6 } // Play when 60% visible
+    );
+
+    if (cardRef.current) {
+      observer.observe(cardRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!user || !course?.id) return;
@@ -119,8 +140,20 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
 
   const displayRating = typeof course.rating === 'number' && !isNaN(course.rating) ? course.rating : 0;
 
+  const getAutoplayUrl = () => {
+    if (!videoInfo) return '';
+    const base = videoInfo.embedUrl;
+    if (videoInfo.type === 'youtube') {
+      return `${base}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&loop=1&playlist=${base.split('/').pop()}`;
+    }
+    if (videoInfo.type === 'facebook') {
+      return `${base}&autoplay=true&muted=true`;
+    }
+    return base;
+  };
+
   return (
-    <div className="flex flex-col bg-bg-main mb-2 border-b border-border-main last:border-0 transition-colors">
+    <div ref={cardRef} className="flex flex-col bg-bg-main mb-2 border-b border-border-main last:border-0 transition-colors">
       <div 
         className="relative aspect-video w-full cursor-pointer group overflow-hidden" 
         onClick={() => {
@@ -144,7 +177,7 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
               onClick={(e) => e.stopPropagation()}
             >
               <iframe
-                src={videoInfo.embedUrl + (videoInfo.type === 'youtube' ? '?autoplay=1' : '')}
+                src={videoInfo.embedUrl + (videoInfo.type === 'youtube' ? '?autoplay=1&rel=0' : '')}
                 title={course.title}
                 className="w-full h-full"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -159,6 +192,22 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
               >
                 <X size={16} />
               </button>
+            </motion.div>
+          ) : (isInViewport && videoInfo && !isPlaying) ? (
+            <motion.div
+                key="autoplay-preview"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 bg-black z-[5] pointer-events-none"
+            >
+                <iframe
+                    src={getAutoplayUrl()}
+                    title={course.title + " preview"}
+                    className="w-full h-full scale-[1.01]"
+                    allow="autoplay; encrypted-media"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
             </motion.div>
           ) : (
             <motion.div
@@ -179,6 +228,11 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
                   <div className="w-14 h-14 rounded-full bg-primary/80 text-bg-main flex items-center justify-center shadow-2xl backdrop-blur-sm transition-transform group-hover:scale-110 active:scale-95">
                     <Play size={28} className="ml-1" fill="currentColor" />
                   </div>
+                </div>
+              )}
+              {resourceInfo?.isAffiliate && (
+                <div className="absolute top-3 left-3 bg-blue-500 text-bg-main text-[8px] px-2 py-1 rounded-lg font-black uppercase tracking-[0.2em] shadow-lg border border-white/20 z-10">
+                  Marketplace
                 </div>
               )}
               <div className="absolute bottom-3 right-3 bg-text-main/80 text-bg-main text-[10px] px-2.5 py-1.5 rounded-lg font-bold backdrop-blur-sm border border-white/10 shadow-lg flex items-center gap-1.5 uppercase tracking-wider">

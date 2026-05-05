@@ -5,7 +5,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { handleFirestoreError, OperationType } from '../lib/firestore-utils';
 import { UserProfile, Session, LearningRequest, Course, DAOGroup, Quiz } from '../types';
 import { useNavigate } from 'react-router-dom';
-import { Settings, CreditCard, BookOpen, GraduationCap, MapPin, Layers, Check, X, RefreshCw, LogOut, ExternalLink, Calendar, Shield, Star, Plus, Users, User as UserIcon, Zap, MessageCircle, Clock, Video, Handshake, ChevronRight, AlertCircle, Sparkles, Save, Trash2, BookOpenCheck, Camera, Image as ImageIcon, Crop, MoreVertical, Share2, Edit, Menu, Copy, Link2 } from 'lucide-react';
+import { Settings, CreditCard, BookOpen, GraduationCap, MapPin, Layers, Check, X, RefreshCw, LogOut, ExternalLink, Calendar, Shield, Star, Plus, Users, User as UserIcon, Zap, MessageCircle, Clock, Video, Handshake, ChevronRight, AlertCircle, Sparkles, Save, Trash2, BookOpenCheck, Camera, Image as ImageIcon, Crop, MoreVertical, Share2, Edit, Menu, Copy, Link2, Monitor, ShoppingBag } from 'lucide-react';
+import { analyzeUrl } from '../lib/video-utils';
 import { motion, AnimatePresence } from 'motion/react';
 import Cropper from 'react-easy-crop';
 import { Area } from 'react-easy-crop';
@@ -55,6 +56,45 @@ const RatingModal = ({ isOpen, onClose, onRate, name }: { isOpen: boolean, onClo
                                 className="flex-1 py-3 bg-primary text-bg-main rounded-xl text-xs font-bold shadow-lg shadow-primary/20 active:scale-95 transition-all"
                             >
                                 Submit Rating
+                            </button>
+                        </div>
+                    </motion.div>
+                </div>
+            )}
+        </AnimatePresence>
+    );
+};
+
+const DeleteModal = ({ isOpen, onClose, onConfirm, title, message }: { isOpen: boolean, onClose: () => void, onConfirm: () => void, title: string, message: string }) => {
+    return (
+        <AnimatePresence>
+            {isOpen && (
+                <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 font-sans">
+                    <motion.div 
+                        initial={{ scale: 0.95, opacity: 0, y: 20 }}
+                        animate={{ scale: 1, opacity: 1, y: 0 }}
+                        exit={{ scale: 0.95, opacity: 0, y: 20 }}
+                        className="bg-theme-card w-full max-w-sm rounded-[32px] p-8 border border-border-main space-y-6 shadow-2xl text-center"
+                    >
+                        <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto text-red-500 mb-2">
+                            <Trash2 size={40} strokeWidth={2.5} />
+                        </div>
+                        <div className="space-y-2">
+                            <h4 className="text-xl font-black text-text-main tracking-tighter">{title || 'Confirm Deletion'}</h4>
+                            <p className="text-[11px] text-text-muted leading-relaxed font-bold px-4">{message}</p>
+                        </div>
+                        <div className="flex gap-3 pt-2">
+                            <button 
+                                onClick={onClose} 
+                                className="flex-1 py-4 text-[11px] font-black text-text-muted hover:text-text-main transition-colors bg-hover-bg rounded-2xl"
+                            >
+                                Not Now
+                            </button>
+                            <button 
+                                onClick={() => { onConfirm(); onClose(); }}
+                                className="flex-2 py-4 bg-red-500 text-bg-main rounded-2xl text-[11px] font-black shadow-xl shadow-red-500/20 active:scale-95 transition-all"
+                            >
+                                Delete Record
                             </button>
                         </div>
                     </motion.div>
@@ -456,8 +496,6 @@ export default function ProfilePage() {
   const [selectedDAOGroup, setSelectedDAOGroup] = useState<DAOGroup | null>(null);
   const [showDAOEdit, setShowDAOEdit] = useState(false);
   const [activeDAOMenu, setActiveDAOMenu] = useState<string | null>(null);
-  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
-  const [showCourseEdit, setShowCourseEdit] = useState(false);
   const [activeCourseMenu, setActiveCourseMenu] = useState<string | null>(null);
   const [learnerSessions, setLearnerSessions] = useState<Session[]>([]);
   const [teacherSessions, setTeacherSessions] = useState<Session[]>([]);
@@ -475,11 +513,19 @@ export default function ProfilePage() {
   const [pendingRequests, setPendingRequests] = useState<LearningRequest[]>([]);
   const [sessionTab, setSessionTab] = useState<'ongoing' | 'upcoming' | 'past'>('upcoming');
 
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<{ id: string, title: string, type: 'course' | 'dao' | 'session' } | null>(null);
+
   const handleDeleteDAO = async (group: DAOGroup) => {
-    if (!confirm(`Are you sure you want to delete "${group.name}"? This action cannot be undone.`)) return;
+    setActiveDAOMenu(null);
+    setItemToDelete({ id: group.id, title: group.name, type: 'dao' });
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeleteDAO = async () => {
+    if (!itemToDelete) return;
     try {
-        await deleteDoc(doc(db, 'daoGroups', group.id));
-        setActiveDAOMenu(null);
+        await deleteDoc(doc(db, 'daoGroups', itemToDelete.id));
     } catch (err) {
         console.error("Delete DAO error:", err);
         alert("Failed to delete DAO group.");
@@ -502,10 +548,15 @@ export default function ProfilePage() {
   };
 
   const handleDeleteCourse = async (course: Course) => {
-    if (!confirm(`Are you sure you want to delete "${course.title}"? This action cannot be undone.`)) return;
+    setActiveCourseMenu(null);
+    setItemToDelete({ id: course.id, title: course.title, type: 'course' });
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeleteCourse = async () => {
+    if (!itemToDelete) return;
     try {
-        await deleteDoc(doc(db, 'courses', course.id));
-        setActiveCourseMenu(null);
+        await deleteDoc(doc(db, 'courses', itemToDelete.id));
     } catch (err) {
         console.error("Delete course error:", err);
         alert("Failed to delete course.");
@@ -523,23 +574,6 @@ export default function ProfilePage() {
     } else {
         navigator.clipboard.writeText(shareUrl);
         alert("Course link copied to clipboard!");
-    }
-  };
-
-  const updateCourse = async () => {
-    if (!selectedCourse) return;
-    try {
-        await updateDoc(doc(db, 'courses', selectedCourse.id), {
-            title: selectedCourse.title,
-            link: selectedCourse.link,
-            thumbnail: selectedCourse.thumbnail,
-            daoGroupLink: selectedCourse.daoGroupLink || ''
-        });
-        setShowCourseEdit(false);
-        alert("Course updated successfully!");
-    } catch (err) {
-        console.error("Update course error:", err);
-        alert("Failed to update course.");
     }
   };
 
@@ -644,35 +678,40 @@ export default function ProfilePage() {
     }
   }, [authProfile]);
 
-  // 2. Data Fetching (Sessions, Requests, Courses)
-  const fetchProfileData = async () => {
+  // 2. Data Fetching (Real-time snapshots)
+  useEffect(() => {
     if (!user) return;
-    try {
-        const [learnerSnap, teacherSnap, coursesSnap, daoSnap, requestsSnap] = await Promise.all([
-            getDocs(query(collection(db, 'sessions'), where('learnerId', '==', user.uid))),
-            getDocs(query(collection(db, 'sessions'), where('teacherId', '==', user.uid))),
-            getDocs(query(collection(db, 'courses'), where('teacherId', '==', user.uid))),
-            getDocs(query(collection(db, 'daoGroups'), where('adminId', '==', user.uid))),
-            getDocs(query(collection(db, 'learningRequests'), where('recipientId', '==', user.uid)))
-        ]);
+    
+    const unsubSessionsL = onSnapshot(query(collection(db, 'sessions'), where('learnerId', '==', user.uid)), (snap) => {
+        setLearnerSessions(snap.docs.map(d => ({ id: d.id, ...d.data() } as Session)));
+    });
+    
+    const unsubSessionsT = onSnapshot(query(collection(db, 'sessions'), where('teacherId', '==', user.uid)), (snap) => {
+        setTeacherSessions(snap.docs.map(d => ({ id: d.id, ...d.data() } as Session)));
+    });
 
-        setLearnerSessions(learnerSnap.docs.map(d => ({ id: d.id, ...d.data() } as Session)));
-        setTeacherSessions(teacherSnap.docs.map(d => ({ id: d.id, ...d.data() } as Session)));
-        
-        const allItems = coursesSnap.docs.map(d => ({ id: d.id, ...d.data() } as Course));
+    const unsubCourses = onSnapshot(query(collection(db, 'courses'), where('teacherId', '==', user.uid)), (snap) => {
+        const allItems = snap.docs.map(d => ({ id: d.id, ...d.data() } as Course));
         setMyCourses(allItems.filter(i => i.itemType !== 'book'));
         setMyOwnBooks(allItems.filter(i => i.itemType === 'book' && (i.bookOrigin === 'own' || !i.bookOrigin)));
         setMyMarketplaceBooks(allItems.filter(i => i.itemType === 'book' && i.bookOrigin === 'affiliate'));
-        
-        setMyDAOGroups(daoSnap.docs.map(d => ({ id: d.id, ...d.data() } as DAOGroup)));
-        setPendingRequests(requestsSnap.docs.map(d => ({ id: d.id, ...d.data() } as LearningRequest)));
-    } catch (err) {
-        console.error("Error fetching profile data:", err);
-    }
-  };
+    });
 
-  useEffect(() => {
-    fetchProfileData();
+    const unsubDAO = onSnapshot(query(collection(db, 'daoGroups'), where('adminId', '==', user.uid)), (snap) => {
+        setMyDAOGroups(snap.docs.map(d => ({ id: d.id, ...d.data() } as DAOGroup)));
+    });
+
+    const unsubRequests = onSnapshot(query(collection(db, 'learningRequests'), where('recipientId', '==', user.uid)), (snap) => {
+        setPendingRequests(snap.docs.map(d => ({ id: d.id, ...d.data() } as LearningRequest)));
+    });
+
+    return () => {
+        unsubSessionsL();
+        unsubSessionsT();
+        unsubCourses();
+        unsubDAO();
+        unsubRequests();
+    };
   }, [user]);
 
   // 2.5 Fetch Stats for Joined Groups
@@ -1142,8 +1181,13 @@ export default function ProfilePage() {
   };
 
   const cancelSession = async (sessionId: string) => {
-    if (!window.confirm('Are you sure you want to cancel this contract?')) return;
-    await updateDoc(doc(db, 'sessions', sessionId), { status: 'Cancelled' });
+    setItemToDelete({ id: sessionId, title: 'This Session', type: 'session' });
+    setShowDeleteModal(true);
+  };
+
+  const confirmCancelSession = async () => {
+    if (!itemToDelete) return;
+    await updateDoc(doc(db, 'sessions', itemToDelete.id), { status: 'Cancelled' });
   };
 
   const rateSession = async (session: Session, score: number, review: string) => {
@@ -1471,7 +1515,7 @@ export default function ProfilePage() {
                                             className="absolute right-4 bottom-12 w-40 bg-theme-card border-2 border-border-main rounded-2xl shadow-2xl z-20 overflow-hidden"
                                         >
                                             <button 
-                                                onClick={() => { setSelectedCourse(course); setShowCourseEdit(true); setActiveCourseMenu(null); }}
+                                                onClick={() => { navigate(`/edit-course/${course.id}`); setActiveCourseMenu(null); }}
                                                 className="w-full flex items-center gap-3 px-4 py-3 text-[11px] font-bold text-text-main hover:bg-hover-bg transition-colors border-b border-border-main"
                                             >
                                                 <Edit size={14} className="text-primary" /> Edit Course
@@ -1542,7 +1586,7 @@ export default function ProfilePage() {
                                             className="absolute right-2 bottom-10 w-32 bg-theme-card border-2 border-border-main rounded-xl shadow-2xl z-20 overflow-hidden"
                                         >
                                             <button 
-                                                onClick={() => { setSelectedCourse(book); setShowCourseEdit(true); setActiveCourseMenu(null); }}
+                                                onClick={() => { navigate(`/edit-course/${book.id}`); setActiveCourseMenu(null); }}
                                                 className="w-full flex items-center gap-2 px-3 py-2 text-[10px] font-bold text-text-main hover:bg-hover-bg"
                                             >
                                                 <Edit size={12} className="text-primary" /> Edit
@@ -1610,7 +1654,7 @@ export default function ProfilePage() {
                                             className="absolute right-2 bottom-10 w-32 bg-theme-card border-2 border-border-main rounded-xl shadow-2xl z-20 overflow-hidden"
                                         >
                                             <button 
-                                                onClick={() => { setSelectedCourse(book); setShowCourseEdit(true); setActiveCourseMenu(null); }}
+                                                onClick={() => { navigate(`/edit-course/${book.id}`); setActiveCourseMenu(null); }}
                                                 className="w-full flex items-center gap-2 px-3 py-2 text-[10px] font-bold text-text-main hover:bg-hover-bg"
                                             >
                                                 <Edit size={12} className="text-primary" /> Edit
@@ -1991,73 +2035,17 @@ export default function ProfilePage() {
                 name={selectedSessionForRating.teacherId === user.uid ? selectedSessionForRating.learnerName : selectedSessionForRating.teacherName}
             />
         )}
-      </AnimatePresence>
-
-      {/* Course Edit Modal */}
-      <AnimatePresence>
-        {showCourseEdit && selectedCourse && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center bg-text-main/20 backdrop-blur-sm p-4">
-                <motion.div 
-                    initial={{ scale: 0.9, opacity: 0 }} 
-                    animate={{ scale: 1, opacity: 1 }} 
-                    exit={{ scale: 0.9, opacity: 0 }}
-                    className="w-full max-w-sm bg-theme-card rounded-[2.5rem] p-8 space-y-6 border border-border-main relative overflow-hidden shadow-2xl"
-                >
-                    <div className="flex items-center justify-between">
-                        <h2 className="text-lg font-bold text-text-main tracking-tight">Edit course</h2>
-                        <button onClick={() => setShowCourseEdit(false)} className="p-2 bg-hover-bg rounded-xl text-text-muted hover:text-text-main">
-                            <X size={20} />
-                        </button>
-                    </div>
-
-                    <div className="space-y-4">
-                        <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-text-muted ml-1">Course title</label>
-                            <input 
-                                value={selectedCourse.title} 
-                                onChange={e => setSelectedCourse({...selectedCourse, title: e.target.value})}
-                                className="w-full bg-hover-bg border-2 border-transparent focus:border-primary/20 rounded-2xl px-5 py-4 text-sm font-bold outline-none focus:bg-hover-bg/40 transition-all text-text-main"
-                                placeholder="Enter title"
-                            />
-                        </div>
-                        <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-text-muted ml-1">Video/Resource URL</label>
-                            <input 
-                                value={selectedCourse.link} 
-                                onChange={e => setSelectedCourse({...selectedCourse, link: e.target.value})}
-                                className="w-full bg-hover-bg border-2 border-transparent focus:border-primary/20 rounded-2xl px-5 py-4 text-sm font-bold outline-none focus:bg-hover-bg/40 transition-all text-text-main"
-                                placeholder="e.g. YouTube link"
-                            />
-                        </div>
-                        <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-text-muted ml-1">Thumbnail URL</label>
-                            <input 
-                                value={selectedCourse.thumbnail} 
-                                onChange={e => setSelectedCourse({...selectedCourse, thumbnail: e.target.value})}
-                                className="w-full bg-hover-bg border-2 border-transparent focus:border-primary/20 rounded-2xl px-5 py-4 text-sm font-bold outline-none focus:bg-hover-bg/40 transition-all text-text-main"
-                                placeholder="Image URL"
-                            />
-                        </div>
-                        <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-text-muted ml-1">DAO Group Link (Optional)</label>
-                            <input 
-                                value={selectedCourse.daoGroupLink || ''} 
-                                onChange={e => setSelectedCourse({...selectedCourse, daoGroupLink: e.target.value})}
-                                className="w-full bg-hover-bg border-2 border-transparent focus:border-primary/20 rounded-2xl px-5 py-4 text-sm font-bold outline-none focus:bg-hover-bg/40 transition-all text-text-main"
-                                placeholder="DAO Link"
-                            />
-                        </div>
-                    </div>
-
-                    <button 
-                        onClick={updateCourse}
-                        className="w-full py-4 bg-primary text-bg-main rounded-2xl font-bold text-xs shadow-xl shadow-primary/20 active:scale-[0.98] transition-all"
-                    >
-                        Update course
-                    </button>
-                </motion.div>
-            </div>
-        )}
+        <DeleteModal 
+            isOpen={showDeleteModal}
+            onClose={() => { setShowDeleteModal(false); setItemToDelete(null); }}
+            onConfirm={() => {
+                if (itemToDelete?.type === 'course') confirmDeleteCourse();
+                if (itemToDelete?.type === 'dao') confirmDeleteDAO();
+                if (itemToDelete?.type === 'session') confirmCancelSession();
+            }}
+            title={`Delete ${itemToDelete?.type === 'course' ? 'Resource' : itemToDelete?.type === 'dao' ? 'DAO Group' : 'Contract'}`}
+            message={`Are you sure you want to delete "${itemToDelete?.title}"? This process is irreversible and all associated data will be purged.`}
+        />
       </AnimatePresence>
 
       <div className="h-24" />
