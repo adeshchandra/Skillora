@@ -102,6 +102,14 @@ export default function SubscriptionPage() {
   const [submitting, setSubmitting] = useState(false);
   const [mySubs, setMySubs] = useState<SubscriptionType[]>([]);
   const [copied, setCopied] = useState(false);
+  const [justActivated, setJustActivated] = useState(false);
+
+  // Sync justActivated state when profile premium status changes
+  useEffect(() => {
+    if (profile?.isPremium && !justActivated) {
+      setJustActivated(true);
+    }
+  }, [profile?.isPremium]);
 
   const PAYMENT_NUMBER = "01934264301";
 
@@ -204,6 +212,48 @@ export default function SubscriptionPage() {
 
   return (
     <div className="min-h-screen bg-bg-main pb-24">
+      {/* Premium Activation Overlay */}
+      <AnimatePresence>
+        {justActivated && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+            <motion.div 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }} 
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/80 backdrop-blur-xl"
+            />
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="relative w-full max-w-sm bg-theme-card rounded-[40px] border-2 border-primary p-8 text-center space-y-6 shadow-[0_0_50px_rgba(var(--primary-rgb),0.3)]"
+            >
+              <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mx-auto relative">
+                <motion.div 
+                  animate={{ scale: [1, 1.2, 1] }} 
+                  transition={{ duration: 2, repeat: Infinity }}
+                  className="absolute inset-0 bg-primary/5 rounded-full"
+                />
+                <ShieldCheck size={48} className="text-primary" />
+              </div>
+              <div className="space-y-2">
+                <h2 className="text-2xl font-black text-text-main tracking-tight uppercase">Premium Activated!</h2>
+                <p className="text-sm text-text-muted font-bold leading-relaxed px-4">
+                  Welcome to Skillora Professional. Your account has been upgraded and all premium features are now unlocked.
+                </p>
+              </div>
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onClick={() => navigate('/')}
+                className="w-full py-5 bg-primary text-bg-main rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-primary/20"
+              >
+                Let's Start Learning
+              </motion.button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       {/* Header */}
       <div className="sticky top-0 z-50 bg-bg-main/80 backdrop-blur-md px-4 h-16 flex items-center justify-between border-b border-border-main">
         <button onClick={() => navigate(-1)} className="p-2 hover:bg-hover-bg rounded-xl transition-colors">

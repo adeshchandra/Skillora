@@ -23,17 +23,39 @@ service cloud.firestore {
         && data.get('transactionId', '') is string && data.get('transactionId', '').size() <= 100
         && data.get('amount', 0) is number
         && data.get('status', 'pending') in ['pending', 'approved', 'rejected']
+        && (data.get('packageType', '') is string)
+        && (data.get('userName', '') is string)
         && (data.get('createdAt', null) == null || data.createdAt is timestamp || data.createdAt is string);
     }
 
     function isValidUser(data) {
-      return data.get('uid', '') == request.auth.uid 
+      return (data.get('uid', '') == '' || data.get('uid', '') == request.auth.uid)
         && (data.get('email', '') == '' || data.get('email', '') is string)
         && (data.get('displayName', '') == '' || (data.get('displayName', '') is string && data.get('displayName', '').size() <= 256))
         && (data.get('photoURL', null) == null || data.photoURL is string)
         && (data.get('credits', null) == null || data.credits is number)
         && (data.get('role', null) == null || data.role is string)
+        && (data.get('bio', null) == null || data.bio is string)
+        && (data.get('location', null) == null || data.location is string)
+        && (data.get('onboardingCompleted', null) == null || data.onboardingCompleted is bool)
+        && (data.get('isPremium', null) == null || data.isPremium is bool)
+        && (data.get('subscriptionStatus', null) == null || data.subscriptionStatus is string)
+        && (data.get('teachSkills', null) == null || data.teachSkills is list)
+        && (data.get('learnSkills', null) == null || data.learnSkills is list)
+        && (data.get('joinedGroups', null) == null || data.joinedGroups is list)
+        && (data.get('rating', null) == null || data.rating is number)
+        && (data.get('reviewCount', null) == null || data.reviewCount is number)
+        && (data.get('darkMode', null) == null || data.darkMode is bool)
+        && (data.get('trialStartedAt', null) == null || data.trialStartedAt is string || data.trialStartedAt is timestamp)
+        && (data.get('premiumExpiresAt', null) == null || data.premiumExpiresAt is string || data.premiumExpiresAt is timestamp)
         && (data.get('createdAt', null) == null || data.createdAt is string || data.createdAt is timestamp);
+    }
+
+    function isValidSkillRequest(data) {
+      return isValidId(data.get('userId', ''))
+        && data.get('skill', '') is string
+        && (data.get('status', 'Pending') in ['Pending', 'Completed', 'Cancelled'])
+        && (data.get('createdAt', null) == null || data.createdAt is timestamp || data.createdAt is string);
     }
 
     function isValidQuiz(data) {
@@ -75,6 +97,9 @@ service cloud.firestore {
         && (data.get('duration', null) == null || data.get('duration', '') is string)
         && (data.get('contactMedia', null) == null || data.get('contactMedia', '') is string)
         && (data.get('contactInfo', null) == null || data.get('contactInfo', '') is string)
+        && (data.get('senderPhoto', null) == null || data.senderPhoto is string)
+        && (data.get('recipientPhoto', null) == null || data.recipientPhoto is string)
+        && (data.get('conversationId', null) == null || data.conversationId is string)
         && (data.get('message', null) == null || data.get('message', '') is string)
         && (data.get('createdAt', null) == null || data.get('createdAt', null) is timestamp || data.get('createdAt', null) is string);
     }
@@ -95,6 +120,12 @@ service cloud.firestore {
 
     // --- Collections ---
 
+    match /skillRequests/{requestId} {
+      allow read: if true;
+      allow create: if isSignedIn() && incoming().userId == request.auth.uid && isValidSkillRequest(incoming());
+      allow update, delete: if isSignedIn() && (isAdmin() || existing().userId == request.auth.uid);
+    }
+
     match /subscriptions/{subId} {
       allow read: if isSignedIn() && (isAdmin() || resource.data.userId == request.auth.uid);
       allow create: if isSignedIn() && incoming().userId == request.auth.uid && isValidSubscription(incoming());
@@ -108,7 +139,7 @@ service cloud.firestore {
         isAdmin() ||
         (isOwner(userId) && (
           // Action: Profile Update
-          (incoming().diff(existing()).affectedKeys().hasOnly(['photoURL', 'displayName', 'bio', 'location', 'teachSkills', 'learnSkills', 'privacy', 'onboardingCompleted', 'credits', 'role'])) ||
+          (incoming().diff(existing()).affectedKeys().hasOnly(['photoURL', 'displayName', 'bio', 'location', 'teachSkills', 'learnSkills', 'privacy', 'onboardingCompleted', 'credits', 'role', 'isPremium', 'subscriptionStatus', 'premiumExpiresAt', 'trialStartedAt', 'darkMode', 'joinedGroups', 'rating', 'reviewCount'])) ||
           // Fallback
           isValidUser(incoming())
         )) ||
@@ -140,11 +171,10 @@ service cloud.firestore {
 
     match /daoGroups/{groupId} {
       allow read: if true;
-      allow create: if isSignedIn() && isValidId(incoming().get('adminId', '')) && incoming().adminId == request.auth.uid;
+      allow create: if isSignedIn() && (incoming().adminId == request.auth.uid);
       allow update: if isSignedIn() && (
         (existing().adminId == request.auth.uid) ||
-        (incoming().diff(existing()).affectedKeys().hasAny(['membersCount', 'rating', 'ratingCount']) &&
-         incoming().diff(existing()).affectedKeys().hasOnly(['membersCount', 'rating', 'ratingCount']))
+        (incoming().diff(existing()).affectedKeys().hasAny(['membersCount', 'rating', 'ratingCount']))
       );
       allow delete: if isSignedIn() && existing().adminId == request.auth.uid;
 

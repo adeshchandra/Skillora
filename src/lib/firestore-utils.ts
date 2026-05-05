@@ -92,8 +92,8 @@ export const LIMITS = {
 export function checkSubscriptionAccess(profile: any) {
   if (!profile) return { allowed: false, reason: 'unauthenticated' };
   
-  // If premium, they are always allowed (limits handled separately if needed)
-  if (profile.isPremium) return { allowed: true };
+  // Premium if isPremium boolean is true OR status is 'active' string
+  if (profile.isPremium || profile.subscriptionStatus === 'active') return { allowed: true };
 
   // Check Trial
   if (profile.trialStartedAt) {

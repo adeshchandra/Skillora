@@ -30,12 +30,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [credits, setCredits] = useState(0);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [unreadMessages, setUnreadMessages] = useState(0);
+  const [hasApprovedSub, setHasApprovedSub] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
     let unsubProfile: (() => void) | null = null;
     let unsubNotif: (() => void) | null = null;
     let unsubMsg: (() => void) | null = null;
+    let unsubSubs: (() => void) | null = null;
 
     const unsubscribe = onAuthStateChanged(auth, (u) => {
       unsubProfile?.();
@@ -49,7 +51,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         unsubProfile = onSnapshot(userDocRef, (snap) => {
           if (snap.exists()) {
             const data = snap.data();
-            setProfile({ ...data, uid: u.uid });
+            // Source of truth for premium is the 'active' string in subscriptionStatus
+            const isPremiumStatus = data.subscriptionStatus === 'active';
+            setProfile({ 
+              ...data, 
+              uid: u.uid,
+              isPremium: data.isPremium || isPremiumStatus || hasApprovedSub
+            });
             const val = data.credits;
             setCredits(typeof val === 'number' && !isNaN(val) ? val : 0);
           } else {
@@ -59,6 +67,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }, (error) => {
           console.error("Profile sync error:", error);
           setLoading(false);
+        });
+
+        // Listen for approved subscriptions to enable real-time activation from console
+        const qSubs = query(collection(db, 'subscriptions'), where('userId', '==', u.uid), where('status', '==', 'approved'));
+        unsubSubs = onSnapshot(qSubs, (snap) => {
+          const approved = !snap.empty;
+          setHasApprovedSub(approved);
+          if (approved) {
+            // Auto-sync back to profile for consistency if needed
+            setDoc(userDocRef, { subscriptionStatus: 'active', isPremium: true }, { merge: true });
+          }
         });
 
         const qNotif = query(collection(db, 'notifications'), where('userId', '==', u.uid), where('read', '==', false));
@@ -90,6 +109,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       unsubProfile?.();
       unsubNotif?.();
       unsubMsg?.();
+      unsubSubs?.();
     };
   }, []);
 
