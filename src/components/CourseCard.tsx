@@ -21,17 +21,17 @@ interface CourseCardProps {
 const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { activeVideoId, toggleVideo } = useVideoPlayer();
+  const { activeVideoId, autoplayId, toggleVideo, registerVisible, unregisterVisible } = useVideoPlayer();
   const [hasVisited, setHasVisited] = useState(false);
   const [hasRated, setHasRated] = useState(false);
   const [isRating, setIsRating] = useState(false);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [hasSentRequest, setHasSentRequest] = useState(false);
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
-  const [isInViewport, setIsInViewport] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
   const isPlaying = activeVideoId === course.id;
+  const isAutoPlaying = autoplayId === course.id;
   const videoInfo = parseVideoUrl(course.link);
   const resourceInfo = analyzeUrl(course.link);
 
@@ -39,7 +39,11 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        setIsInViewport(entry.isIntersecting);
+        if (entry.isIntersecting) {
+          registerVisible(course.id, entry.boundingClientRect.top);
+        } else {
+          unregisterVisible(course.id);
+        }
       },
       { threshold: 0.6 } // Play when 60% visible
     );
@@ -48,8 +52,11 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
       observer.observe(cardRef.current);
     }
 
-    return () => observer.disconnect();
-  }, []);
+    return () => {
+      observer.disconnect();
+      unregisterVisible(course.id);
+    };
+  }, [course.id, registerVisible, unregisterVisible]);
 
   useEffect(() => {
     if (!user || !course?.id) return;
@@ -153,7 +160,7 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
   };
 
   return (
-    <div ref={cardRef} className="flex flex-col bg-bg-main mb-2 border-b border-border-main last:border-0 transition-colors">
+    <div ref={cardRef} className="flex flex-col bg-bg-main mb-2 last:border-0 transition-colors">
       <div 
         className="relative aspect-video w-full cursor-pointer group overflow-hidden" 
         onClick={() => {
@@ -193,7 +200,7 @@ const CourseCard = ({ course, hideTeacher = false }: CourseCardProps) => {
                 <X size={16} />
               </button>
             </motion.div>
-          ) : (isInViewport && videoInfo && !isPlaying) ? (
+          ) : (isAutoPlaying && videoInfo && !isPlaying) ? (
             <motion.div
                 key="autoplay-preview"
                 initial={{ opacity: 0 }}
